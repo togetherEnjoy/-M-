@@ -1,0 +1,124 @@
+/*=======reset css========*/
+body,
+p,
+h1,
+h2,
+h3,
+h4,
+ul,
+li,
+dl,
+dd,
+dt,
+input,
+figure,
+div,
+header,
+nav,
+main,
+footer,
+section,
+article,
+aside,
+*::before,
+*::after {
+    /*所有的标签，和伪元素都选中*/
+    margin: 0;
+    padding: 0;
+    /*移动端常用布局是非固定像素*/
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    /*点击高亮效果的清除*/
+    tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-size: 12px;
+    font-family: "Microsoft YaHei", sans-serif;
+    color: #0D1C31;
+    // user-select: none;
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+}
+
+i,
+em {
+    font-style: normal;
+}
+
+input,
+textarea,
+button,
+select {
+    border: none;
+    outline: none;
+    /*不允许改变尺寸*/
+    resize: none;
+    /*元素的外观  none没有任何样式*/
+    -webkit-appearance: none;
+}
+button {
+    cursor: pointer;
+}
+
+/*=======common css========*/
+.flex {
+    display: flex;
+}
+.blue {
+    color: #5C98F8;
+}
+
+.s2 {
+    margin-top: 25px;
+    height: 42px;
+    display: flex;
+  }
+
+.clearFix::before,
+.clearFix::after {
+    content: "";
+    display: block;
+    visibility: hidden;
+    height: 0;
+    line-height: 0;
+    clear: both;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+  position: absolute;
+}
+.fade-leave-to {
+    // display: none !important;
+}
+
+.fade-enter-to,
+.fade-leave {
+  opacity: 1;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all .1s;
+}
+
+
+// 
+.backoff {
+    width: 17px;
+    height: 32px;
+    position: absolute;
+    left: 40px;
+    top: 28px;
+  }
