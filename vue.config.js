@@ -1,7 +1,7 @@
 const pxtorem = require('postcss-pxtorem')
 const autoprefixer = require('autoprefixer')
 module.exports = {
-  publicPath: '/',
+  publicPath: './',
   devServer: {
     proxy: {
       '/dhr': {
@@ -28,5 +28,6 @@ module.exports = {
       },
 
     }
-  }
+  },
+  outputDir: process.env.outputDir
 }

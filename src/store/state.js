@@ -2,7 +2,8 @@
 
 const state = {
     list: {},
-    detail_id: ''
+    detail_id: '',
+    title: ''
 }
 
 export default state

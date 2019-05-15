@@ -1,7 +1,7 @@
 <template>
   <div class="hot_detail" ref="hotD">
     <div class="top_bar">
-      <div class="t_l"></div>
+      <div class="t_l" @click="$router.push({path: '/'})"></div>
       <div class="t_c">
         <img src="../../assets/images/hot/tit2.png">
       </div>
@@ -15,31 +15,31 @@
       <h3>{{content['name']}}</h3>
 
       <p class="hover">
-        {{ content['lables'] }} · {{ _getDateDiff(content['createdAt']) }}
+        {{ simpleName }} · {{ _getDateDiff(content['createdAt']) }}
         <span>评论数：{{ count }}</span>
       </p>
 
       <div class="ctx">
-        <div class="ctx_img">
-          <img :src="content['coverImg']">
-        </div>
-
-        <div class="ctx_t" v-html="content['content']">
-          <!-- <p>{{ content['content'] }}</p> -->
-        </div>
+        <div class="ctx_t" v-html="content['content']"></div>
       </div>
     </div>
 
     <!-- 相关文章 -->
     <div class="rel_box">
       <h1>相关文章</h1>
-      <div v-for="(list, i) in hot_content_list.slice(0,3)" :key="i" @click="reload(list.id)">
-        <div class="rel">
+      <div
+        v-for="(list, i) in hot_content_list.slice(0,3)"
+        :key="i"
+        @click="reload(list.id, list.name)"
+        style="cursor:pointer"
+      >
+        <div class="rel" style="cursor:pointer">
           <div class="hot_item" v-if="!list.coverImg1 && !list.coverImg2">
             <div class="item_left">
               <p class="txt">{{ list.name }}</p>
               <p class="hover">
-                {{ list.simpleName }} · {{ _getDateDiff(list.createdAt) }}
+                <i v-if="list.simpleName">{{ list.simpleName }}</i>
+                · {{ _getDateDiff(list.createdAt) }}
                 <span>评论数：{{ list.commentCount }}</span>
               </p>
             </div>
@@ -65,7 +65,8 @@
             </div>
             <div class="all_b">
               <p class="hover">
-                {{ list.simpleName }} · {{ _getDateDiff(list.createdAt) }}
+                <i>{{ list.simpleName }}</i>
+                · {{ _getDateDiff(list.createdAt) }}
                 <span>评论数：{{ list.commentCount }}</span>
               </p>
             </div>
@@ -82,14 +83,14 @@
           <div class="heads">
             <img src="../../assets/images/hot/common.png">
           </div>
-          <p>{{ comm.id }}</p>
+          <p>热心网友</p>
         </div>
 
         <div class="c_hua">
           <p>{{ comm.content }}</p>
         </div>
       </div>
-      <p class="lookmore" @click="moreComment">查看更多</p>
+      <!-- <p class="lookmore" @click="moreComment"  v-show="count > 5">查看更多</p> -->
     </div>
 
     <!-- 评论 -->
@@ -98,34 +99,14 @@
     </div>
 
     <!-- 咨询 -->
-    <div class="zi">
-      <div class="z_l">
-        <div class="z_l_img">
-          <!-- :src="content.merchant.headImg ? content.merchant.headImg : head_img" -->
-          <img :src="head_img">
-        </div>
-        <div class="z_l_t">
-          <!-- {{ content.merchant.simpleName }} -->
-          <h3>{{ content.merchant['simpleName'] }}</h3>
-          <p>咨询量：500</p>
-        </div>
-      </div>
-      <div class="z_c">
-        <p>立即咨询</p>
-      </div>
-      <div class="z_r">
-        <p>
-          <a href="tel:176 3097 1140">免费电话</a>
-        </p>
-      </div>
-    </div>
+    <con :simpleName="simpleName"/>
 
     <!-- 评论组 -->
     <div class="from_group" @touchmove.prevent ref="inpBox">
       <p>
         <span @click="sendComment">发布</span>
       </p>
-      <textarea placeholder="至少5个字哦~" ref="inp" :v-model="comment_content" minlength="5"></textarea>
+      <textarea placeholder ref="inp" :v-model="comment_content" minlength="5"></textarea>
     </div>
 
     <div class="mask" @click="down" @touchmove.prevent></div>
@@ -137,9 +118,10 @@ const MORE_LIMIT = 5;
 const TEXT_LEN = 5;
 import { Toast } from "vant";
 import { getDateDiff } from "../../api/api.js";
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 import { type } from "os";
-import { request } from "http";
+import con from "../../components/conf";
+import wxApi from "../../common/wxapi.js";
 export default {
   props: {},
   data() {
@@ -152,21 +134,62 @@ export default {
       comment: [],
       page: 1,
       limit: 5,
-      head_img: require("../../assets/images/hot/2.png"),
-      hot_content_list: []
+      head_img: require("../../assets/images/hot/logo2.png"),
+      hot_content_list: [],
+      simpleName: ""
     };
   },
+  mounted() {
+    wxApi.wxRegister(this.wxRegCallback);
+  },
   computed: {
-    // hot_content_list() {
-    //   if (this.list) return this.list.slice(0, 3);
-    // },
-
-    ...mapGetters(["list"])
+    tit() {
+      return this.title;
+    },
+    ...mapGetters(["list", "title"])
   },
   methods: {
-    reload(id) {
-      this.$router.replace({ path:  `/news/newsd`,query: {id}});
-     this.$router.go(0)
+    wxRegCallback() {
+      // 用于微信JS-SDK回调
+      this.wxShareTimeline();
+      this.wxShareAppMessage();
+    },
+    wxShareTimeline() {
+      let option = {
+        title: '限时团购周 挑战最低价',
+        link: location.href.split('#')[0],
+        imgUrl: this.content.coverImg,
+        success: () => {
+          alert('分享成功')
+        },
+        error: () => {
+          alert('分享失败')
+        }
+      }
+
+      wxApi.ShareTimeline(option)
+    },
+    wxShareAppMessage() {
+      let option = {
+        title: '限时团购周 挑战最低价',
+        link: location.href.split('#')[0],
+        imgUrl: this.content.coverImg,
+        success: () => {
+          alert('分享成功')
+        },
+        error: () => {
+          alert('分享失败')
+        }
+      }
+
+      wxApi.ShareAppMessage(option)
+    },
+
+    reload(id, name) {
+      localStorage.setItem("title", name);
+      this.set_tit(name || localStorage.getItem("title"));
+      this.$router.replace({ path: `/news/newsd`, query: { id } });
+      this.$router.go(0);
     },
 
     // 加载更多评论
@@ -177,9 +200,7 @@ export default {
     // 获取评论api
     getComment() {
       this.$fetch(
-        `/dhr/client/comment/list?soft_language_id=${this.content.id}&page=${
-          this.page
-        }&limit=${this.limit}`
+        `/dhr/client/comment/list?soft_language_id=${this.content.id}`
       ).then(res => {
         console.log(res);
         this.comment = res.Result.data;
@@ -189,10 +210,6 @@ export default {
     // 发送评论api
     sendComment() {
       this.comment_content = this.$refs.inp.value;
-      if (this.comment_content.length < TEXT_LEN) {
-        Toast.fail("内容太少");
-        return;
-      }
       this.$post("/dhr/client/comment", {
         soft_language_id: this.content.id,
         content: this.comment_content
@@ -212,14 +229,15 @@ export default {
       });
     },
     // 获取详情api
-    getDetails() {
+    getDetails(name) {
+      document.documentElement.scrollTop = 0 + "px";
       let { id } = this.$route.query;
       this.$fetch(`/dhr/client/article/${id}`).then(res => {
-        console.log(res);
         if (res.ErrCode == "0000") {
           this.content = res.Result;
-
-          console.log(this.content);
+          console.log(this.content)
+          this.set_tit(this.content.name); //讲name保存到 vuex中
+          this.simpleName = this.content.merchant.simpleName;
           this.getComment();
         }
       });
@@ -244,7 +262,13 @@ export default {
     },
     // 获取列表
     getList() {
-      this.$fetch(`/dhr/client/article/list?cate=1`)
+      let { index } = this.$route.query;
+      this.$fetch(
+        `/dhr/client/article/list${
+          index ? "?cate=" + index + "&showCityNum=0" : "?showCityNum=0"
+        }`
+      )
+
         .then(res => {
           if (res.Result.data.length > 0) {
             this.list_data = res.Result.data;
@@ -255,14 +279,30 @@ export default {
         .catch(err => {
           console.log(err);
         });
-    }
+    },
+    ...mapMutations({
+      set_tit: "SET_TITLE"
+    })
+  },
+  beforeRouteLeave(to, from, next) {
+    document.title =
+      "去海外网，海外房产，移民，留学，游学，东南亚，美国，英国，澳洲，加拿大，日本，希腊，圣基茨，塞浦路斯";
+    next();
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      document.title = vm.tit || localStorage.getItem("title") || "";
+      // document.body.scrollTop = 0;
+      // document.documentElement.scrollTop = 0;
+      // window.pageYOffset = 0;
+    });
   },
   created() {
     this.getList();
     this.getDetails();
-    // this.getComment();
-
-    document.documentElement.scrollTop = 0 + "px";
+  },
+  components: {
+    con
   }
 };
 </script>
@@ -277,7 +317,7 @@ export default {
 
 <style scoped lang="scss">
 .hot_detail {
-  overflow-y: hidden;
+  overflow: hidden;
   position: relative;
   &.open .mask {
     visibility: visible;
@@ -366,7 +406,9 @@ export default {
         line-height: 60px;
         font-weight: 500;
         img {
-
+          width: 690px !important;
+          height: 460px !important;
+          display: block;
         }
       }
     }
@@ -400,6 +442,7 @@ export default {
         .item_right {
           width: 240px;
           height: 160px;
+          overflow: hidden;
           img {
             display: block;
             width: 100%;
@@ -432,6 +475,7 @@ export default {
           img {
             display: block;
             width: 100%;
+            height: 100%;
           }
         }
       }
@@ -554,8 +598,10 @@ export default {
         align-self: center;
         img {
           display: block;
-          width: 100%;
-          height: 100%;
+          width: 70%;
+          object-position: center;
+          margin: 0 auto;
+          // height: 100%;
         }
       }
       .z_l_t {
