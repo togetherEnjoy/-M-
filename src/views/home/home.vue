@@ -15,16 +15,14 @@
     <!-- 精品推荐 -->
     <div class="jinp">
       <div class="tuij">精品推荐</div>
-      <div class="jinp_some">泰国</div>
-      <div class="jinp_some">日本</div>
-      <div class="jinp_some">新加坡</div>
+      <div class="jinp_some" v-for="(item, i) in recommen" :key="i">{{ item.img }}</div>
     </div>
 
     <div class="swip">
       <van-swipe indicator-color="white" :autoplay="3000">
-        <van-swipe-item v-for="(image, index) in 4">
+        <van-swipe-item v-for="(image, index) in swipeImg" :key="index">
           <div class="banner_box">
-            <img src="../../assets/images/home/m-banner.png">
+            <img v-lazy="image.img">
           </div>
         </van-swipe-item>
       </van-swipe>
@@ -422,21 +420,20 @@ export default {
       // 移民menu
       immig_menu: [],
       // 留学
-      study_menu: []
+      study_menu: [],
+      // 轮播图
+      swipeImg: [],
+      // 精品推荐
+      recommen: []
     };
   },
   mounted() {
     this.$nextTick(() => {
       let house = this.$refs;
-      console.log(house);
-      if (!this.houseBS) {
-        console.log(11);
-        // this.houseBS = new BScroll(house, BSConfigX);
-      }
       let yim = this.$refs.yim;
-      // if (!this.yim) {
-      //   this.yim = new BScroll(yim, BSConfigX);
-      // }
+      if (!this.yim) {
+        // this.yim = new BScroll(yim, BSConfigX);
+      }
     });
   },
   computed: {
@@ -446,10 +443,24 @@ export default {
     ...mapGetters(["list"])
   },
   methods: {
+    getSwipeImg() {
+      this.$fetch('/dhr/advertise/img?showCityNum=1').then(res => {
+        
+        if (res.ErrCode == '0000') {
+          this.swipeImg = res.Result.data.slice(0, 4)
+        }
+      })
+      this.$fetch('/dhr/advertise/text?showCityNum=1').then(res => {
+        // console.log(res)
+        if (res.ErrCode == '0000') {
+          this.recommen = res.Result.data
+          console.log( this.recommen)
+        }
+      })
+    },
     // 获取游学menu
     getStudyTourdata() {
       this.$fetch("/dhr/client/study_tour/menu").then(res => {
-        console.log(res);
         if (res.ErrCode == "0000") {
           this.yx_menu = res.Result.recruitStudent;
         }
@@ -472,7 +483,6 @@ export default {
         }
       });
     },
-
     // 获取房产国家
     getMenuData() {
       this.$fetch("/dhr/client/house/menu").then(res => {
@@ -483,8 +493,6 @@ export default {
     },
 
     // 游学
-    onYxLoad() {},
-    // onHsLoad() {},
     hsTabClick(i = 0) {
       this.house_data = [];
       this.$fetch("/dhr/client/house/list", {
@@ -511,7 +519,6 @@ export default {
         } else if (res.ErrCode == "9999") {
           this.$toast("刷新太快了");
         }
-        console.log(this.yx_data);
       });
     },
     // 上拉加载
@@ -609,6 +616,7 @@ export default {
       this.getStudyData();
       this.getStudyTourdata();
       this.yxBtnClick();
+      this.getSwipeImg()
     },
     ...mapMutations({
       set_list: "SET_LIST",
@@ -755,7 +763,7 @@ export default {
       height: 48px;
       line-height: 48px;
       text-align: center;
-      width: 116px;
+      padding: 0 15px;
       border: 1px solid #eee;
       border-radius: 24px;
     }

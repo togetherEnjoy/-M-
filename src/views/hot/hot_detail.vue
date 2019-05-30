@@ -657,11 +657,10 @@ export default {
   .from_group {
     width: 100%;
     background-color: #fff;
-    padding: 0 30px 15px;
+    padding: 0 30px 98px;
     position: fixed;
     bottom: 0;
     left: 0;
-    // transform: scale(0);
     transform: translatey(100%);
     transition: all 0.3s ease-out;
     z-index: 3;
@@ -675,6 +674,7 @@ export default {
     textarea {
       height: 280px;
       width: 100%;
+      width: calc(100% - 29px);
       font-size: 24px;
       color: #9399a5;
       background-color: #f8f8f8;
