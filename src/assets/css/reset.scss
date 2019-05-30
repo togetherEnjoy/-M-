@@ -31,6 +31,7 @@ aside,
     /*点击高亮效果的清除*/
     tap-highlight-color: transparent;
     -webkit-tap-highlight-color: transparent;
+    -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -38,6 +39,8 @@ body {
     font-family: "Microsoft YaHei", sans-serif;
     color: #0D1C31;
     -webkit-overflow-scrolling: touch;
+    overflow:auto;
+    
 }
 
 ul,
@@ -121,11 +124,13 @@ img {
 }
 
 
-// 
-.backoff {
-    width: 17px;
-    height: 32px;
-    position: absolute;
-    left: 40px;
-    top: 28px;
+
+//  刷新动画
+@keyframes referer {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }

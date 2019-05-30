@@ -15,7 +15,7 @@ export const BSConfigX = {
     scrollX: true,
     eventPassthrough: "vertical",
     bounceTime: 400,
-    click: true
+    click: true,
 }
 
 export const BSConfigY = {

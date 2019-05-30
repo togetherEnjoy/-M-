@@ -21,7 +21,7 @@
     </div>
 
     <div class="swip">
-      <van-swipe indicator-color="white">
+      <van-swipe indicator-color="white" :autoplay="3000">
         <van-swipe-item v-for="(image, index) in 4">
           <div class="banner_box">
             <img src="../../assets/images/home/m-banner.png">
@@ -35,7 +35,7 @@
         <img src="../../assets/images/home/house.png">
         <p>房产</p>
       </div>
-      <div class="cate_item" @click="$router.push({path: '/home/immig'})">
+      <div class="cate_item" @click="$router.push({path: '/home/immig',query: {hostCountryNum:0}})">
         <img src="../../assets/images/home/yimin.png">
         <p>移民</p>
       </div>
@@ -60,31 +60,36 @@
           <h1>海外好房</h1>
           <p style="cursor:pointer" v-on:click="$router.push({path: '/home/house'})">探索更多海外房产</p>
         </div>
+        <van-tabs :line-height="0" @click="hsTabClick">
+          <van-tab v-for="(item, i) in house_menu.country" :key="i" :title="item.name">
+            <div class="h_cate">
+              <div class="house_content" ref="house_content">
+                <div class="show_box">
+                  <van-loading color="#ed2530" v-if="house_data.length == 0"></van-loading>
 
-        <div class="h_cate">
-          <div ref="house_head" class="house_ca">
-            <ul>
-              <li v-for="(house, i) in house" :key="i" :class="{'active': i == 0}">{{ house }}</li>
-            </ul>
-          </div>
+                  <div
+                    class="show_item"
+                    v-for="(item, i) in house_data"
+                    :key="i"
+                    v-if="house_data.length>0"
+                    @click="$router.push({name: 'housedetail',params: {id: item.id}})"
+                  >
+                    <div class="show_bg">
+                      <img v-lazy="item.coverImg">
+                    </div>
 
-          <div class="house_content" ref="house_content">
-            <div class="show_box">
-              <div class="show_item" v-for="item in 4">
-                <div class="show_bg">
-                  <img src="../../assets/images/home/house_img.png">
+                    <p class="tit">{{ item.title }}</p>
+                    <p class="param">{{ item.minArea }}~{{ item.maxArea }}㎡ | 首付 10%</p>
+                    <p class="price">
+                      ￥
+                      <span>{{ item.price }}</span>万起
+                    </p>
+                  </div>
                 </div>
-
-                <p class="tit">迈阿密市中心智能公寓YotelPad</p>
-                <p class="param">89~109㎡ | 首付 10%</p>
-                <p class="price">
-                  ￥
-                  <span>330</span>万起
-                </p>
               </div>
             </div>
-          </div>
-        </div>
+          </van-tab>
+        </van-tabs>
       </div>
 
       <!-- 热门移民国家 -->
@@ -95,21 +100,29 @@
         </div>
         <div class="yim_box" ref="yim">
           <ul>
-            <li>
+            <li
+              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[0].id}})"
+            >
               <img src="../../assets/images/home/meiguo.png">
-              <p>美国</p>
+              <p v-if="immig_menu.length>0">{{ immig_menu[0].name }}</p>
             </li>
-            <li>
+            <li
+              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[1].id}})"
+            >
               <img src="../../assets/images/home/aodaliya.png">
-              <p>澳大利亚</p>
+              <p v-if="immig_menu.length>0">{{ immig_menu[1].name }}</p>
             </li>
-            <li>
+            <li
+              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[2].id}})"
+            >
               <img src="../../assets/images/home/jianada.png">
-              <p>加拿大</p>
+              <p v-if="immig_menu.length>0">{{ immig_menu[2].name }}</p>
             </li>
-            <li>
+            <li
+              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[3].id}})"
+            >
               <img src="../../assets/images/home/jianada.png">
-              <p>加拿大</p>
+              <p v-if="immig_menu.length>0">{{ immig_menu[3].name }}</p>
             </li>
           </ul>
         </div>
@@ -123,28 +136,40 @@
         </div>
 
         <div class="lx_box">
-          <div class="lx_item">
+          <div
+            class="lx_item"
+            @click="$router.push({path: '/home/study',query: {id: study_menu[0].id}})"
+          >
             <div>
               <img src="../../assets/images/home/m_l.png">
-              <p>美国学院</p>
+              <p v-if="study_menu.length>0">{{ study_menu[0].name }}学院</p>
             </div>
           </div>
-          <div class="lx_item">
+          <div
+            class="lx_item"
+            @click="$router.push({path: '/home/study',query: {id: study_menu[1].id}})"
+          >
             <div>
               <img src="../../assets/images/home/ao_l.png">
-              <p>澳洲学院</p>
+              <p v-if="study_menu.length>0">{{ study_menu[1].name }}学院</p>
             </div>
           </div>
-          <div class="lx_item">
+          <div
+            class="lx_item"
+            @click="$router.push({path: '/home/study',query: {id: study_menu[2].id}})"
+          >
             <div>
               <img src="../../assets/images/home/yin_l.png">
-              <p>英国学院</p>
+              <p v-if="study_menu.length>0">{{ study_menu[2].name }}学院</p>
             </div>
           </div>
-          <div class="lx_item">
+          <div
+            class="lx_item"
+            @click="$router.push({path: '/home/study',query: {id: study_menu[3].id}})"
+          >
             <div>
               <img src="../../assets/images/home/jia_l.png">
-              <p>加拿大学院</p>
+              <p v-if="study_menu.length>0">{{ study_menu[3].name }}学院</p>
             </div>
           </div>
         </div>
@@ -156,34 +181,34 @@
           <h1>精品海外游学</h1>
           <p @click="$router.push({path: '/home/studytour'})">探索更多海外留学</p>
         </div>
+        <van-tabs :line-height="0" @click="yxBtnClick">
+          <van-tab v-for="(item, i) in yx_menu" :key="i" :title="item.name">
+            <div class="liux_box">
+              <div class="lx_content">
+                <van-loading color="#ed2530" v-if="yx_data.length == 0"></van-loading>
+                <div
+                  class="lx_c_item"
+                  v-for="(item, i) in yx_data"
+                  :key="i"
+                  @click="$router.push({path:`/home/studytour/${item.id}`})"
+                >
+                  <div class="imgs">
+                    <img v-lazy="item.coverImg">
+                  </div>
+                  <div class="lx_r">
+                    <p class="tit">{{ item.name }}</p>
 
-        <div class="liux_box">
-          <div ref="jin_yx" class="house_ca">
-            <ul class="bscroll-container">
-              <li v-for="(lx, i) in jin_lx" :key="i" :class="{'active': i == 0}">{{ lx }}</li>
-            </ul>
-          </div>
-
-          <div class="lx_content">
-            <div class="lx_c_item" v-for="item in 4">
-              <div class="imgs">
-                <img src="../../assets/images/home/lx.png">
-              </div>
-              <div class="lx_r">
-                <p class="tit">
-                  伯克利学分夏校SSD - 你们陪我长
-                  大，我陪你们旅行
-                </p>
-
-                <p class="price">
-                  价格：
-                  <i>￥3900</i>
-                  <span>7天6晚</span>
-                </p>
+                    <p class="price">
+                      价格：
+                      <i>￥{{ item.price }}</i>
+                      <span>{{ item.days }}</span>
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </van-tab>
+        </van-tabs>
       </div>
 
       <!-- 海外热门 -->
@@ -192,12 +217,6 @@
           <h1>海外热门</h1>
           <p @click="$router.push({path: '/news'})">探索更多海外热门</p>
         </div>
-
-        <!-- <div ref="jin_hot" class="house_ca">
-          <ul class="bscroll-container">
-            <li v-for="(lx, i) in hot" :key="i" :class="{'active': i == 0}">{{ lx }}</li>
-          </ul>
-        </div>-->
 
         <van-tabs :line-height="0" @click="tabBtnClick">
           <van-tab v-for="(item, i ) in hot" :key="i" :title="item">
@@ -388,20 +407,36 @@ export default {
       index: 0,
       limit: 10,
       count: "",
-      list_data: []
+      list_data: [],
+
+      // 游学
+      yx_loading: false,
+      yx_finished: true,
+      yx_menu: [],
+      yx_page: 1,
+      yx_limit: 4,
+      yx_data: [],
+      // 房产menu
+      house_menu: [],
+      house_data: [],
+      // 移民menu
+      immig_menu: [],
+      // 留学
+      study_menu: []
     };
   },
   mounted() {
     this.$nextTick(() => {
-      let houst_head = this.$refs.house_head;
-      let house_content = this.$refs.house_content;
+      let house = this.$refs;
+      console.log(house);
+      if (!this.houseBS) {
+        console.log(11);
+        // this.houseBS = new BScroll(house, BSConfigX);
+      }
       let yim = this.$refs.yim;
-
-      this.house_contentBSroll = new BScroll(house_content, BSConfigX);
-      this.yim = new BScroll(yim, BSConfigX);
-      // this.jin = new BScroll(this.$refs.jin_hot, BSConfigX);
-      this.jin = new BScroll(this.$refs.jin_yx, BSConfigX);
-      this.houseBSroll = new BScroll(houst_head, BSConfigX);
+      // if (!this.yim) {
+      //   this.yim = new BScroll(yim, BSConfigX);
+      // }
     });
   },
   computed: {
@@ -411,6 +446,74 @@ export default {
     ...mapGetters(["list"])
   },
   methods: {
+    // 获取游学menu
+    getStudyTourdata() {
+      this.$fetch("/dhr/client/study_tour/menu").then(res => {
+        console.log(res);
+        if (res.ErrCode == "0000") {
+          this.yx_menu = res.Result.recruitStudent;
+        }
+      });
+    },
+    // 获取留学国家
+    getStudyData() {
+      this.$fetch("/dhr/client/study_abroad/menu").then(res => {
+        if (res.ErrCode == "0000") {
+          this.study_menu = res.Result.country;
+        }
+      });
+    },
+    // 获取移民国家
+    getImmigData() {
+      this.$fetch("/dhr/client/migrate/menu").then(res => {
+        if (res.ErrCode == "0000") {
+          this.immig_menu = res.Result.country;
+          this.immigMenu(this.immig_menu);
+        }
+      });
+    },
+
+    // 获取房产国家
+    getMenuData() {
+      this.$fetch("/dhr/client/house/menu").then(res => {
+        this.house_menu = res.Result;
+        console.log(this.house_menu);
+        this.houseMenu(this.house_menu);
+      });
+    },
+
+    // 游学
+    onYxLoad() {},
+    // onHsLoad() {},
+    hsTabClick(i = 0) {
+      this.house_data = [];
+      this.$fetch("/dhr/client/house/list", {
+        belongCountry: i,
+        page: 1,
+        limit: 4
+      }).then(res => {
+        if (res.ErrCode == "0000") {
+          this.house_data = res.Result.data;
+        } else if (res.ErrCode == "9999") {
+          this.$toast("刷新太快了");
+        }
+      });
+    },
+    yxBtnClick(index = 0) {
+      this.yx_data = [];
+      this.$fetch("/dhr/client/study_tour/list", {
+        page: this.yx_page,
+        limit: this.yx_limit,
+        recruitStudent: index + 1
+      }).then(res => {
+        if (res.ErrCode == "0000") {
+          this.yx_data = res.Result.data;
+        } else if (res.ErrCode == "9999") {
+          this.$toast("刷新太快了");
+        }
+        console.log(this.yx_data);
+      });
+    },
     // 上拉加载
     onRefresh() {
       let self = this;
@@ -487,7 +590,7 @@ export default {
         this.onLoad(pageName);
       }
     },
-     getDetails(id, name) {
+    getDetails(id, name) {
       this.$router.push({
         path: `/news/newsd`,
         query: { id, index: this.index }
@@ -499,10 +602,23 @@ export default {
     _getDateDiff(t) {
       return getDateDiff(t);
     },
+    init() {
+      this.getMenuData();
+      this.hsTabClick();
+      this.getImmigData();
+      this.getStudyData();
+      this.getStudyTourdata();
+      this.yxBtnClick();
+    },
     ...mapMutations({
       set_list: "SET_LIST",
-      set_title: "SET_TITLE"
+      set_title: "SET_TITLE",
+      houseMenu: "HOUSE_MENU",
+      immigMenu: "IMMIG_MENU"
     })
+  },
+  created() {
+    this.init();
   },
   components: {
     [Tab.name]: Tab,
@@ -559,6 +675,23 @@ export default {
       color: #fff;
     }
   }
+
+  // loading
+  .van-loading {
+    width: 80px;
+    height: 80px;
+    display: inline-block;
+  }
+  // van-list__loading
+  .van-list__loading {
+    padding-top: 25px;
+  }
+}
+
+// toast
+.van-toast {
+  font-size: 30px !important;
+  padding: 30px !important;
 }
 </style>
 
@@ -630,7 +763,7 @@ export default {
   .swip {
     .banner_box {
       height: 420px;
-      width: 750px;
+      // width: 750px;
     }
   }
 
@@ -718,15 +851,25 @@ export default {
     .house {
       .h_cate {
         margin-top: 39px;
-
+        .house_content {
+          overflow-y: hidden;
+          overflow-x: scroll;
+          text-align: center;
+          // -webkit-overflow-scrolling: touch;
+          &::-webkit-scrollbar {
+            /*隐藏滚轮*/
+            display: none;
+          }
+        }
         .show_box {
-          margin-top: 40px;
+          // margin-top: 40px;
           display: inline-block;
           white-space: nowrap;
 
           .show_item {
             display: inline-block;
             margin-right: 30px;
+            text-align: left;
             &:last-child {
               margin-right: 0;
             }
@@ -765,6 +908,11 @@ export default {
 
       .yim_box {
         margin-top: 38px;
+        overflow-x: auto;
+        &::-webkit-scrollbar {
+          /*隐藏滚轮*/
+          display: none;
+        }
         ul {
           display: inline-block;
           white-space: nowrap;
@@ -855,32 +1003,40 @@ export default {
       }
       .lx_content {
         padding-right: 35px;
-        padding-top: 40px;
+        text-align: center;
         .lx_c_item {
           display: flex;
+          margin-bottom: 20px;
+          text-align: left;
           .imgs {
             width: 210px;
             height: 210px;
             overflow: hidden;
             img {
-              height: auto !important;
+              // height: auto !important;
             }
           }
 
           .lx_r {
+            padding: 20px 0;
             margin-left: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             .tit {
               font-size: 24px;
               font-weight: bold;
               line-height: 48px;
             }
             .price {
-              margin-top: 35px;
               font-size: 22px;
               color: #9399a5;
+              display: flex;
+              align-items: center;
               i {
                 color: #ed2530;
                 font-size: 34px;
+                width: 150px;
               }
               span {
                 width: 110px;

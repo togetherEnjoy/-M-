@@ -1,18 +1,48 @@
 <template>
   <div class="house">
-    <smenu :item="item"/>
+    <smenu
+      :item="item"
+      :country="menu.country"
+      :athor="menu.housingDemand"
+      :two="menu.hoseType"
+      :three="menu.cost"
+      :params1="'housingDemand'"
+      :params2="'hoseType'"
+      :params3="'cost'"
+      @get_result="get_result"
+    />
+
+    <div class="sx_result" v-if="Object.keys(result_data).length > 0">
+      <h3>筛选结果</h3>
+      <div class="condition">
+        <div v-for="(item,i) of result_data" :key="i" class="sel" v-if="item.html != ''">
+          <p v-if="item.html != ''" :typed="item.type">
+            <span>{{ item.html }}</span>
+            <i>
+              <span @click.self="empty"></span>
+            </i>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click="emptyall">
+      <span></span>
+      清空所有条件
+    </div>
 
     <div class="house_wrap">
+      <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3>
       <van-list
         v-model="loading"
         :finished="finished"
         finished-text="没有更多了"
         @load="onLoad"
-        :offset="100"
+        :offset="10"
       >
         <div
           class="list_box"
-          v-for="(item, i) in houseList"
+          v-for="(item, i) in allListData"
           :key="i"
           @click="$router.push({name: 'housedetail',params: {id: item.id}})"
         >
@@ -22,7 +52,9 @@
           </div>
           <div class="l_right">
             <h3 class="tit">{{ item.title }}</h3>
-            <p class="de">独栋别墅 | {{ item.propertyRightYears }} | {{ item.minArea }}m-{{ item.maxArea }}m</p>
+            <p
+              class="de"
+            >独栋别墅 | {{ item.propertyRightYears }} | {{ item.minArea }}m-{{ item.maxArea }}m</p>
             <p class="price">
               <i class="le">
                 ￥
@@ -40,51 +72,43 @@
       </van-list>
     </div>
 
-    <transition name="fade" mode="out-in">
+    <!-- <transition name="fade" mode="out-in">
       <router-view></router-view>
-    </transition>
+    </transition>-->
   </div>
 </template>
 
 <script>
 import smenu from "../../components/slideMenu";
+import { screen_data } from "../../utils/mixins";
 export default {
-  props: {},
+  mixins: [screen_data],
   data() {
     return {
       item: ["国家", "购房需求", "物业类型", "总价"],
-      houseList: [],
-      loading: false,
-      finished: false,
-      count: "",
-      page: 1,
-      limit: 10
+      url: `/dhr/client/house/list`,
+      menu: [] // 顶部筛选
     };
   },
-  created() {},
-  computed: {},
   methods: {
     onLoad() {
-      this.getHouseList();
+      console.log('触发')
+      this.getAllList(this.result_data);
     },
-    getHouseList() {
-      this.$fetch("/dhr/client/house/list", {
-        page: this.page,
-        limit: this.limit
-      }).then(res => {
-        console.log(res.Result.data);
-        if (res.ErrCode == "0000") {
-          this.houseList = this.houseList.concat(res.Result.data);
-          this.count = res.Result.count / 1;
-          this.loading = false;
-          if (this.houseList.length >= this.count) {
-            this.finished = true;
-            console.log("无更多数据");
-          }
-          this.page ++
-        }
+    screenTheData() {
+      this.getAllList(this.result_data)
+    },
+    // 获取menu
+    getMenuData() {
+      this.$fetch("/dhr/client/house/menu").then(res => {
+        this.menu = res.Result;
+        console.log(this.menu);
       });
     }
+  },
+
+  created() {
+    this.getMenuData();
   },
   components: {
     smenu
@@ -95,6 +119,89 @@ export default {
 <style scoped lang="scss">
 .house {
   background-color: #f8f8f8;
+  overflow: hidden;
+  .sx_result {
+    h3 {
+      font-weight: 500;
+    }
+    padding: 30px;
+    background-color: #fff;
+    margin-top: 30px;
+    transition: all 0.3s ease;
+    .condition {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 30px 0 40px;
+      .sel {
+        margin-right: 30px;
+        p {
+          width: 150px;
+          height: 50px;
+          border: 1px solid rgba(229, 229, 229, 1);
+          text-align: center;
+          line-height: 50px;
+          font-size: 24px;
+          color: #9399a5;
+          position: relative;
+          i {
+            position: absolute;
+            width: 26px;
+            height: 23px;
+            color: #fff;
+            background: url("../../assets/images/study/sx.png") no-repeat right
+              bottom / 26px 23px;
+
+            right: 0;
+            bottom: 0;
+            font-size: 8px;
+
+            span {
+              position: absolute;
+              width: 10px;
+              height: 10px;
+              right: 2px;
+              top: 8px;
+              background: url("../../assets/images/study/close.png") no-repeat
+                center/ cover;
+            }
+          }
+
+          &.check {
+            background-color: #ed2530;
+            color: #fff;
+          }
+        }
+        &:nth-child(4n) {
+          margin-right: 0;
+        }
+        &:nth-child(n + 5) {
+          margin-top: 25px;
+        }
+      }
+    }
+  }
+
+  .thinklike {
+    color: #9399a5;
+    font-size: 24px;
+    font-weight: 500;
+    padding-top: 32px;
+    padding-left: 30px;
+    span {
+      display: inline-block;
+      vertical-align: bottom;
+      width: 30px;
+      height: 30px;
+      background: url("../../assets/images/immig/laj.png") no-repeat center /
+        cover;
+    }
+  }
+  .like {
+    font-size: 30px;
+    font-weight: 500;
+    padding-top: 30px;
+  }
+
   .house_wrap {
     background-color: #fff;
     margin-top: 30px;

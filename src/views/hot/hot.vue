@@ -119,8 +119,6 @@ import { Tab, Tabs } from "vant";
 import { getDateDiff } from "../../api/api.js";
 import { mapMutations, mapGetters } from "vuex";
 import { setTimeout } from "timers";
-
-import moment from "moment";
 export default {
   name: "hot",
   props: {},

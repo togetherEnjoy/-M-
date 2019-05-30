@@ -10,7 +10,6 @@ import {
 import fastclick from 'fastclick'; //移动端300ms
 // px to rem 插件
 import 'lib-flexible'
-import Mint from 'mint-ui';
 
 // vant 组件
 import 'vant/lib/index.css';
@@ -24,7 +23,8 @@ import {
   Toast,
   Lazyload,
   PullRefresh,
-  List
+  List,
+  Loading 
 } from 'vant';
 
 Vue.use(Dialog)
@@ -34,18 +34,18 @@ Vue.use(Dialog)
   .use(Swipe)
   .use(SwipeItem)
   .use(Toast)
-  .use(Lazyload)
+  .use(Lazyload, {
+    loading: ''
+  })
   .use(PullRefresh)
   .use(List)
+  .use(Loading)
 
 // 300ms延迟
 // fastclick.attach(document.body);
 
-import 'mint-ui/lib/style.css'
-Vue.use(Mint);
-
-
 /*第一层if判断生产环境和开发环境*/
+console.log(process.env.VUE_APP_FLAG)
 if (process.env.NODE_ENV === 'production') {
   /*第二层if，根据.env文件中的VUE_APP_FLAG判断是生产环境还是测试环境*/
   if (process.env.VUE_APP_FLAG === 'pro') {
@@ -70,15 +70,8 @@ Vue.prototype.$post = post
 Vue.config.productionTip = false
 
 
-router.beforeEach((to, from, next) => {
-  // console.log(to)
-  // chrome
-  // document.body.scrollTop = 0
-  // // firefox
-  // document.documentElement.scrollTop = 0
-  // // safari
-  // window.pageYOffset = 0
-  next()
+Vue.filter('goTime', (value) => {
+  return Math.floor(value / (24 * 3600 * 1000))
 })
 
 

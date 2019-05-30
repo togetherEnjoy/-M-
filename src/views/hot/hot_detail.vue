@@ -123,7 +123,6 @@ import { type } from "os";
 import con from "../../components/conf";
 import wxApi from "../../common/wxapi.js";
 export default {
-  props: {},
   data() {
     return {
       content: {},

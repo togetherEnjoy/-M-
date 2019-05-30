@@ -3,12 +3,12 @@
     <div class="ser_img_wrap">
       <div class="card_item">
         <div class="imgs">
-          <img src="../../assets/images/immig/immig.png">
+          <img v-lazy="immig_detail.imgs">
         </div>
 
         <div class="txt">
-          <h1>澳洲创业移民</h1>
-          <p>移民速度最快的澳洲商业移民签证</p>
+          <h1>{{ immig_detail.name }}</h1>
+          <p>{{ immig_detail.subtitle }}</p>
         </div>
       </div>
 
@@ -17,7 +17,7 @@
           <span class="fuwuf">参考服务费</span>
           <span class="price">
             ￥
-            <i>3.8</i>万
+            <i>{{ immig_detail.referenceServiceFee }}</i>万
           </span>
           <span class="yi">（以服务商为准）</span>
         </div>
@@ -25,21 +25,21 @@
         <div class="card_ds">
           <div>
             <div class="c_ch os">
-              <p class="m">3-6个月</p>
+              <p class="m">{{ immig_detail.handlingCycle }}个月</p>
               <p>办理周期</p>
             </div>
             <div class="c_ch">
-              <p class="m">永久居民</p>
+              <p class="m">{{ immig_detail.identityType }}</p>
               <p>身份类别</p>
             </div>
           </div>
           <div>
             <div class="c_ch os">
-              <p class="m">20-50万澳币</p>
+              <p class="m">{{ immig_detail.investmentQuota }}万澳币</p>
               <p>投资额度</p>
             </div>
             <div class="c_ch">
-              <p class="m">无居住要求</p>
+              <p class="m">{{ immig_detail.demand }}</p>
               <p>居住要求</p>
             </div>
           </div>
@@ -51,11 +51,9 @@
       <div class="s_tit">
         <h3>移民供应商</h3>
 
-        <div class="s_huan">
-          <p>
-            换一换
-            <span @click="$router.push({path: '/home/immigmore'})">更多</span>
-          </p>
+        <div class="s_huan" ref="change">
+          <p @click="referer">换一换</p>
+          <span @click="$router.push({path: '/home/immigmore'})">更多</span>
         </div>
       </div>
 
@@ -83,36 +81,31 @@
     <div class="project">
       <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1">
         <van-tab title="项目介绍">
-          <div class="content">
-            <p>
+          <div class="content" v-html="immig_detail.projectIntroduction">
+            <!-- <p>
               如果申请墨尔本则需投资40万澳元，悉尼需50万澳元。澳洲188A创业移民，是澳洲188系列签证之一。188A签证是澳洲政府为吸引和鼓励成功商业人士前往澳洲定居，并利用其经验技术在澳继续经营生意或从事投资，设立的临时居留签证（TR）。
               澳洲188A签证申请人登陆澳洲之后，投资不少于20万澳元新建一门生意，就可符合移民局要求。如果申请墨尔本则需投资40万澳元，悉尼需50万澳元。
-            </p>
+               
+            </p>-->
 
-            <div class="imgs">
+            <!-- <div class="imgs">
               <img src="../../assets/images/house/pro.png">
             </div>
 
             <p>
               如果申请墨尔本则需投资40万澳元，悉尼需50万澳元。澳洲188A创业移民，是澳洲188系列签证之一。188A签证是澳洲政府为吸引和鼓励成功商业人士前往澳洲定居，并利用其经验技术在澳继续经营生意或从事投资，设立的临时居留签证（TR）。
               澳洲188A签证申请人登陆澳洲之后，投资不少于20万澳元新建一门生意，就可符合移民局要求。如果申请墨尔本则需投资40万澳元，悉尼需50万澳元。
-            </p>
+            </p>-->
           </div>
         </van-tab>
         <van-tab title="申请条件">
-          <div class="content">
-            <p v-for="i in 20">1.55周岁以下或州政府豁免年龄要求,随行子女23周岁</p>
-          </div>
+          <div class="content" v-html="immig_detail.requirement"></div>
         </van-tab>
         <van-tab title="申请流程">
-          <div class="content">
-            <p v-for="i in liucheng">{{ i }}</p>
-          </div>
+          <div class="content" v-html="immig_detail.process"></div>
         </van-tab>
         <van-tab title="费用详情">
-          <div class="content">
-            <p v-for="i in liucheng">{{ i }}</p>
-          </div>
+          <div class="content" v-html="immig_detail.costDetails"></div>
         </van-tab>
       </van-tabs>
     </div>
@@ -124,6 +117,10 @@
 <script>
 import { Tab, Tabs } from "vant";
 import con from "../../components/conf";
+import { setTimeout } from "timers";
+
+const url = `/dhr/client/migrate/`;
+const gysUrl = `/dhr/client/migrate/merchant_list`;
 export default {
   props: {},
   data() {
@@ -137,14 +134,52 @@ export default {
         "6. 通知补充移民材料或直接通知体检 ",
         "7. 缴纳英语培训费 ",
         "8. 获批188A签证"
-      ]
+      ],
+      id: this.$route.query.id,
+      referer_can: true,
+      immig_detail: [],
+      merchant_data: []
     };
   },
-  computed: {},
-  created() {},
-  mounted() {},
-  watch: {},
-  methods: {},
+  methods: {
+    // 换一换
+    referer() {
+      const change = this.$refs.change;
+      if (this.referer_can) {
+        this.referer_can = false;
+        change.classList.add("refe");
+        this.getMerchantData();
+        setTimeout(() => {
+          change.classList.remove("refe");
+          this.referer_can = true;
+        }, 4000);
+      }
+    },
+    getImmigDetail() {
+      this.$fetch(url + this.id).then(res => {
+        console.log(res);
+        if (res.ErrCode == "0000") {
+          this.immig_detail = res.Result;
+        }
+      });
+    },
+    // 供应商
+    getMerchantData() {
+      this.$fetch(gysUrl, {
+        id: this.id
+      }).then(res => {
+        console.log(res);
+        if (res.ErrCode == '0000') {
+          this.merchant_data = res.Result.data
+        }
+      });
+    }
+  },
+  created() {
+    this.getImmigDetail();
+    this.getMerchantData();
+    console.log(this.id);
+  },
   components: {
     [Tab.name]: Tab,
     [Tabs.name]: Tabs,
@@ -160,6 +195,7 @@ export default {
 <style scoped lang="scss">
 .immg_detail {
   background-color: #f8f8f8;
+  padding-bottom: 98px;
   .ser_img_wrap {
     .card_item {
       color: #fff;
@@ -280,6 +316,7 @@ export default {
       }
       .s_huan {
         font-size: 24px;
+        display: flex;
         p {
           color: #3db484;
           position: relative;
@@ -294,9 +331,16 @@ export default {
             left: 0;
             top: 6px;
           }
-          span {
-            color: #9399a5;
-            margin-left: 30px;
+        }
+        span {
+          color: #9399a5;
+          margin-left: 30px;
+        }
+        &.refe {
+          p {
+            &::after {
+              animation: referer linear 3s forwards;
+            }
           }
         }
       }
@@ -380,5 +424,6 @@ export default {
       }
     }
   }
+
 }
 </style>

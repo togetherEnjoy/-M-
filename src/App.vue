@@ -12,7 +12,20 @@
   </div>
 </template>
 <script>
-export default {};
+import { goTime } from "./api/UTCformat.js";
+
+export default {
+  provide() {
+    return {
+      app: this
+    };
+  },
+  methods: {
+    _goTime(start, end) {
+      return goTime(start, end);
+    }
+  }
+};
 </script>
 
 <style lang="scss">

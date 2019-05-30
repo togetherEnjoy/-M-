@@ -39,8 +39,10 @@ export function fetch(url, params = {}) {
 export function post(url, data = {}) {
     return new Promise((resolve, reject) => {
         axios.post(url, data, {
-            headers:{'Content-Type': 'application/json'}
-        })
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
             .then(response => {
                 resolve(response.data);
             }, err => {

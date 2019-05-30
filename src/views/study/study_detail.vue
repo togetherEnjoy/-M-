@@ -3,27 +3,30 @@
     <div class="ser_img_wrap">
       <div class="card_item">
         <div class="imgs">
-          <img src="../../assets/images/study/detail.png">
+          <img v-lazy="detail_data.bgImg">
         </div>
 
         <div class="cont_txt">
-          <div class="badge"></div>
-          <p class="dx">哈佛大学</p>
-          <p class="yw">Harvard University</p>
-          <p class="addr">美国 马萨诸塞-波士顿</p>
-          <p class="website">http://www.harvard.edu/</p>
+          <div
+            class="badge"
+            :style="{'background': `url('${detail_data.schoolBadgeImg}'),url('../../assets/images/study/yuan.png') no-repeat center/cover`}"
+          ></div>
+          <p class="dx">{{ detail_data.schoolName }}</p>
+          <p class="yw">{{ detail_data.englishName }}</p>
+          <p class="addr">{{ detail_data.hostCountry }} {{ detail_data.hostCity }}</p>
+          <p class="website">{{ detail_data.schoolWebsite }}</p>
         </div>
       </div>
       <div class="rank">
         <div class="rank_l">
           <h3>国内排名</h3>
-          <div>2</div>
+          <div>{{ detail_data.countryRanking }}</div>
           <p class="fir">1（耶鲁）</p>
           <p class="sec">3（剑桥）</p>
         </div>
         <div class="rank_r">
           <h3>国际排名</h3>
-          <div>1</div>
+          <div>{{ detail_data.internationalRanking }}</div>
           <p class="fir">2（耶鲁）</p>
           <p class="sec">3（剑桥）</p>
         </div>
@@ -32,13 +35,11 @@
 
     <div class="supplier">
       <div class="s_tit">
-        <h3>移民供应商</h3>
+        <h3>服务商家</h3>
 
-        <div class="s_huan">
-          <p>
-            换一换
-            <span @click="$router.push({path: '/home/studymore'})">更多</span>
-          </p>
+        <div class="s_huan" ref="change">
+          <p @click="referer(getStudyDetail)">换一换</p>
+          <span @click="$router.push({path: '/home/studymore'})">更多</span>
         </div>
       </div>
 
@@ -89,34 +90,34 @@
             </van-row>
           </div>
 
-          <p class="article">
-            麻省理工学院（Massachusetts Institute of Technology），简称MIT，是美国一所研究型私立大学，位于马萨诸塞州（麻省）的剑桥市，查尔斯河（Charles River）将其与波士顿的后湾区（Back Bay）隔开。麻省理工学院无论是在美国还是全世界都有非常重要的影响力，MIT培养了众多对世界产生影响的人士，是全球高科技和高等研究的先驱领导大学。
+          <p class="article" v-html="detail_data.schoolIntroduce">
+            <!-- 麻省理工学院（Massachusetts Institute of Technology），简称MIT，是美国一所研究型私立大学，位于马萨诸塞州（麻省）的剑桥市，查尔斯河（Charles River）将其与波士顿的后湾区（Back Bay）隔开。麻省理工学院无论是在美国还是全世界都有非常重要的影响力，MIT培养了众多对世界产生影响的人士，是全球高科技和高等研究的先驱领导大学。
             麻省理工学院（英文全称：Massachusetts Institute of Technology， 简称MIT），位于美国马萨诸塞州剑桥市，占地面积168英亩（68.0公顷），吉祥物是海狸（Beaver），NCAA运动队绰号是工程师（Engineers），校训是“理论与实践并重”
             （Mens et Manus），英文翻译是：Mind and Hand。 MIT录取率极低，每年只录取2000人，保证了全世界最优秀的学子云集于MIT，每年能从MIT顺利毕业的人无疑是世界上最精英的一群人。
-            2014年9月16日发布2014—2015年世界大学排名榜，美国麻省理工学院连续第三年位居榜首。
+            2014年9月16日发布2014—2015年世界大学排名榜，美国麻省理工学院连续第三年位居榜首。-->
           </p>
         </van-tab>
         <van-tab title="申请条件">
-          <div class="condition">
-            <h3>一. 需要参加的考试</h3>
+          <div class="condition" v-html="detail_data.applicationConditions">
+            <!-- <h3>一. 需要参加的考试</h3>
             <p>
               We require the SAT Reasoning Test or the ACT Plus Writing with the writing test. We do not prefer one over the other.
               In addition, we require two SAT Subject Tests: one in math (level 1 or 2), and one in science (physics, chemistry, or
               biology e/m).
               1、SAT1或者ACT或者ielts
               2、SAT 2的两科
-            </p>
+            </p>-->
           </div>
         </van-tab>
         <van-tab title="专业设置">
-          <div class="condition">
+          <div class="condition" v-html="detail_data.professionalSetup">
             <h3>专业介绍</h3>
             <p>修读年限：4年</p>
           </div>
-          <div class="condition">
+          <!-- <div class="condition">
             <h3>本科专业</h3>
             <p>文学：音乐学、创意写作、文学研究、语言学、戏剧艺术、艺术与设计、比较媒体研究、写作与人文</p>
-          </div>
+          </div>-->
 
           <div id="swipe" ref="bs_swipe">
             <ul>
@@ -127,8 +128,8 @@
           </div>
         </van-tab>
         <van-tab title="每年学费">
-          <div class="mnxf">
-            <van-row v-for="i in 7">
+          <div class="mnxf" v-html="detail_data.annualFee">
+            <van-row v-for="i in 2">
               <van-col span="6">
                 <div class="content_item">
                   <h3>费用类型</h3>
@@ -153,7 +154,7 @@
           </div>
         </van-tab>
         <van-tab title="截止日期">
-          <div class="mnxf">
+          <div class="mnxf" v-html="detail_data.expirationDate">
             <van-row v-for="i in 3">
               <van-col span="12">
                 <div class="content_item">
@@ -168,7 +169,7 @@
             </van-row>
           </div>
         </van-tab>
-        <van-tab title="开学日期">
+        <van-tab title="开学日期" v-html="detail_data.schoolBeginsDate">
           <div class="mnxf">
             <van-row v-for="i in 3">
               <van-col span="12">
@@ -196,18 +197,52 @@ import { Tab, Tabs, Row, Col } from "vant";
 import con from "../../components/conf";
 import BScroll from "better-scroll";
 import { BSConfigX } from "../../utils/config.js";
+const url = `/dhr/client/study_abroad/`;
 export default {
-  props: {},
   data() {
     return {
-      active: 0
+      active: 0,
+      id: this.$route.params.id,
+      detail_data: [],
+      referer_can: true
     };
   },
-  computed: {},
-  created() {},
-  mounted() {},
-  watch: {},
+  created() {
+    this.getStudyDetail();
+    this.business()
+  },
   methods: {
+    // 换一换
+    referer() {
+        const change = this.$refs.change;
+        if (this.referer_can) {
+            this.referer_can = false;
+            change.classList.add("refe");
+            this.business();
+            setTimeout(() => {
+                change.classList.remove("refe");
+                this.referer_can = true;
+            }, 4000);
+        }
+    },
+    // 服务商家
+    business() {
+      this.$fetch('dhr/client/study_abroad/merchant_list', {
+        id: this.id
+      }).then(res => {
+        console.log(res)
+      })
+    },
+    
+    getStudyDetail() {
+      this.$fetch(url + this.id).then(res => {
+        console.log(res);
+        if (res.ErrCode == "0000") {
+          this.detail_data = res.Result;
+        }
+      });
+    },
+
     onTabClick(i) {
       this.$nextTick(() => {
         if (this.$refs.bs_swipe) {
@@ -227,6 +262,7 @@ export default {
 </script>
 <style lang="scss">
 .study_detail {
+  padding-bottom: 98px;
   .van-tabs__wrap--scrollable .van-tab {
     flex-basis: 26% !important;
   }
@@ -291,6 +327,7 @@ export default {
         .badge {
           width: 140px;
           height: 140px;
+          border-radius: 50%;
           margin: auto;
           background: url("../../assets/images/study/学校校徽图.png") no-repeat
               center/106px,
@@ -365,6 +402,7 @@ export default {
       }
       .s_huan {
         font-size: 24px;
+        display: flex;
         p {
           color: #3db484;
           position: relative;
@@ -377,11 +415,18 @@ export default {
             background: url("../../assets/images/immig/refresh.png") no-repeat
               center / cover;
             left: 0;
-            top: 6px;
+            top: 7px;
           }
-          span {
-            color: #9399a5;
-            margin-left: 30px;
+        }
+        span {
+          color: #9399a5;
+          margin-left: 30px;
+        }
+        &.refe {
+          p {
+            &::after {
+              animation: referer linear 3s forwards;
+            }
           }
         }
       }

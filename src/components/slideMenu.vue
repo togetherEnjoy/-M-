@@ -10,42 +10,68 @@
       <div class="c_left" ref="bs1">
         <ul>
           <li
-            v-for="(item, i) in city"
+            v-for="(item, i) in country"
             :key="i"
             :class="{active: i == 0}"
             @click="checkCountry(i,$event)"
-          >{{ item.zo }}</li>
+          >{{ item.name }}</li>
         </ul>
       </div>
       <div class="c_right">
-        <ul v-for="(item, i) in city" :key="i" :city="item.zo" :class="{checked: i==checked}">
+        <ul
+          v-for="(item, i) in country"
+          :key="i"
+          :city="item.name"
+          :id="i == 0?'fir':''"
+          :class="{checked: i==checked}"
+        >
           <li
             v-for="(ci, i) in item.city"
             :class="{active: i==0}"
             :key="i"
-            @click="checkCtry"
+            @click="checkCtry(ci.id, $event)"
             ref="ctry"
-          >{{ ci }}</li>
+            :country="true"
+          >{{ ci.name }}</li>
         </ul>
       </div>
     </div>
 
     <div :class="navs===1? 'some one cs': 'some one'" ref="bs2">
-      <ul>
-        <li v-for="(item, i) in athor" :key="i" @click="act">{{ item }}</li>
-      </ul>
+      <div class="one">
+        <ul>
+          <li
+            v-for="(item, i) in athor"
+            :key="i"
+            @click="oneClick(item.id, $event)"
+            :data-id="item.id"
+          >{{ item.name }}</li>
+        </ul>
+      </div>
     </div>
 
     <div :class="navs===2? 'some two cs': 'some two'">
-      <ul>
-        <li v-for="(item, i) in two" :key="i" @click="act">{{ item }}</li>
-      </ul>
+      <div class="two">
+        <ul>
+          <li
+            v-for="(item, i) in two"
+            :key="i"
+            @click="twoClick(item.id, $event)"
+            :data-id="item.id"
+          >{{ item.name }}</li>
+        </ul>
+      </div>
     </div>
 
     <div :class="navs===3? 'some three cs': 'some three'" :style="more? 'height:inherit' : '100%'">
-      <div ref="bs4" v-show="!more" style="height: 100%;overflow:hidden">
+      <div ref="bs4" v-if="!more" style="height: 100%;overflow:hidden" class="three">
         <ul>
-          <li v-for="(item, i) in three" :key="i" @click="act">{{ item }}</li>
+          <li
+            v-for="(item, i) in three"
+            :key="i"
+            @click="threeClick(item.id, $event)"
+            :data-id="item.id"
+          >{{ item.name }}</li>
         </ul>
       </div>
 
@@ -54,14 +80,14 @@
         <div class="tuofu t">
           <h3>托福要求</h3>
           <div class="condition">
-            <p v-for="i in tf" @click="tfcheck" ref="all_p">{{i}}</p>
+            <p v-for="i in tf" @click="tfcheck(i.id,$event)" ref="all_p">{{i.name}}</p>
           </div>
         </div>
         <!-- 雅思 -->
         <div class="tuofu y">
           <h3>雅思要求</h3>
           <div class="condition">
-            <p v-for="i in ys" @click="yscheck" ref="all_p">{{ i }}</p>
+            <p v-for="i in ys" @click="yscheck(i.id,$event)" ref="all_p">{{ i.name }}</p>
           </div>
         </div>
 
@@ -69,7 +95,7 @@
         <div class="tuofu f">
           <h3>每年费用</h3>
           <div class="condition">
-            <p v-for="i in fy" @click="fycheck" ref="all_p">{{ i }}</p>
+            <p v-for="i in fy" @click="fycheck(i.id,$event)" ref="all_p">{{ i.name }}</p>
           </div>
         </div>
 
@@ -87,53 +113,179 @@
 <script>
 import { BSConfigY } from "../utils/config.js";
 import BScroll from "better-scroll";
+import { mapGetters, mapMutations } from "vuex";
 export default {
   props: {
     item: {
       type: Array
     },
-    city: {
+    country: {
       type: Array,
       default() {
         return [
           {
-            zo: "不限",
-            city: ["不限"]
-          },
-          {
-            zo: "泰国",
-            city: ["不限", "加利福尼亚州", "马萨诸塞州", "新泽西州", "新泽西州"]
-          },
-          {
-            zo: "马来西亚",
+            name: "不限",
             city: [
-              "不限",
-              "加利福尼亚州",
-              "马萨诸塞州",
-              "新泽西州",
-              "新泽西州",
-              "新泽西州"
-            ]
+              {
+                id: 0,
+                name: "不限"
+              }
+            ],
+            id: 0
           },
           {
-            zo: "日本",
-            city: ["不限", "加利福尼亚州", "马萨诸塞州", "新泽西州", "新泽西州"]
+            name: "泰国",
+            city: [
+              {
+                id: 0,
+                name: "不限"
+              },
+              {
+                id: 1,
+                name: "加利福尼亚州"
+              },
+              {
+                id: 2,
+                name: "马萨诸塞州"
+              },
+              {
+                id: 3,
+                name: "新泽西州"
+              }
+            ],
+            id: 1
           },
           {
-            zo: "美国",
-            city: ["不限", "加利福尼亚州", "马萨诸塞州", "新泽西州", "新泽西州"]
+            name: "马来西亚",
+            city: [
+              {
+                id: 0,
+                name: "不限"
+              },
+              {
+                id: 0,
+                name: "加利福尼亚州"
+              },
+              {
+                id: 0,
+                name: "马萨诸塞州"
+              },
+              {
+                id: 0,
+                name: "新泽西州"
+              }
+            ],
+            id: 2
           },
           {
-            zo: "英国",
-            city: ["不限", "加利福尼亚州", "新泽西州", "新泽西州", "新泽西州"]
+            name: "日本",
+            city: [
+              {
+                id: 0,
+                name: "不限"
+              },
+              {
+                id: 0,
+                name: "加利福尼亚州"
+              },
+              {
+                id: 0,
+                name: "马萨诸塞州"
+              },
+              {
+                id: 0,
+                name: "新泽西州"
+              }
+            ],
+            id: 3
           },
           {
-            zo: "澳大利亚",
-            city: ["不限", "马萨诸塞州", "新泽西州", "新泽西州", "新泽西州"]
+            name: "美国",
+            city: [
+              {
+                id: 0,
+                name: "不限"
+              },
+              {
+                id: 0,
+                name: "加利福尼亚州"
+              },
+              {
+                id: 0,
+                name: "马萨诸塞州"
+              },
+              {
+                id: 0,
+                name: "新泽西州"
+              }
+            ],
+            id: 4
           },
           {
-            zo: "希腊",
-            city: ["不限", "马萨诸塞州", "新泽西州", "新泽西州"]
+            name: "英国",
+            city: [
+              {
+                id: 0,
+                name: "不限"
+              },
+              {
+                id: 0,
+                name: "加利福尼亚州"
+              },
+              {
+                id: 0,
+                name: "马萨诸塞州"
+              },
+              {
+                id: 0,
+                name: "新泽西州"
+              }
+            ],
+            id: 5
+          },
+          {
+            name: "澳大利亚",
+            city: [
+              {
+                id: 0,
+                name: "不限"
+              },
+              {
+                id: 0,
+                name: "加利福尼亚州"
+              },
+              {
+                id: 0,
+                name: "马萨诸塞州"
+              },
+              {
+                id: 0,
+                name: "新泽西州"
+              }
+            ],
+            id: 6
+          },
+          {
+            name: "希腊",
+            city: [
+              {
+                id: 0,
+                name: "不限"
+              },
+              {
+                id: 0,
+                name: "加利福尼亚州"
+              },
+              {
+                id: 0,
+                name: "马萨诸塞州"
+              },
+              {
+                id: 0,
+                name: "新泽西州"
+              }
+            ],
+            id: 7
           }
         ];
       }
@@ -209,43 +361,73 @@ export default {
           "4万美元以上"
         ];
       }
-    }
+    },
+    params1: "",
+    params2: "",
+    params3: ""
   },
   data() {
     return {
       checked: 0,
       navs: "",
-      tfresult: "",
-      ysresult: "",
-      fyresult: "",
       countryresult: "",
-      type: "",
-      rank: "",
-      result_data: []
+      result_data: [],
+
+      ones: {},
+      twos: {},
+      threes: {},
+
+      // 单选结果筛选
+      radio_data: [],
+      g_house: "",
+      g_type: "",
+
+      sendObj: {}
     };
   },
   mounted() {
     this.$nextTick(() => {
-      this.aBScroll1 = new BScroll(this.$refs.bs1, BSConfigY);
-      this.aBScroll2 = new BScroll(this.$refs.bs2, BSConfigY);
-      if (this.$refs.bs4) {
-        this.aBScroll4 = new BScroll(this.$refs.bs4, BSConfigY);
-      }
+      // this.aBScroll1 = new BScroll(this.$refs.bs1, BSConfigY);
+      // this.aBScroll2 = new BScroll(this.$refs.bs2, BSConfigY);
+      // if (this.$refs.bs4) {
+      //   this.aBScroll4 = new BScroll(this.$refs.bs4, BSConfigY);
+      // }
     });
   },
+  computed: {
+    screen() {
+      return this.screen;
+    },
+    ...mapGetters({
+      screen: "screen"
+    })
+  },
+
   methods: {
-    tfcheck(e) {
+    tfcheck(i, e) {
       this.checkall(e);
-      console.log(e.target.innerHTML);
-      this.tfresult = e.target.innerHTML;
+      this.$set(this.sendObj, "TOEFL", {
+        id: i,
+        html: e.target.innerHTML,
+        type: "TOEFL"
+      });
+      console.log(this.sendObj);
     },
-    yscheck(e) {
+    yscheck(i, e) {
       this.checkall(e);
-      this.ysresult = e.target.innerHTML;
+      this.$set(this.sendObj, "IELTS", {
+        id: i,
+        html: e.target.innerHTML,
+        type: "IELTS"
+      });
     },
-    fycheck(e) {
+    fycheck(i, e) {
       this.checkall(e);
-      this.fyresult = e.target.innerHTML;
+      this.$set(this.sendObj, "cost", {
+        id: i,
+        html: e.target.innerHTML,
+        type: "cost"
+      });
     },
 
     reset() {
@@ -255,8 +437,8 @@ export default {
           val.classList.remove("check");
         }
       });
-      this.tfresult = this.ysresult = this.fyresult = this.countryresult = this.type = this.rank =
-        "";
+      console.log(this.sendObj);
+      // this.$emit("get_result", this.sendObj);
     },
     confirm() {
       let par = this.$refs.par;
@@ -265,38 +447,18 @@ export default {
           val.classList.remove("active");
         }
       });
+
       this.$refs.mask.classList.remove("show");
       this.navs = "";
 
-      if (
-        !this.tfresult &&
-        !this.ysresult &&
-        !this.fyresult &&
-        !this.countryresult &&
-        !this.type &&
-        !this.rank
-      ) {
-        this.result_data = [];
-        this.$emit("get_result", this.result_data);
-      } else {
-        this.result_data = [
-          this.tfresult,
-          this.ysresult,
-          this.fyresult,
-          this.countryresult,
-          this.type,
-          this.rank
-        ];
+      //调用父组件方法
+      this.$parent.page = 1;
+      this.$parent.allListData = [];
+      this.$parent.getAllList(this.sendObj);
 
-        let data = [];
-        this.result_data.forEach(val => {
-          if (val != "") {
-            data.push(val);
-          }
-        });
-        this.$emit("get_result", data);
-        document.body.style.overflow = "initial";
-      }
+      console.log(this.sendObj);
+      this.$emit("get_result", this.sendObj);
+      document.body.style.overflow = "initial";
     },
 
     checkall(e) {
@@ -310,8 +472,10 @@ export default {
     },
     chang(i, e) {
       this.$nextTick(() => {
-        this.aBScroll1 = new BScroll(this.$refs.bs1, BSConfigY);
-        if (this.$refs.bs4) {
+        if (this.aBScroll1 && this.$refs.bs1) {
+          this.aBScroll1 = new BScroll(this.$refs.bs1, BSConfigY);
+        }
+        if (this.$refs.bs4 && !this.aBScroll4) {
           this.aBScroll4 = new BScroll(this.$refs.bs4, BSConfigY);
         }
       });
@@ -338,9 +502,6 @@ export default {
       this.$refs.mask.classList.add("show");
       this.navs = i;
     },
-    act(e) {
-      this.teds(e);
-    },
     checkCountry(i, e) {
       let target = e.target;
       let all_li = target.parentNode.children;
@@ -351,44 +512,109 @@ export default {
           val.classList.remove("active");
         }
       });
-
       target.classList.add("active");
       this.checked = i;
+      this.$set(this.sendObj, "hostCountryNum", {
+        id: i,
+        html: "",
+        type: "hostCountryNum"
+      });
+      this.$emit("get_result", this.sendObj);
     },
-    checkCtry(e) {
+    checkCtry(id, e) {
       let html = e.target.innerHTML;
       this.countryresult = html;
-
       let ctry = this.$refs.ctry;
-
       ctry.forEach(val => {
         if (val.classList.contains("active")) {
           val.classList.remove("active");
         }
       });
       e.target.classList.add("active");
+      if (e.target.parentNode.id == "fir") {
+        this.$set(this.sendObj, "hostCountryNum", {
+          id: 0,
+          html: "",
+          type: "hostCountryNum"
+        });
+      }
+
+      this.$set(this.sendObj, "hostCityNum", {
+        id: id,
+        html: html,
+        type: "hostCityNum"
+      });
+      this.close_all();
+      this.$parent.page = 1;
+      this.$parent.allListData = [];
+      this.$emit("get_result", this.sendObj);
+
+      this.$parent.getAllList(this.sendObj);
+      this.$parent.allListData = [];
+      document.body.style.overflow = "initial";
     },
 
-    teds(e) {
+    teds(name, type, id, e) {
+      console.log("触发了");
       let target = e.target;
+      let html = target.innerHTML;
+      let parent = target.parentNode.parentNode;
       let all_li = target.parentNode.children;
-      let par = target.parentNode.parentNode;
-      if (par.classList.contains("one")) {
-        this.type = e.target.innerHTML;
-      }
-      if (par.classList.contains("two")) {
-        this.rank = e.target.innerHTML;
-      }
+      let par = target.parentNode.parentNode.parentNode;
+
       let li = [...all_li];
       li.forEach(val => {
         if (val.classList.contains("active")) {
           val.classList.remove("active");
         }
       });
-
       target.classList.add("active");
+      document.body.style.overflow = "initial";
+
+      if (this.$parent.isList) {
+        // this.$parent.count = "";
+        // this.$parent.loading = false;
+        // this.$parent.finished = false;
+      }
+
+      this.$set(this.sendObj, name, {
+        id: id,
+        html: html,
+        type: name
+      });
+
+      console.log(this.sendObj);
+
+      this.close_all();
+      this.$parent.page = 1;
+      this.$parent.allListData = [];
+      //调用父组件方法
+      this.$parent.getAllList(this.sendObj);
+      this.$emit("get_result", this.sendObj);
     },
+
+    oneClick(id, e) {
+      let type = 1;
+      let name = this.params1;
+      this.teds(name, type, id, e);
+    },
+    twoClick(id, e) {
+      let type = 2;
+      let name = this.params2;
+      this.teds(name, type, id, e);
+    },
+    threeClick(id, e) {
+      let type = 3;
+      let name = this.params3;
+      this.teds(name, type, id, e);
+    },
+
     close() {
+      this.close_all();
+      document.body.style.overflow = "initial";
+    },
+
+    close_all() {
       this.$refs.mask.classList.remove("show");
       this.navs = "";
       this.$refs.par.forEach(val => {
@@ -396,8 +622,10 @@ export default {
           val.classList.remove("active");
         }
       });
-      document.body.style.overflow = "initial";
-    }
+    },
+    ...mapMutations({
+      screen_result: "SCREEN_RESULT"
+    })
   },
   components: {}
 };
@@ -545,7 +773,7 @@ export default {
         line-height: 80px;
         border-bottom: 1px solid #e5e5e5;
         &:first-child {
-          background-color: #f8f8f8;
+          // background-color: #f8f8f8;
         }
         &.active {
           color: #ed2530;

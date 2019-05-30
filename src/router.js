@@ -14,9 +14,9 @@ import immig from './views/immigrant/immigrant.vue'
 import immigdetail from './views/immigrant/immigrant_detail.vue'
 // 留学
 import study from './views/study/study.vue'
-import {
-  resolve
-} from 'path';
+// import {
+//   resolve
+// } from 'path';
 Vue.use(Router)
 
 export default new Router({
@@ -24,7 +24,10 @@ export default new Router({
   base: process.env.BASE_URL,
   linkActiveClass: 'active-c',
   routes: [
-
+    {
+      path: '/test',
+      component: resolve => require(['./views/test.vue'], resolve)
+    },
     {
       path: '/home',
       name: 'home',
@@ -82,15 +85,17 @@ export default new Router({
       path: '/home/immig',
       name: 'immig',
       component: immig,
-      children: [],
       meta: {
-        keepAlive: true
+        // keepAlive: true
       }
     },
     {
-      path: '/home/immig/:id',
+      path: '/home/immig/detail',
       name: 'immigdetail',
       component: immigdetail,
+      meta: {
+        keepAlive: false
+      }
     },
     {
       path: '/home/immigmore',

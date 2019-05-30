@@ -11,5 +11,5 @@ export function getMonthDays(year, month) {
 
 
 export function getYearMD(t) {
-    return  t.getFullYear()+'-' + t.getMonth() + 1 +'-' + t.getDate() +' '+ t.getHours() + ':' + t.getMinutes()
+    return t.getFullYear() + '-' + t.getMonth() + 1 + '-' + t.getDate() + ' ' + t.getHours() + ':' + t.getMinutes()
 }

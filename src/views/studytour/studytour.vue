@@ -1,19 +1,37 @@
 <template>
   <div class="studytour">
-    <smenu :item="item" :athor="athor" :two="two" :three="three" :showCity="false"/>
-    <div class="sx_result" v-if="result_data.length > 0">
+    <smenu
+      :item="item"
+      :athor="athor"
+      :two="two"
+      :three="three"
+      :showCity="false"
+      :params1="'recruitStudent'"
+      :params2="'countyNum'"
+      :params3="'theme'"
+      @get_result="get_result"
+    />
+    <div class="sx_result" v-if="Object.keys(result_data).length > 0">
       <h3>筛选结果</h3>
       <div class="condition">
-        <p v-for="i in result_data">
-          {{ i }}
-          <i>
-            <span @click.self="empty"></span>
-          </i>
-        </p>
+        <div v-for="(item,i) of result_data" :key="i" class="sel" v-if="item.html != ''">
+          <p v-if="item.html != ''" :typed="item.type">
+            <span>{{ item.html }}</span>
+            <i>
+              <span @click.self="empty"></span>
+            </i>
+          </p>
+        </div>
       </div>
     </div>
+
+    <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click="emptyall">
+      <span></span>
+      清空所有条件
+    </div>
+
     <div class="lx_content">
-      <h3 class="like" v-if="result_data.length > 0">猜您喜欢</h3>
+      <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3>
       <van-list
         v-model="loading"
         :finished="finished"
@@ -23,7 +41,7 @@
       >
         <div
           class="lx_c_item"
-          v-for="(item, i) in List_data"
+          v-for="(item, i) in allListData"
           @click="$router.push({path: `/home/studytour/${item.id}`})"
           :key="i"
         >
@@ -36,7 +54,7 @@
             <p class="price">
               价格：
               <i>￥{{ item.price }}</i>
-              <span>{{ item.days }}</span>
+              <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}</span>
             </p>
           </div>
         </div>
@@ -47,8 +65,10 @@
 
 <script>
 import smenu from "../../components/slideMenu";
+import { screen_data } from "../../utils/mixins";
 export default {
-  props: {},
+  mixins: [screen_data],
+  inject: ['app'],
   data() {
     return {
       item: ["招生对象", "游学国家", "游学主题"],
@@ -64,21 +84,33 @@ export default {
         "公益服务",
         "文化兴趣"
       ],
+      isList: true,
 
-      result_data: [],
-      List_data: [],
-      loading: false,
-      finished: false,
-      count: "",
-      page: 1,
-      limit: 10
+      yx_menu: [],
+      url: `/dhr/client/study_tour/list`
     };
   },
-  computed: {},
-  created() {},
+  created() {
+    this.getStudyTourdata();
+    
+  },
   methods: {
     onLoad() {
-      this.getStudyTourList();
+      this.getAllList(this.result_data);
+    },
+    screenTheData() {
+      this.getAllList(this.result_data);
+    },
+    // 获取游学menu
+    getStudyTourdata() {
+      this.$fetch("/dhr/client/study_tour/menu").then(res => {
+        if (res.ErrCode == "0000") {
+          this.yx_menu = res.Result;
+          this.athor = this.yx_menu.recruitStudent;
+          this.two = this.yx_menu.country;
+          this.three = this.yx_menu.theme;
+        }
+      });
     },
     getStudyTourList() {
       this.$fetch("/dhr/client/study_tour/list", {
@@ -95,10 +127,10 @@ export default {
           }
           this.page++;
         }
-        console.log(this.List_data);
       });
     }
   },
+
   components: {
     smenu
   }
@@ -151,7 +183,7 @@ export default {
           i {
             color: #ed2530;
             font-size: 34px;
-          width: 150px;
+            width: 150px;
           }
           span {
             width: 110px;
@@ -164,7 +196,6 @@ export default {
             line-height: 36px;
             text-align: center;
             margin-left: 20px;
-            
           }
         }
       }
@@ -227,6 +258,21 @@ export default {
           color: #fff;
         }
       }
+    }
+  }
+  .thinklike {
+    color: #9399a5;
+    font-size: 24px;
+    font-weight: 500;
+    padding-top: 32px;
+    padding-left: 30px;
+    span {
+      display: inline-block;
+      vertical-align: bottom;
+      width: 30px;
+      height: 30px;
+      background: url("../../assets/images/immig/laj.png") no-repeat center /
+        cover;
     }
   }
 }
