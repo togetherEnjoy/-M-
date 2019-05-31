@@ -18,7 +18,7 @@
         <p class="price">
           价格：
           <i>￥{{ List_data.price }}</i>
-          <span>{{ _goTime(List_data.startTime,List_data.endTime) | goTime()  }}天</span>
+          <span>{{ app._goTime(List_data.startTime,List_data.endTime) | goTime()  }}天</span>
         </p>
       </div>
 
@@ -26,7 +26,7 @@
         <div class="left">
           <p>
             行程天数:
-            <span>{{ _goTime(List_data.startTime,List_data.endTime) | goTime() }}天</span>
+            <span>{{ app._goTime(List_data.startTime,List_data.endTime) | goTime() }}天</span>
           </p>
           <p>
             出发城市:
@@ -102,7 +102,7 @@
 <script>
 import { Tab, Tabs } from "vant";
 import con from "../../components/conf";
-import { UTCformat, goTime } from "../../api/UTCformat.js";
+import { UTCformat } from "../../api/UTCformat.js";
 export default {
   inject: ['app'],
   data() {
@@ -133,9 +133,7 @@ export default {
     _UTCformat(t) {
       return UTCformat(t);
     },
-    _goTime(start, end) {
-      return goTime(start, end);
-    }
+ 
   },
   filters: {
     days(value) {

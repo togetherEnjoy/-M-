@@ -23,7 +23,6 @@ export const screen_data = {
             count: "",
             loading: false,
             finished: false,
-            
 
             allListData: [],
             result_data: {}
@@ -32,6 +31,7 @@ export const screen_data = {
     methods: {
         // 获取list数据
         getAllList(box) {
+            // console.log('获取数据:')
             let params = {
                 page: this.page,
                 limit: this.limit
@@ -47,9 +47,10 @@ export const screen_data = {
                 this.$fetch(this.url, params).then(res => {
                     if (res.ErrCode == "0000") {
                         this.allListData = this.allListData.concat(res.Result.data);
+                        console.log(this.allListData)
                         this.count = res.Result.count / 1;
-                        console.log('count-----' + this.count)
-                        console.log( "data----" + this.allListData.length)
+                        // console.log('count-----' + this.count)
+                        // console.log("data----" + this.allListData.length)
                         this.loading = false;
                         if (this.allListData.length >= this.count) {
                             this.finished = true;
@@ -58,8 +59,6 @@ export const screen_data = {
                             this.finished = false
                         }
                         this.page++;
-
-                        console.log(this.finished)
                     }
                 });
             }, 500);
@@ -67,7 +66,6 @@ export const screen_data = {
 
         get_result(data) {
             this.result_data = data;
-            console.log(this.result_data);
             this.page = 1;
         },
 
@@ -77,29 +75,27 @@ export const screen_data = {
             if (type in this.result_data) {
                 this.$delete(this.result_data, type);
             }
-            console.log(this.result_data);
+            if (Object.keys(this.result_data).length == 1 && Object.keys(this.result_data)[0] == 'hostCountryNum') {
+                this.result_data = {}
+            }
             this.$children[0].sendObj = this.result_data;
             // 筛选数据
             this.page = 1;
             this.allListData = [];
-            this.screenTheData();
+            this.getAllList(this.result_data);
         },
         emptyall() {
+           
             this.result_data = {}
             this.$children[0].sendObj = this.result_data;
             // 筛选数据
             this.page = 1;
             this.allListData = [];
-            console.log(this.result_data)
+            this.loading = false
+            // this.finished = false
+            this.getAllList(this.result_data);
+        },
 
-            this.loading = false;
-            this.finished = false;
-            this.screenTheData();
-        },
-        get_result(data, page) {
-            this.result_data = data;
-            console.log(this.result_data);
-            this.page = 1;
-        },
+      
     }
 }

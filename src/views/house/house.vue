@@ -54,7 +54,7 @@
             <h3 class="tit">{{ item.title }}</h3>
             <p
               class="de"
-            >独栋别墅 | {{ item.propertyRightYears }} | {{ item.minArea }}m-{{ item.maxArea }}m</p>
+            >{{ houstType(item.hoseType) }} | {{ item.propertyRightYears }} | {{ item.minArea }}m-{{ item.maxArea }}m</p>
             <p class="price">
               <i class="le">
                 ￥
@@ -64,7 +64,7 @@
 
               <span class="ri">
                 首付比例
-                <i>10%</i>
+                <i>{{ item.downPay }}%</i>
               </span>
             </p>
           </div>
@@ -92,11 +92,8 @@ export default {
   },
   methods: {
     onLoad() {
-      console.log('触发')
+      console.log("触发");
       this.getAllList(this.result_data);
-    },
-    screenTheData() {
-      this.getAllList(this.result_data)
     },
     // 获取menu
     getMenuData() {
@@ -104,6 +101,18 @@ export default {
         this.menu = res.Result;
         console.log(this.menu);
       });
+    },
+    houstType(type) {
+      switch (type) {
+        case 1:
+          return "独栋别墅";
+        case 2:
+          return "联排别墅";
+        case 3:
+          return "精品住宅";
+        case 4:
+          return "双拼别墅"
+      }
     }
   },
 

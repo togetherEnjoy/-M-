@@ -14,8 +14,7 @@
       @get_result="get_result"
     />
 
-
-    <div class="sx_result" v-if="Object.keys(result_data).length > 1">
+    <div class="sx_result" v-if="Object.keys(result_data).length > 0">
       <h3>筛选结果</h3>
       <div class="condition">
         <div v-for="(item,i) of result_data" :key="i" class="sel" v-if="item.html != ''">
@@ -29,7 +28,7 @@
       </div>
     </div>
 
-    <div class="thinklike" v-if="Object.keys(result_data).length > 1" @click="emptyall">
+    <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click.stop.prevent="emptyall">
       <span></span>
       清空所有条件
     </div>
@@ -77,11 +76,11 @@
 <script>
 import smenu from "../../components/slideMenu";
 import { mapGetters, mapMutations } from "vuex";
-// import { screen_data } from "../../utils/mixins";
+import { screen_data } from "../../utils/mixins";
 
 const url = `/dhr/client/study_abroad/list`;
 export default {
-  // mixins: [screen_data],
+  mixins: [screen_data],
   data() {
     return {
       item: ["国家", "类别", "国内排名", "更多"],
@@ -92,104 +91,21 @@ export default {
       ys: [],
       fy: [],
       study_menu: [],
-      url: `/dhr/client/study_abroad/list`,
-      page: 1,
-      limit: 10,
-      count: "",
-      loading: false,
-      finished: false,
-
-      allListData: [],
-      result_data: {}
+      url: `/dhr/client/study_abroad/list`
     };
   },
   created() {
     this.getStudyData();
   },
   methods: {
-    // 获取list数据
-    getAllList(box) {
-      let params = {
-        page: this.page,
-        limit: this.limit
-      };
-      let keys = Object.keys(this.result_data);
-      if (keys.length == 1 && keys[0] == "hostCountryNum") {
-        
-      } else {
-        if (box) {
-          let data = {};
-          for (let k in box) {
-            data[k] = box[k].id;
-          }
-          params = Object.assign(params, data);
-        }
-      }
-
-      setTimeout(() => {
-        this.$fetch(this.url, params).then(res => {
-          if (res.ErrCode == "0000") {
-            this.allListData = this.allListData.concat(res.Result.data);
-            this.count = res.Result.count / 1;
-            this.loading = false;
-            if (this.allListData.length >= this.count) {
-              this.finished = true;
-              console.log("无更多数据");
-            }
-            this.page++;
-          }
-        });
-      }, 500);
-    },
-
-    get_result(data) {
-      this.result_data = data;
-      console.log(this.result_data);
-      this.page = 1;
-    },
-
-    empty(e) {
-      let text = e.target.parentNode.parentNode;
-      const type = text.getAttribute("typed");
-      if (type in this.result_data) {
-        this.$delete(this.result_data, type);
-      }
-      console.log(this.result_data);
-
-      this.$children[0].sendObj = this.result_data;
-      // 筛选数据
-      this.page = 1;
-      this.allListData = [];
-      this.screenTheData();
-    },
-    emptyall() {
-      this.result_data = {
-        hostCountryNum: {
-          id: 0,
-          html: "",
-          type: "hostCountryNum"
-        }
-      };
-
-      this.$children[0].reset();
-      this.$children[0].sendObj = this.result_data;
-      // 筛选数据
-      this.page = 1;
-      this.allListData = [];
-      this.screenTheData();
-    },
-    get_result(data, page) {
-      this.result_data = data;
-      console.log(this.result_data);
-      this.page = 1;
-    },
     onLoad() {
-      this.getAllList();
-    },
-    // 筛选数据
-    screenTheData() {
+      console.log("触发了 onload")
       this.getAllList(this.result_data);
     },
+    // // 筛选数据
+    // screenTheData() {
+    //   this.getAllList(this.result_data);
+    // },
     // 获取留学国家
     getStudyData() {
       this.$fetch("/dhr/client/study_abroad/menu").then(res => {

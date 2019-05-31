@@ -437,8 +437,6 @@ export default {
           val.classList.remove("check");
         }
       });
-      console.log(this.sendObj);
-      // this.$emit("get_result", this.sendObj);
     },
     confirm() {
       let par = this.$refs.par;
@@ -555,7 +553,8 @@ export default {
     },
 
     teds(name, type, id, e) {
-      console.log("触发了");
+      // console.log("触发了");
+      console.log(this.$parent.loading);
       let target = e.target;
       let html = target.innerHTML;
       let parent = target.parentNode.parentNode;
@@ -570,21 +569,12 @@ export default {
       });
       target.classList.add("active");
       document.body.style.overflow = "initial";
-
-      if (this.$parent.isList) {
-        // this.$parent.count = "";
-        // this.$parent.loading = false;
-        // this.$parent.finished = false;
-      }
-
       this.$set(this.sendObj, name, {
         id: id,
         html: html,
         type: name
       });
-
-      console.log(this.sendObj);
-
+      
       this.close_all();
       this.$parent.page = 1;
       this.$parent.allListData = [];

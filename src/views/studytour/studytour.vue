@@ -54,7 +54,7 @@
             <p class="price">
               价格：
               <i>￥{{ item.price }}</i>
-              <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}</span>
+              <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}天</span>
             </p>
           </div>
         </div>

@@ -93,8 +93,8 @@
       <!-- 热门移民国家 -->
       <div class="yim">
         <div class="top_bar">
-          <h1>热门移民国家</h1>
-          <p @click="$router.push({path: '/home/immig'})">探索更多移民国家</p>
+          <h1>热门移民</h1>
+          <p @click="$router.push({path: '/home/immig',query: {hostCountryNum: 0}})">探索更多移民国家</p>
         </div>
         <div class="yim_box" ref="yim">
           <ul>
@@ -199,7 +199,7 @@
                     <p class="price">
                       价格：
                       <i>￥{{ item.price }}</i>
-                      <span>{{ item.days }}</span>
+                      <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}天</span>
                     </p>
                   </div>
                 </div>
@@ -216,7 +216,7 @@
           <p @click="$router.push({path: '/news'})">探索更多海外热门</p>
         </div>
 
-        <van-tabs :line-height="0" @click="tabBtnClick">
+        <van-tabs :line-height="0" @click="tabBtnClick" animated>
           <van-tab v-for="(item, i ) in hot" :key="i" :title="item">
             <van-list
               v-model="loading"
@@ -333,7 +333,7 @@
       </div>
 
       <!-- footb -->
-      <div class="footb">
+      <!-- <div class="footb">
         <div class="f_box">
           <div class="f_item">
             <div class="imgs">
@@ -362,14 +362,14 @@
             <p>会员增值</p>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <!-- foot -->
-    <footer class="foot">
+    <!-- <footer class="foot">
       <p>关于去海外</p>
       <p class="s">市场合作：support@qhiwi.com</p>
       <p class="b">备案号：xxxxxxxxxxxxx</p>
-    </footer>
+    </footer> -->
   </div>
 </template>
 
@@ -381,6 +381,7 @@ import { mapMutations, mapGetters } from "vuex";
 
 import { getDateDiff } from "../../api/api.js";
 export default {
+  inject: ["app"],
   data() {
     return {
       msg: process.env.VUE_APP_MSG,
@@ -408,15 +409,16 @@ export default {
       list_data: [],
 
       // 游学
-      yx_loading: false,
-      yx_finished: true,
       yx_menu: [],
       yx_page: 1,
       yx_limit: 4,
       yx_data: [],
+      yx_cache: {}, // 缓存
       // 房产menu
       house_menu: [],
       house_data: [],
+      houst_cache: {},
+      house_referer: 0,
       // 移民menu
       immig_menu: [],
       // 留学
@@ -444,19 +446,18 @@ export default {
   },
   methods: {
     getSwipeImg() {
-      this.$fetch('/dhr/advertise/img?showCityNum=1').then(res => {
-        
-        if (res.ErrCode == '0000') {
-          this.swipeImg = res.Result.data.slice(0, 4)
+      this.$fetch("/dhr/advertise/img?showCityNum=1").then(res => {
+        if (res.ErrCode == "0000") {
+          this.swipeImg = res.Result.data.slice(0, 4);
         }
-      })
-      this.$fetch('/dhr/advertise/text?showCityNum=1').then(res => {
+      });
+      this.$fetch("/dhr/advertise/text?showCityNum=1").then(res => {
         // console.log(res)
-        if (res.ErrCode == '0000') {
-          this.recommen = res.Result.data
-          console.log( this.recommen)
+        if (res.ErrCode == "0000") {
+          this.recommen = res.Result.data;
+          console.log(this.recommen);
         }
-      })
+      });
     },
     // 获取游学menu
     getStudyTourdata() {
@@ -492,9 +493,13 @@ export default {
       });
     },
 
-    // 游学
-    hsTabClick(i = 0) {
-      this.house_data = [];
+    // 房产
+    hsTabClick(i = 0, pageName = "美国") {
+      if (!this.getcache('houseList','house_data', pageName))  return
+      
+      this.houseListData(i, pageName);
+    },
+    houseListData(i = 0, pageName = "美国") {
       this.$fetch("/dhr/client/house/list", {
         belongCountry: i,
         page: 1,
@@ -502,13 +507,21 @@ export default {
       }).then(res => {
         if (res.ErrCode == "0000") {
           this.house_data = res.Result.data;
+
+          this.houst_cache[pageName] = this.house_data;
+          console.log(this.houst_cache);
+          sessionStorage.setItem("houseList", JSON.stringify(this.houst_cache));
         } else if (res.ErrCode == "9999") {
           this.$toast("刷新太快了");
         }
       });
     },
-    yxBtnClick(index = 0) {
-      this.yx_data = [];
+    // 游学
+    yxBtnClick(index = 0, pageName = "幼儿") {
+      if (!this.getcache('yxList', 'yx_data', pageName)) return
+      this.yxListData(index, pageName)
+    },
+    yxListData(index = 0, pageName = "幼儿") {
       this.$fetch("/dhr/client/study_tour/list", {
         page: this.yx_page,
         limit: this.yx_limit,
@@ -516,11 +529,28 @@ export default {
       }).then(res => {
         if (res.ErrCode == "0000") {
           this.yx_data = res.Result.data;
+
+          this.yx_cache[pageName] = this.yx_data;
+          console.log(this.yx_cache);
+          sessionStorage.setItem("yxList", JSON.stringify(this.yx_cache));
         } else if (res.ErrCode == "9999") {
           this.$toast("刷新太快了");
         }
       });
     },
+
+    getcache(cacheName,data, pageName) {
+      let list = JSON.parse(sessionStorage.getItem(cacheName));
+      if (pageName in list) {
+        this[data] = list[pageName];
+        console.log(this[data]);
+        return false;
+      } else {
+        this[data] = [];
+        return true
+      }
+    },
+
     // 上拉加载
     onRefresh() {
       let self = this;
@@ -554,7 +584,7 @@ export default {
           this.count = data.count / 1;
           this.list_data = this.list_data.concat(data.data);
           this.loading = false;
-          localStorage.setItem("list", JSON.stringify(this.list_data));
+          // localStorage.setItem("list", JSON.stringify(this.list_data));
 
           if (this.list_data.length >= this.count) {
             this.finished = true;
@@ -611,12 +641,12 @@ export default {
     },
     init() {
       this.getMenuData();
-      this.hsTabClick();
+      this.houseListData();
       this.getImmigData();
       this.getStudyData();
       this.getStudyTourdata();
-      this.yxBtnClick();
-      this.getSwipeImg()
+      this.yxListData();
+      this.getSwipeImg();
     },
     ...mapMutations({
       set_list: "SET_LIST",

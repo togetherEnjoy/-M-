@@ -86,7 +86,7 @@ export default new Router({
       name: 'immig',
       component: immig,
       meta: {
-        // keepAlive: true
+        keepAlive: false
       }
     },
     {

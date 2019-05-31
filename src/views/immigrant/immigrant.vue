@@ -75,17 +75,19 @@ export default {
       loading: false,
       finished: false,
       active: this.$route.query.hostCountryNum || 0,
-      list_data: []
+      list_data: [],
+
+      immig_country: []
     };
   },
   computed: {
-    // hostCountryNum() {
-    //   return this.$route.query.hostCountryNum
+    // immig_country() {
+    //   return this.immig_menu;
     // },
-    immig_country() {
-      return this.immig_menu;
-    },
-    ...mapGetters(["immig_menu"])
+    // ...mapGetters(["immig_menu"])
+    // active() {
+    //   return this.$route.query.hostCountryNum || 0
+    // }
   },
   activated() {
     console.log("actived");
@@ -93,13 +95,21 @@ export default {
   deactivated() {
     console.log("deactivated");
   },
+  created() {
+    this.getImmigData()
+  },
   methods: {
+    getImmigData() {
+      this.$fetch("/dhr/client/migrate/menu").then(res => {
+        if (res.ErrCode == "0000") {
+          this.immig_country = res.Result.country;
+          
+        }
+      });
+    },
     getImmigListData() {
       console.log("触发了");
-      console.log(this.hostCountryNum);
-      if (this.isLoading) {
-        return false;
-      }
+      
       setTimeout(() => {
         this.$fetch(url, {
           page: this.page,
@@ -138,6 +148,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     console.log(to);
     if (to.path == "/home/immig") {
+      console.log(to)
     }
     next();
   },

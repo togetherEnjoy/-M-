@@ -2,12 +2,12 @@
   <div class="house_detail">
     <van-swipe @change="onChange">
       <!-- :style="`width:${viewWidth}px`" -->
-      <van-swipe-item v-for="item in 4">
+      <van-swipe-item v-for="item in swipe">
         <div class="hd_img">
-          <img src="../../assets/images/house/hd.png">
+          <img v-lazy="item.img">
         </div>
       </van-swipe-item>
-      <div class="custom-indicator" slot="indicator">{{ current + 1 }}/4</div>
+      <div class="custom-indicator" slot="indicator">{{ current + 1 }}/{{ swipe.length }}</div>
     </van-swipe>
 
     <div class="details">
@@ -65,15 +65,15 @@
           </p>
           <p class="dbld">
             物业类型：
-            <span>{{ house_detail.hoseType }}</span>
+            <span>{{ houstType(house_detail.hoseType) }}</span>
           </p>
           <p class="dbld">
             交房标准：
-            <span>{{house_detail.deliverCriterion}}</span>
+            <span>{{ deliverCriterion(house_detail.deliverCriterion) }}</span>
           </p>
           <p class="dbld">
             可选户型：
-            <span>{{ house_detail.optionalRoomType }}</span>
+            <span v-for="(item,i) in useHx(house_detail.optionalRoomType)" :key="i">{{ item }}</span>
           </p>
         </div>
         <div class="dbl">
@@ -201,13 +201,24 @@ export default {
       current: 0,
       active: 0,
       house_detail: {},
-      property: {}
+      property: {},
+      swipe: []
     };
   },
   created() {
     this.getHouseDetail()
+    this.getSwipeData()
   },
   methods: {
+    // 轮播
+    getSwipeData() {
+      this.$fetch('/dhr/advertise/img/home').then(res => {
+        console.log(res)
+        if (res.ErrCode == '0000') {
+          this.swipe = res.Result.data
+        }
+      })
+    },
     getHouseDetail() {
       let { id } = this.$route.params
       this.$fetch(`/dhr/client/house/${id}`).then(res => {
@@ -221,6 +232,41 @@ export default {
     },
     onChange(index) {
       this.current = index;
+    },
+    // 房产类型
+    houstType(type) {
+      switch (type) {
+        case 1:
+          return "独栋别墅";
+        case 2:
+          return "联排别墅";
+        case 3:
+          return "精品住宅";
+        case 4:
+          return "双拼别墅"
+      }
+    },
+    // 可选户型
+    useHx(data) {
+      const type = ['一室','二室','三室','四室','四室以上']
+      let newData = data.split(',')
+      let showD = []
+      let map = newData.map((val, index) => {
+        let number = Number(val)
+        if (number) {
+          showD.unshift(type[index])
+        }
+      })
+      return showD
+    },
+    // 交房标准
+    deliverCriterion(data) {
+      switch (data) {
+        case 1: 
+          return '精装交付';
+        case 2:
+          return '其他'
+      }
     }
   },
   components: {
