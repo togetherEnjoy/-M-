@@ -150,10 +150,11 @@ export default new Router({
 
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
+      console.log(savedPosition)
       return savedPosition
     } else {
       if (from.meta.keepAlive) {
-      //  console.log(from)
+       console.log(document.body.scrollTop)
         from.meta.savedPosition = document.body.scrollTop;
         // console.log(from.meta.savedPosition)
       }

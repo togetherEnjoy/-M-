@@ -134,3 +134,10 @@ img {
       transform: rotate(360deg);
     }
   }
+
+    // 字体溢出省略
+    .text_overflow {
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap
+    }

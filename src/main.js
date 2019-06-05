@@ -8,6 +8,9 @@ import {
   post
 } from './utils/http'
 import fastclick from 'fastclick'; //移动端300ms
+
+// fastclick.attach(document.body);
+
 // px to rem 插件
 import 'lib-flexible'
 
@@ -35,17 +38,15 @@ Vue.use(Dialog)
   .use(SwipeItem)
   .use(Toast)
   .use(Lazyload, {
-    loading: ''
+    loading: require('./assets/images/hot/lazy.png')
   })
   .use(PullRefresh)
   .use(List)
   .use(Loading)
 
-// 300ms延迟
-// fastclick.attach(document.body);
+
 
 /*第一层if判断生产环境和开发环境*/
-console.log(process.env.VUE_APP_FLAG)
 if (process.env.NODE_ENV === 'production') {
   /*第二层if，根据.env文件中的VUE_APP_FLAG判断是生产环境还是测试环境*/
   if (process.env.VUE_APP_FLAG === 'pro') {
@@ -59,7 +60,7 @@ if (process.env.NODE_ENV === 'production') {
   }
 } else {
   //dev 开发环境
-  // axios.defaults.baseURL = 'http://120.78.158.34/';
+  axios.defaults.baseURL = 'http://120.78.158.34/';
 }
 
 

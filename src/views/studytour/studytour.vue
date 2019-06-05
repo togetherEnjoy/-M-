@@ -53,7 +53,7 @@
 
             <p class="price">
               价格：
-              <i>￥{{ item.price }}</i>
+              <b>￥</b><i>{{ item.price }}</i>
               <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}天</span>
             </p>
           </div>
@@ -180,10 +180,15 @@ export default {
           color: #9399a5;
           display: flex;
           align-items: center;
+          b {
+            color: #ed2530;
+            margin-top: 5px;
+          }
           i {
             color: #ed2530;
             font-size: 34px;
             width: 150px;
+            font-weight: bold;
           }
           span {
             width: 110px;

@@ -71,10 +71,6 @@
             交房标准：
             <span>{{ deliverCriterion(house_detail.deliverCriterion) }}</span>
           </p>
-          <p class="dbld">
-            可选户型：
-            <span v-for="(item,i) in useHx(house_detail.optionalRoomType)" :key="i">{{ item }}</span>
-          </p>
         </div>
         <div class="dbl">
           <p class="dbld">
@@ -82,19 +78,19 @@
             <span>{{ house_detail.propertyRightYears }}</span>
           </p>
           <p class="dbld">
-            是否贷款：
-            <span>能</span>
-          </p>
-          <p class="dbld">
             交房时间：
             <span>{{ house_detail.deliveryTime }}</span>
+          </p>
+          <p class="dbld">
+            可选户型：
+            <span v-for="(item,i) in useHx(house_detail.optionalRoomType)" :key="i">{{ item }}</span>
           </p>
         </div>
       </div>
     </div>
 
     <div class="project">
-      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1">
+      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" sticky>
         <van-tab title="项目简介">
           <div class="content" v-html="house_detail.content">
             <!-- <p>在科学研究方面，美国学者赢得了大量的诺贝尔奖，尤其是在生物和医学领域。美国国家健康研究中心是美国生物医学的聚焦点，并已完成人类基因组计划，使人类对肿瘤、阿兹海默症等疾病的治愈研究进入重要阶段。航空和航天研究的政府机构是美国国家航空航天局。波音公司和洛克希德·马丁公司一类的私营企业也扮演了重要角色。美国国家科学院、美国国家工程院、美国国家医学院和美国国家自然基金会，是美国科学界最高水平的四大学术机构。除自然基金会外，其他三院分别授予院士头衔。</p>
@@ -195,7 +191,6 @@
 import { Tab, Tabs } from "vant";
 import con from "../../components/conf";
 export default {
-  props: {},
   data() {
     return {
       current: 0,
@@ -226,7 +221,7 @@ export default {
         if (res.ErrCode == '0000') {
           this.house_detail = res.Result
           this.property = JSON.parse(res.Result.property)
-          console.log(this.property)
+          console.log(this.house_detail)
         }
       })
     },
@@ -261,10 +256,11 @@ export default {
     },
     // 交房标准
     deliverCriterion(data) {
+      console.log(data)
       switch (data) {
         case 1: 
           return '精装交付';
-        case 2:
+        case 0:
           return '其他'
       }
     }
@@ -280,6 +276,7 @@ export default {
 <style lang="scss">
 .house_detail {
   width: 100%;
+  overflow-x: hidden;
   .custom-indicator {
     position: absolute;
     width: 90px;
@@ -297,15 +294,30 @@ export default {
   }
 
 }
+
+// 去掉tabs的边框
+.van-hairline--top-bottom::after {
+    border-width: 0 !important;
+  }
+
+  // 加粗选择的tabs
+  .van-tab--active {
+    font-weight: 700 !important;
+  }
+
+  // tab 下的 line
+  .van-tabs__line {
+    height: 2px !important;
+  }
 </style>
 
 
 <style scoped lang="scss">
 .house_detail {
   background-color: #f8f8f8;
-  padding-bottom: 98px;
+  margin-bottom: 158px;
   .hd_img {
-    width: 750px;
+    width: 100%;
     height: 500px;
   }
 
@@ -333,7 +345,7 @@ export default {
           top: 2px;
           width: 24px;
           height: 24px;
-          background: url("../../assets/images/house/red_posi.png") no-repeat
+          background: url("../../assets/images/house/posi.png") no-repeat
             center / cover;
         }
       }
@@ -426,10 +438,12 @@ export default {
     margin-top: 30px;
     background-color: #fff;
     // padding: 0 30px;
-    color: #9399a5;
+    // color: #9399a5;
     line-height: 48px;
     font-size: 24px;
     .content {
+      padding-top: 20px;
+      font-size: 30px;
       .imgs {
         width: 480px;
         height: 320px;
@@ -443,6 +457,7 @@ export default {
     }
     .zb_content,
     .wy_content {
+      font-size: 30px;
       & > div {
         padding: 35px 0 30px 0;
         border-bottom: 1px solid #e5e5e5;

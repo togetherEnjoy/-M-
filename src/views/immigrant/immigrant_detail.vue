@@ -53,33 +53,34 @@
 
         <div class="s_huan" ref="change">
           <p @click="referer">换一换</p>
-          <span @click="$router.push({path: '/home/immigmore'})">更多</span>
+          <span @click="$router.push({path: '/home/immigmore', query:{id}})">更多</span>
         </div>
       </div>
 
-      <div class="s_item" v-for="i in 4">
+      <div class="s_item" v-for="(item,i) in merchant_data.slice(0, 4)" :key="i">
         <div class="heads_img">
-          <img src="../../assets/images/immig/immig.png">
+          <img v-lazy="item.img">
         </div>
 
         <div class="text">
-          <h3>启德留学</h3>
-          <p>咨询量：500</p>
+          <h3>{{ item.merchantName }}</h3>
+          <p>咨询量：{{ item.hot }}</p>
         </div>
 
         <div class="func">
-          <span>
+          <span @click="showToast">
             <i class="email"></i>
           </span>
           <span class="pb">
-            <i class="phone"></i>
+            <!-- <i class="phone"></i> -->
+            <a href="tel:400 877 1008" class="phone"></a>
           </span>
         </div>
       </div>
     </div>
 
     <div class="project">
-      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1">
+      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" sticky>
         <van-tab title="项目介绍">
           <div class="content" v-html="immig_detail.projectIntroduction">
             <!-- <p>
@@ -110,7 +111,7 @@
       </van-tabs>
     </div>
 
-    <con :simpleName="'海外网'"/>
+    <con :simpleName="simpleName" :head_img="head_img" :hot="hot" :typeOf="2" ref="con" />
   </div>
 </template>
 
@@ -120,9 +121,8 @@ import con from "../../components/conf";
 import { setTimeout } from "timers";
 
 const url = `/dhr/client/migrate/`;
-const gysUrl = `/dhr/client/migrate/merchant_list`;
+const gysUrl = `/dhr/business/immigrant/support`;
 export default {
-  props: {},
   data() {
     return {
       active: 0,
@@ -138,7 +138,11 @@ export default {
       id: this.$route.query.id,
       referer_can: true,
       immig_detail: [],
-      merchant_data: []
+      merchant_data: [],
+      simpleName: "",
+      head_img: "",
+      hot: "",
+
     };
   },
   methods: {
@@ -168,17 +172,24 @@ export default {
       this.$fetch(gysUrl, {
         id: this.id
       }).then(res => {
-        console.log(res);
-        if (res.ErrCode == '0000') {
-          this.merchant_data = res.Result.data
+        if (res.ErrCode == "0000") {
+          this.merchant_data = res.Result.data;
+          console.log(this.merchant_data);
+          this.simpleName = this.merchant_data[0].merchantName;
+          this.head_img = this.merchant_data[0].img;
+          this.hot = this.merchant_data[0].hot;
         }
       });
+    },
+    // 咨询框
+    showToast() {
+      let con = this.$refs.con;
+      con.eject();
     }
   },
   created() {
     this.getImmigDetail();
     this.getMerchantData();
-    console.log(this.id);
   },
   components: {
     [Tab.name]: Tab,
@@ -195,7 +206,7 @@ export default {
 <style scoped lang="scss">
 .immg_detail {
   background-color: #f8f8f8;
-  padding-bottom: 98px;
+  padding-bottom: 158px;
   .ser_img_wrap {
     .card_item {
       color: #fff;
@@ -383,7 +394,8 @@ export default {
           border-radius: 50%;
           background-color: #fde9ea;
           text-align: center;
-          i {
+          i,
+          a {
             display: inline-block;
             width: 48px;
             height: 48px;
@@ -412,6 +424,7 @@ export default {
     line-height: 48px;
     font-size: 24px;
     .content {
+      padding-top: 20px;
       .imgs {
         width: 480px;
         height: 320px;
@@ -424,6 +437,5 @@ export default {
       }
     }
   }
-
 }
 </style>

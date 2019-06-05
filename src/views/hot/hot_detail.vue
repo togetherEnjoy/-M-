@@ -425,6 +425,7 @@ export default {
       padding: 0 30px;
       .hot_item {
         display: flex;
+        justify-content: space-between;
         padding: 30px 0;
         border-bottom: 1px solid #e5e5e5;
 
@@ -439,8 +440,9 @@ export default {
         }
 
         .item_right {
-          width: 240px;
-          height: 160px;
+          width: 210px;
+          height: 140px;
+          border-radius: 4px;
           overflow: hidden;
           img {
             display: block;

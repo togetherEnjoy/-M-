@@ -8,7 +8,7 @@
         <img src="../../assets/images/home/logo.png">
       </div>
       <div class="top_ri">
-        <img src="../../assets/images/home/per.png">
+        <!-- <img src="../../assets/images/home/per.png"> -->
       </div>
     </div>
 
@@ -20,9 +20,11 @@
 
     <div class="swip">
       <van-swipe indicator-color="white" :autoplay="3000">
-        <van-swipe-item v-for="(image, index) in swipeImg" :key="index">
+        <van-swipe-item  v-for="(image, index) in swipeImg" :key="index">
           <div class="banner_box">
-            <img v-lazy="image.img">
+              <router-link to="/home/house">
+                <img v-lazy="image.img">
+              </router-link>
           </div>
         </van-swipe-item>
       </van-swipe>
@@ -76,7 +78,7 @@
                       <img v-lazy="item.coverImg">
                     </div>
 
-                    <p class="tit">{{ item.title }}</p>
+                    <p class="tit text_overflow">{{ item.title }}</p>
                     <p class="param">{{ item.minArea }}~{{ item.maxArea }}㎡ | 首付 10%</p>
                     <p class="price">
                       ￥
@@ -119,7 +121,7 @@
             <li
               @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[3].id}})"
             >
-              <img src="../../assets/images/home/jianada.png">
+              <img src="../../assets/images/home/yidali.png">
               <p v-if="immig_menu.length>0">{{ immig_menu[3].name }}</p>
             </li>
           </ul>
@@ -130,7 +132,7 @@
       <div class="liuxue">
         <div class="top_bar lx_top_bar">
           <h1>热门留学</h1>
-          <p @click="$router.push({path: '/home/study'})">探索更多海外国家</p>
+          <p @click="$router.push({path: '/home/study'})">探索更多海外留学</p>
         </div>
 
         <div class="lx_box">
@@ -171,13 +173,14 @@
             </div>
           </div>
         </div>
+        
       </div>
 
       <!-- 精品海外游学 -->
       <div class="jin_liuxue">
         <div class="top_bar">
-          <h1>精品海外游学</h1>
-          <p @click="$router.push({path: '/home/studytour'})">探索更多海外留学</p>
+          <h1>海外游学</h1>
+          <p @click="$router.push({path: '/home/studytour'})">探索更多海外游学</p>
         </div>
         <van-tabs :line-height="0" @click="yxBtnClick">
           <van-tab v-for="(item, i) in yx_menu" :key="i" :title="item.name">
@@ -225,57 +228,7 @@
               @load="onLoad"
               :offset="10"
             >
-              <!-- <div>
-                <div class="hot_wrap">
-                  <div
-                    class="hot_item"
-                    @click="$router.push({path: `/news/newsd`,query: {id: list.id}})"
-                  >
-                    <div class="item_left">
-                      <p class="txt">
-                        白发苍苍的老人，用他自己对音乐
-                        的热爱感染了在场的每一位游客！
-                      </p>
-                      <p class="hover">
-                        皇包车 · 2天前
-                        <span>评论数：5</span>
-                      </p>
-                    </div>
-                    <div class="item_right">
-                      <img src="../../assets/images/home/1.png">
-                    </div>
-                  </div>
-
-                  <div
-                    class="hot_all"
-                    @click="$router.push({path:  `/news/newsd`,query: {id: list.id}})"
-                  >
-                    <div class="all_t">
-                      <p>
-                        白发苍苍的老人，用他自己对音乐的热爱感染了在场
-                        的每一位游客，感染了在场的每一位游客！
-                      </p>
-                    </div>
-                    <div class="all_c">
-                      <div>
-                        <img src="../../assets/images/home/1.png">
-                      </div>
-                      <div>
-                        <img src="../../assets/images/home/2.png">
-                      </div>
-                      <div>
-                        <img src="../../assets/images/home/3.png">
-                      </div>
-                    </div>
-                    <div class="all_b">
-                      <p class="hover">
-                        皇包车 · 2天前
-                        <span>评论数：5</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>-->
+            
 
               <div>
                 <div v-if="list_data.length > 0" v-for="(list, i) in list_data" :key="i">
@@ -362,14 +315,14 @@
             <p>会员增值</p>
           </div>
         </div>
-      </div> -->
+      </div>-->
     </div>
     <!-- foot -->
     <!-- <footer class="foot">
       <p>关于去海外</p>
       <p class="s">市场合作：support@qhiwi.com</p>
       <p class="b">备案号：xxxxxxxxxxxxx</p>
-    </footer> -->
+    </footer>-->
   </div>
 </template>
 
@@ -446,9 +399,13 @@ export default {
   },
   methods: {
     getSwipeImg() {
-      this.$fetch("/dhr/advertise/img?showCityNum=1").then(res => {
+      this.$fetch("/dhr/advertise/img", {
+        showCityNum: 1
+      }).then(res => {
+        console.log(res);
         if (res.ErrCode == "0000") {
           this.swipeImg = res.Result.data.slice(0, 4);
+          console.log(this.swipeImg);
         }
       });
       this.$fetch("/dhr/advertise/text?showCityNum=1").then(res => {
@@ -495,8 +452,8 @@ export default {
 
     // 房产
     hsTabClick(i = 0, pageName = "美国") {
-      if (!this.getcache('houseList','house_data', pageName))  return
-      
+      if (!this.getcache("houseList", "house_data", pageName)) return;
+
       this.houseListData(i, pageName);
     },
     houseListData(i = 0, pageName = "美国") {
@@ -518,8 +475,8 @@ export default {
     },
     // 游学
     yxBtnClick(index = 0, pageName = "幼儿") {
-      if (!this.getcache('yxList', 'yx_data', pageName)) return
-      this.yxListData(index, pageName)
+      if (!this.getcache("yxList", "yx_data", pageName)) return;
+      this.yxListData(index, pageName);
     },
     yxListData(index = 0, pageName = "幼儿") {
       this.$fetch("/dhr/client/study_tour/list", {
@@ -539,7 +496,7 @@ export default {
       });
     },
 
-    getcache(cacheName,data, pageName) {
+    getcache(cacheName, data, pageName) {
       let list = JSON.parse(sessionStorage.getItem(cacheName));
       if (pageName in list) {
         this[data] = list[pageName];
@@ -547,7 +504,7 @@ export default {
         return false;
       } else {
         this[data] = [];
-        return true
+        return true;
       }
     },
 
@@ -724,6 +681,10 @@ export default {
   .van-list__loading {
     padding-top: 25px;
   }
+  // 去掉home的line
+   .van-tabs__line {
+    height: 0px !important;
+  }
 }
 
 // toast
@@ -893,7 +854,7 @@ export default {
           overflow-y: hidden;
           overflow-x: scroll;
           text-align: center;
-          // -webkit-overflow-scrolling: touch;
+          -webkit-overflow-scrolling: touch;
           &::-webkit-scrollbar {
             /*隐藏滚轮*/
             display: none;
@@ -903,11 +864,11 @@ export default {
           // margin-top: 40px;
           display: inline-block;
           white-space: nowrap;
-
           .show_item {
             display: inline-block;
             margin-right: 30px;
             text-align: left;
+            width: 480px;
             &:last-child {
               margin-right: 0;
             }
@@ -919,8 +880,9 @@ export default {
             }
             .tit {
               font-size: 30px;
-              font-weight: 500;
+              font-weight: bold;
               margin-top: 18px;
+              overflow: hidden;
             }
             .param {
               font-size: 24px;
@@ -964,11 +926,14 @@ export default {
             margin-right: 30px;
             p {
               position: absolute;
+              width: 100%;
+              height: 70px;
+              padding: 10px 10px 0;
               font-size: 30px;
-              font-weight: bold;
               color: #fff;
-              left: 10px;
-              bottom: 19px;
+              left: 0px;
+              bottom: 0px;
+              background: linear-gradient(to bottom, rgba(0,0,0,.1),rgba(0,0,0,.5));
             }
 
             &:last-child {
@@ -1045,24 +1010,25 @@ export default {
         .lx_c_item {
           display: flex;
           margin-bottom: 20px;
+
           text-align: left;
           .imgs {
             width: 210px;
             height: 210px;
+            border-radius: 4px;
             overflow: hidden;
-            img {
-              // height: auto !important;
-            }
+       
           }
 
           .lx_r {
+            flex: 1;
             padding: 20px 0;
             margin-left: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             .tit {
-              font-size: 24px;
+              font-size: 30px;
               font-weight: bold;
               line-height: 48px;
             }
@@ -1122,6 +1088,9 @@ export default {
             margin-right: 21px;
             width: 429px;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             .txt {
               font-size: 30px;
               line-height: 40px;
@@ -1132,6 +1101,8 @@ export default {
           .item_right {
             width: 210px;
             height: 140px;
+            border-radius: 4px;
+            overflow: hidden;
             img {
               display: block;
               width: 100%;
@@ -1144,7 +1115,6 @@ export default {
           line-height: 24px;
           color: #9399a5;
           font-size: 22px;
-          margin-top: 40px;
           span {
             margin-left: 30px;
           }
@@ -1176,9 +1146,9 @@ export default {
             }
           }
 
-          // .all_b {
-
-          // }
+          .all_b {
+            padding-top: 20px;
+          }
         }
       }
     }

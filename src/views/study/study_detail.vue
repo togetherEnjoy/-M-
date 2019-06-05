@@ -39,63 +39,65 @@
 
         <div class="s_huan" ref="change">
           <p @click="referer(getStudyDetail)">换一换</p>
-          <span @click="$router.push({path: '/home/studymore'})">更多</span>
+          <span @click="$router.push({path: '/home/studymore', query:{id}})">更多</span>
         </div>
       </div>
 
-      <div class="s_item" v-for="i in 4">
+      <div class="s_item" v-for="(item,i) in mer_data" :key="i">
         <div class="heads_img">
-          <img src="../../assets/images/study/sjhead.png">
+          <img v-lazy="item.img">
         </div>
 
         <div class="text">
-          <h3>启德留学</h3>
-          <p>咨询量：500</p>
+          <h3>{{ item.merchantName }}</h3>
+          <p>咨询量：{{ item.hot }}</p>
         </div>
 
         <div class="func">
-          <span>
+          <span @click="showToast">
             <i class="email"></i>
           </span>
           <span class="pb">
-            <i class="phone"></i>
+            <a href="tel:400 877 1008" class="phone"></a>
           </span>
         </div>
       </div>
     </div>
 
     <div class="project" ref="wipe">
-      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" @click="onTabClick">
+      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" @click="onTabClick" sticky>
         <van-tab title="学校介绍">
-          <div class="content">
-            <van-row v-for="i in 4">
-              <van-col span="8">
-                <div class="content_item">
-                  <h3>录取率</h3>
-                  <p>5%</p>
-                </div>
-              </van-col>
-              <van-col span="8">
-                <div class="content_item">
-                  <h3>录取率</h3>
-                  <p>5%</p>
-                </div>
-              </van-col>
-              <van-col span="8">
-                <div class="content_item">
-                  <h3>录取率</h3>
-                  <p>5%</p>
-                </div>
-              </van-col>
-            </van-row>
-          </div>
+          <div class="study_de">
+            <div class="content">
+              <van-row v-for="i in 4">
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>录取率</h3>
+                    <p>5%</p>
+                  </div>
+                </van-col>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>录取率</h3>
+                    <p>5%</p>
+                  </div>
+                </van-col>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>录取率</h3>
+                    <p>5%</p>
+                  </div>
+                </van-col>
+              </van-row>
+            </div>
 
-          <p class="article" v-html="detail_data.schoolIntroduce">
-            <!-- 麻省理工学院（Massachusetts Institute of Technology），简称MIT，是美国一所研究型私立大学，位于马萨诸塞州（麻省）的剑桥市，查尔斯河（Charles River）将其与波士顿的后湾区（Back Bay）隔开。麻省理工学院无论是在美国还是全世界都有非常重要的影响力，MIT培养了众多对世界产生影响的人士，是全球高科技和高等研究的先驱领导大学。
+            <p class="article" v-html="detail_data.schoolIntroduce">
+              <!-- 麻省理工学院（Massachusetts Institute of Technology），简称MIT，是美国一所研究型私立大学，位于马萨诸塞州（麻省）的剑桥市，查尔斯河（Charles River）将其与波士顿的后湾区（Back Bay）隔开。麻省理工学院无论是在美国还是全世界都有非常重要的影响力，MIT培养了众多对世界产生影响的人士，是全球高科技和高等研究的先驱领导大学。
             麻省理工学院（英文全称：Massachusetts Institute of Technology， 简称MIT），位于美国马萨诸塞州剑桥市，占地面积168英亩（68.0公顷），吉祥物是海狸（Beaver），NCAA运动队绰号是工程师（Engineers），校训是“理论与实践并重”
             （Mens et Manus），英文翻译是：Mind and Hand。 MIT录取率极低，每年只录取2000人，保证了全世界最优秀的学子云集于MIT，每年能从MIT顺利毕业的人无疑是世界上最精英的一群人。
-            2014年9月16日发布2014—2015年世界大学排名榜，美国麻省理工学院连续第三年位居榜首。-->
-          </p>
+              2014年9月16日发布2014—2015年世界大学排名榜，美国麻省理工学院连续第三年位居榜首。-->
+            </p>
+          </div>
         </van-tab>
         <van-tab title="申请条件">
           <div class="condition" v-html="detail_data.applicationConditions">
@@ -169,8 +171,8 @@
             </van-row>
           </div>
         </van-tab>
-        <van-tab title="开学日期" v-html="detail_data.schoolBeginsDate">
-          <div class="mnxf">
+        <van-tab title="开学日期">
+          <div class="mnxf" v-html="detail_data.schoolBeginsDate">
             <van-row v-for="i in 3">
               <van-col span="12">
                 <div class="content_item">
@@ -188,7 +190,7 @@
       </van-tabs>
     </div>
 
-    <con :simpleName="'海外网'"/>
+    <con :simpleName="'海外网'" :head_img="head_img" :hot="hot" :typeOf="2" ref="con"/>
   </div>
 </template>
 
@@ -204,39 +206,51 @@ export default {
       active: 0,
       id: this.$route.params.id,
       detail_data: [],
-      referer_can: true
+      referer_can: true,
+
+      // 服务商家
+      mer_data: [],
+      simpleName: '',
+      head_img: '',
+      hot: ''
     };
   },
   created() {
     this.getStudyDetail();
-    this.business()
+    this.business();
   },
   methods: {
     // 换一换
     referer() {
-        const change = this.$refs.change;
-        if (this.referer_can) {
-            this.referer_can = false;
-            change.classList.add("refe");
-            this.business();
-            setTimeout(() => {
-                change.classList.remove("refe");
-                this.referer_can = true;
-            }, 4000);
-        }
+      const change = this.$refs.change;
+      if (this.referer_can) {
+        this.referer_can = false;
+        change.classList.add("refe");
+        this.business();
+        setTimeout(() => {
+          change.classList.remove("refe");
+          this.referer_can = true;
+        }, 4000);
+      }
     },
     // 服务商家
     business() {
-      this.$fetch('dhr/client/study_abroad/merchant_list', {
+      this.$fetch("/dhr/client/study_abroad/merchant_list", {
         id: this.id
       }).then(res => {
-        console.log(res)
-      })
+        if (res.ErrCode == "0000") {
+          this.mer_data = res.Result.data;
+          console.log(this.mer_data);
+          this.simpleName = this.mer_data[0].merchantName;
+          this.head_img = this.mer_data[0].img;
+          this.hot = this.mer_data[0].hot;
+        }
+      });
     },
-    
+
     getStudyDetail() {
       this.$fetch(url + this.id).then(res => {
-        console.log(res);
+        // console.log(res);
         if (res.ErrCode == "0000") {
           this.detail_data = res.Result;
         }
@@ -249,6 +263,12 @@ export default {
           this.bs = new BScroll(this.$refs.bs_swipe, BSConfigX);
         }
       });
+    },
+
+    // 咨询框
+    showToast() {
+      let con = this.$refs.con;
+      con.eject();
     }
   },
   components: {
@@ -295,6 +315,7 @@ export default {
 <style scoped lang="scss">
 .study_detail {
   background-color: #f8f8f8;
+  padding-bottom: 158px;
   .ser_img_wrap {
     .card_item {
       color: #fff;
@@ -378,7 +399,7 @@ export default {
         }
         .fir,
         .sec {
-          font-size: 22px;
+          font-size: 24px;
           color: #9399a5;
           margin-top: 20px;
         }
@@ -469,7 +490,8 @@ export default {
           border-radius: 50%;
           background-color: #fde9ea;
           text-align: center;
-          i {
+          i,
+          a {
             display: inline-block;
             width: 48px;
             height: 48px;
@@ -497,7 +519,9 @@ export default {
     color: #9399a5;
     line-height: 48px;
     font-size: 24px;
-
+    .study_de {
+      padding-top: 20px;
+    }
     .content {
       background-color: #fff;
       text-align: center;
@@ -523,6 +547,9 @@ export default {
     }
 
     .condition {
+      padding-top: 20px;
+      font-size: 30px;
+
       h3 {
         font-size: 24px;
         color: #0d1c31;
@@ -551,6 +578,7 @@ export default {
     }
   }
   .mnxf {
+    padding-top: 20px;
     .content_item {
       height: 78px;
       line-height: 78px;

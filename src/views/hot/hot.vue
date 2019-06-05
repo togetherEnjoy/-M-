@@ -121,7 +121,6 @@ import { mapMutations, mapGetters } from "vuex";
 import { setTimeout } from "timers";
 export default {
   name: "hot",
-  props: {},
   data() {
     return {
       tabs: [
@@ -375,7 +374,7 @@ export default {
   padding: 30px 30px 30px 30px !important;
 }
 .van-tabs__wrap--scrollable .van-tab {
-  flex-basis: 17% !important;
+  flex-basis: 18% !important;
 }
 .van-tabs__wrap--scrollable .van-tab:last-child {
   margin-right: 50px !important;
@@ -503,8 +502,8 @@ export default {
       }
 
       .item_right {
-        width: 240px;
-        height: 160px;
+        width: 210px;
+        height: 140px;
         border-radius: 4px;
         overflow: hidden;
         img {

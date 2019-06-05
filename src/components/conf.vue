@@ -1,21 +1,23 @@
 <template>
   <div class="zi">
-    <div class="z_l">
-      <div class="z_l_img">
-        <img :src="head_img">
+    <div class="zi_box" v-if="showFoot">
+      <div class="z_l">
+        <div class="z_l_img">
+          <img :src="head_img">
+        </div>
+        <div class="z_l_t">
+          <h3>{{ simpleName }}</h3>
+          <p>咨询量：{{ hot }}</p>
+        </div>
       </div>
-      <div class="z_l_t">
-        <h3>{{ simpleName }}</h3>
-        <p>咨询量：618</p>
+      <div class="z_c" @click="eject">
+        <p>立即咨询</p>
       </div>
-    </div>
-    <div class="z_c" @click="eject">
-      <p>立即咨询</p>
-    </div>
-    <div class="z_r">
-      <p>
-        <a href="tel:400 877 1008">免费电话</a>
-      </p>
+      <div class="z_r">
+        <p>
+          <a href="tel:400 877 1008">免费电话</a>
+        </p>
+      </div>
     </div>
 
     <div class="eject_wrap" ref="eje">
@@ -27,7 +29,7 @@
             <span>*</span>
             姓名
           </p>
-          <input type="text" placeholder="请输入姓名">
+          <input type="text" placeholder="请输入姓名" v-model="name" maxlength="5" minlength="1">
         </label>
       </div>
       <div class="phone">
@@ -36,11 +38,11 @@
             <span>*</span>
             电话
           </p>
-          <input type="phone" placeholder="请输入电话">
+          <input type="telephone" placeholder="请输入电话" v-model="phone" minlength="11" maxlength="11">
         </label>
       </div>
 
-      <div class="immed">立即预约</div>
+      <div class="immed" @click="sendMSG">立即预约</div>
     </div>
     <div class="mask" ref="mask" @click="close"></div>
   </div>
@@ -50,29 +52,49 @@
 export default {
   props: {
     head_img: {
-      default() {
-        return require("../assets/images/hot/logo2.png");
-      }
+      // default() {
+      //   return require("../assets/images/hot/logo2.png");
+      // }
+    },
+    showFoot: {
+      default: true
     },
     simpleName: {
       type: String
-    }
+    },
+    hot: {},
+    // 产品类型
+    typeOf: {},
   },
   data() {
-    return {};
+    return {
+      name: "",
+      phone: ""
+    };
   },
   methods: {
     eject() {
-      let eje = this.$refs.eje
-     let mask = this.$refs.mask
-     mask.classList.add('show')
-      eje.classList.add('zoomin')
+      let eje = this.$refs.eje;
+      let mask = this.$refs.mask;
+      mask.classList.add("show");
+      eje.classList.add("zoomin");
     },
     close() {
-       let eje = this.$refs.eje
-       let mask = this.$refs.mask
-       mask.classList.remove('show')
-        eje.classList.remove('zoomin')
+      let eje = this.$refs.eje;
+      let mask = this.$refs.mask;
+      mask.classList.remove("show");
+      eje.classList.remove("zoomin");
+    },
+    sendMSG() {
+      if (this.name && this.phone) {
+        this.$post("/dhr/visitNumber/add", {
+          name: this.name,
+          phone: this.phone,
+          typeOf: this.typeOf
+        }).then(res => {
+          console.log(res);
+        });
+      }
     }
   },
   components: {}
@@ -81,17 +103,25 @@ export default {
 
 <style scoped lang="scss">
 .zi {
-  display: flex;
-  height: 98px;
-  // margin-top: 60px;
-  background-color: #fff;
-  justify-content: space-between;
-  padding: 0 30px;
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
   z-index: 9999;
+  .zi_box {
+    display: flex;
+    height: 98px;
+    // margin-top: 60px;
+    background-color: #fff;
+    justify-content: space-between;
+    padding: 0 30px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+  }
+
   .z_l {
     display: flex;
     align-self: center;
@@ -155,8 +185,10 @@ export default {
     bottom: 110px;
     text-align: center;
     padding: 38px 30px 40px;
-    transform: scale3d(0,0,0);
+    transform: scale3d(0, 0, 0);
     z-index: 2;
+    left: 50%;
+    margin-left: -345px;
     h3 {
       font-size: 40px;
       font-weight: bold;
@@ -208,17 +240,17 @@ export default {
   }
 
   .zoomin {
-    animation:  zoomIn .3s both;
+    animation: zoomIn 0.3s both;
   }
 
   @keyframes zoomIn {
     0% {
       opacity: 0;
-      transform: scale3d(.3,.3,.3);
+      transform: scale3d(0.3, 0.3, 0.3);
     }
     100% {
       opacity: 1;
-      transform: scale3d(1,1,1);
+      transform: scale3d(1, 1, 1);
     }
   }
 

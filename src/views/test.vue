@@ -9,8 +9,8 @@
   </div>
 </template>
 <script>
+import request from '../utils/request'
 export default {
-  props: {},
   data() {
     return {
       obj: {
@@ -20,30 +20,21 @@ export default {
     };
   },
   computed: {},
-  created() {},
+  created() {
+    console.log(request)
+    
+  },
   mounted() {
-    //   obj.a = 1111
-    //   this.$set(this.obj, 'a', 1111)
-    // this.obj = Object.assign(this.obj, {
-    //   a: 1111112
-    // });
+    
   },
   methods: {
     td() {
-        // this.obj.a ++
-        // console.log(this.obj.a)
-    //   this.$forceUpdate()
-  
-      this.$set(this.obj, 'a', this.i++)
-     
-    //   this.obj = Object.assign(this.obj, {
-    //     a: this.i++
-    //   });
-    //   this.$forceUpdate()
-       console.log(this.obj.a)
+      request.post('/dhr/advertise/img/home').then(res => {
+        console.log(res)
+      })
     }
   },
-  components: {}
+
 };
 </script>
 

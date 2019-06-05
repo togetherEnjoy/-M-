@@ -34,7 +34,7 @@
     </div>
 
     <div class="study_wrap">
-      <h3 class="like" v-if="result_data.length > 0">猜您喜欢</h3>
+      <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3>
       <van-list
         v-model="loading"
         :finished="finished"
@@ -132,6 +132,7 @@ export default {
 .study {
   background-color: #f8f8f8;
   .study_wrap {
+    // padding-top:  
     .like {
       font-size: 30px;
       font-weight: 500;

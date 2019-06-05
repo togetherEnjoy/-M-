@@ -96,20 +96,19 @@ export default {
     console.log("deactivated");
   },
   created() {
-    this.getImmigData()
+    this.getImmigData();
   },
   methods: {
     getImmigData() {
       this.$fetch("/dhr/client/migrate/menu").then(res => {
         if (res.ErrCode == "0000") {
           this.immig_country = res.Result.country;
-          
         }
       });
     },
     getImmigListData() {
       console.log("触发了");
-      
+
       setTimeout(() => {
         this.$fetch(url, {
           page: this.page,
@@ -148,7 +147,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     console.log(to);
     if (to.path == "/home/immig") {
-      console.log(to)
+      console.log(to);
     }
     next();
   },
@@ -164,6 +163,10 @@ export default {
   .van-tabs__nav--line {
     padding: 0.4rem 0.4rem 0.4rem 0 !important;
   }
+}
+
+.van-list__finished-text {
+  padding-top: 30px;
 }
 </style>
 
@@ -237,7 +240,7 @@ export default {
         text-align: center;
         & > div {
           color: #9399a5;
-          font-size: 22px;
+          font-size: 24px;
           .m {
             color: #ed2530;
             font-size: 24px;

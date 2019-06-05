@@ -18,7 +18,7 @@
         <p class="price">
           价格：
           <i>￥{{ List_data.price }}</i>
-          <span>{{ app._goTime(List_data.startTime,List_data.endTime) | goTime()  }}天</span>
+          <span>{{ app._goTime(List_data.startTime,List_data.endTime) | goTime() }}天</span>
         </p>
       </div>
 
@@ -35,7 +35,7 @@
         </div>
         <div class="right">
           <p>
-            <i>年龄</i>:
+            <i class="justify">年龄</i>:
             <span>{{ List_data.ages }}岁</span>
           </p>
           <p>
@@ -47,11 +47,11 @@
     </div>
 
     <div class="project" ref="wipe">
-      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1">
+      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" sticky>
         <van-tab title="详细行程">
           <div class="xcbox">
             <div class="day" v-for="(item, i) in detailedDescription" :key="i">
-              <p>
+              <p class="day_title">
                 <span class="whatday">{{ item.daytitle | days }}</span>
                 <span class="na">{{ item.daytitle | title }}</span>
               </p>
@@ -104,7 +104,7 @@ import { Tab, Tabs } from "vant";
 import con from "../../components/conf";
 import { UTCformat } from "../../api/UTCformat.js";
 export default {
-  inject: ['app'],
+  inject: ["app"],
   data() {
     return {
       active: 0,
@@ -132,8 +132,7 @@ export default {
     },
     _UTCformat(t) {
       return UTCformat(t);
-    },
- 
+    }
   },
   filters: {
     days(value) {
@@ -153,7 +152,7 @@ export default {
 
 <style scoped lang="scss">
 .studytour_detail {
-  padding-bottom: 110px;
+  padding-bottom: 158px;
   background-color: #f8f8f8;
   .ser_img_wrap {
     .card_item {
@@ -230,6 +229,22 @@ export default {
           text-align: justify;
           text-align-last: justify;
         }
+
+        .justify {
+          position: relative;
+          display: inline-block;
+          height: 28px;
+          text-align: justify;
+          overflow: hidden;
+          &:after {
+            display: inline-block;
+            content: "";
+            width: 100%;
+            height: 100%;
+            text-align: justify;
+            overflow: hidden;
+          }
+        }
       }
     }
   }
@@ -244,9 +259,17 @@ export default {
 
     .xcbox {
       font-weight: 500;
+      padding-top: 20px;
       .day {
+        margin-top: 20px;
+        &:first-child {
+          margin-top: 0;
+        }
+        .day_title {
+          font-size: 35px;
+        }
         p {
-          font-size: 24px;
+          font-size: 30px;
           .whatday {
             color: #0d1c31;
           }
@@ -260,6 +283,8 @@ export default {
       }
     }
     .fybox {
+      padding-top: 20px;
+      font-size: 30px;
       h3 {
         color: #0d1c31;
       }
