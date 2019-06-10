@@ -2,21 +2,26 @@
   <div class="zi">
     <div class="zi_box" v-if="showFoot">
       <div class="z_l">
-        <div class="z_l_img">
-          <img :src="head_img">
+        <div class="z_l_img" @click="$router.push({path: '/home/merchant',query:{id}})">
+          <div>
+            <img :src="head_img">
+          </div>
         </div>
         <div class="z_l_t">
           <h3>{{ simpleName }}</h3>
           <p>咨询量：{{ hot }}</p>
         </div>
       </div>
-      <div class="z_c" @click="eject">
-        <p>立即咨询</p>
-      </div>
-      <div class="z_r">
-        <p>
-          <a href="tel:400 877 1008">免费电话</a>
-        </p>
+
+      <div class="btn_wrap">
+        <div class="z_c" @click="eject">
+          <p>在线问</p>
+        </div>
+        <div class="z_r">
+          <p>
+            <a href="tel:400 877 1008">打电话</a>
+          </p>
+        </div>
       </div>
     </div>
 
@@ -44,27 +49,40 @@
 
       <div class="immed" @click="sendMSG">立即预约</div>
     </div>
+
+    <!-- 预约成功 toast -->
+    <div class="success" ref="success">
+      <div class="img">
+        <img src="../assets/images/home/success.png">
+      </div>
+      <p>恭喜您，预约成功</p>
+    </div>
+
     <div class="mask" ref="mask" @click="close"></div>
   </div>
 </template>
 
 <script>
+import { setTimeout } from "timers";
 export default {
   props: {
-    head_img: {
-      // default() {
-      //   return require("../assets/images/hot/logo2.png");
-      // }
-    },
+    id: {},
+    head_img: {},
     showFoot: {
       default: true
     },
     simpleName: {
       type: String
     },
-    hot: {},
+    hot: {
+      default() {
+        return 10;
+      }
+    },
     // 产品类型
     typeOf: {},
+    showCity: "",
+    sourceDescription: ""
   },
   data() {
     return {
@@ -73,11 +91,17 @@ export default {
     };
   },
   methods: {
+    // 供应商
+
     eject() {
-      let eje = this.$refs.eje;
+      this.showAndHide("add");
       let mask = this.$refs.mask;
       mask.classList.add("show");
-      eje.classList.add("zoomin");
+    },
+    showAndHide(add) {
+      let eje = this.$refs.eje;
+
+      eje.classList[add]("zoomin");
     },
     close() {
       let eje = this.$refs.eje;
@@ -86,13 +110,29 @@ export default {
       eje.classList.remove("zoomin");
     },
     sendMSG() {
+      console.log(this.showCity);
+      console.log(this.sourceDescription);
       if (this.name && this.phone) {
         this.$post("/dhr/visitNumber/add", {
           name: this.name,
           phone: this.phone,
-          typeOf: this.typeOf
+          typeOf: this.typeOf,
+          showCity: this.showCity,
+          showCityNum: 1,
+          sourceDescription: this.sourceDescription
         }).then(res => {
           console.log(res);
+          if (res.ErrCode == "0000") {
+            this.showAndHide("remove");
+            let success = this.$refs.success;
+            success.classList.add("showToast");
+
+            setTimeout(() => {
+              success.classList.remove("showToast");
+              let mask = this.$refs.mask;
+              mask.classList.remove("show");
+            }, 1000);
+          }
         });
       }
     }
@@ -110,7 +150,7 @@ export default {
   z-index: 9999;
   .zi_box {
     display: flex;
-    height: 98px;
+    height: 150px;
     // margin-top: 60px;
     background-color: #fff;
     justify-content: space-between;
@@ -125,48 +165,59 @@ export default {
   .z_l {
     display: flex;
     align-self: center;
+    flex: 1;
     .z_l_img {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       overflow: hidden;
-      align-self: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      div {
+        // width: 50px;
+        // height: 50px;
+      }
       img {
         display: block;
-        width: 70%;
-        object-position: center;
-        margin: 0 auto;
+        width: 100%;
         // height: 100%;
       }
     }
     .z_l_t {
-      margin-left: 27px;
+      margin-left: 15px;
 
       h3 {
-        font-size: 22px;
+        font-size: 28px;
         font-weight: bold;
       }
       p {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 500;
         color: #9399a5;
         margin-top: 15px;
       }
     }
   }
+  .btn_wrap {
+    display: flex;
+  }
   .z_c,
   .z_r {
-    width: 220px;
-    height: 80px;
+    width: 205px;
+    height: 90px;
     border-radius: 10px;
     color: #fff;
     font-size: 28px;
     text-align: center;
-    line-height: 80px;
+    font-weight: bold;
+    line-height: 90px;
     align-self: center;
   }
   .z_c {
     background-color: #3cb584;
+    margin-right: 15px;
+
     // display: none;
   }
   .z_r {
@@ -182,7 +233,7 @@ export default {
     background-color: #fff;
     border-radius: 8px;
     width: 690px;
-    bottom: 110px;
+    bottom: 200px;
     text-align: center;
     padding: 38px 30px 40px;
     transform: scale3d(0, 0, 0);
@@ -236,6 +287,69 @@ export default {
       font-size: 32px;
       border-radius: 4px;
       margin-top: 40px;
+    }
+  }
+
+  // 预约成功
+  .success {
+    width: 604px;
+    height: 360px;
+    background-color: #fff;
+    border-radius: 8px;
+    position: fixed;
+    z-index: 2;
+    top: 40%;
+    left: 50%;
+    margin-left: -302px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: 0 top;
+    // transition: all 1000ms cubic-bezier(0.86, 0, 0.34, 1);
+    visibility: hidden;
+    // opacity: 0;
+    transform: translateY(-300px);
+
+    // &.show {
+    //   visibility: visible;
+    //   // opacity: 1;
+    //   transform: none;
+    // }
+    .img {
+      width: 100px;
+      height: 100px;
+    }
+    p {
+      font-size: 48px;
+      font-weight: 500;
+      margin-top: 44px;
+    }
+  }
+
+  .showToast {
+    animation: showToast 1.5s cubic-bezier(0.86, 0, 0.34, 1);
+  }
+  @keyframes showToast {
+    0% {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(-300px);
+    }
+    25% {
+      visibility: visible;
+      opacity: 1;
+      transform: none;
+    }
+    80% {
+      visibility: visible;
+      opacity: 0.5;
+      transform: none;
+    }
+    100% {
+      visibility: hidden;
+      opacity: 0;
+      transform: none;
     }
   }
 

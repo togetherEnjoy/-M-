@@ -1,6 +1,7 @@
 
 import * as types from './mutation-type'
 import { stat } from 'fs';
+import { type } from 'os';
 const mutations = {
     [types.SET_LIST](state, list) {
         state.list[list.pageName] = {
@@ -20,6 +21,9 @@ const mutations = {
     },
     [types.IMMIG_MENU](state, menu) {
         state.immig_menu = menu
+    },
+    [types.SET_NUMBER] (state, number) {
+        state.number = number
     }
 
 }

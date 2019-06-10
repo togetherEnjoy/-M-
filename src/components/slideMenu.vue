@@ -623,7 +623,12 @@ export default {
 
 <style scoped lang="scss">
 .menu {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  z-index: 999;
   .item_wrap {
     box-shadow: 0px 2px 15px 0px rgba(16, 29, 55, 0.06);
     height: 100px;

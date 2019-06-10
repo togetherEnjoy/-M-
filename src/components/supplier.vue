@@ -107,6 +107,7 @@ export default {
 <style scoped lang="scss">
 .supplier_box {
   background-color: #f8f8f8;
+  padding-top: 100px;
   .supplier {
     margin-top: 30px;
     padding: 0 30px;

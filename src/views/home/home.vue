@@ -1,30 +1,35 @@
 <template>
   <div class="home">
+    <city ref="city" @getCity="getCity"/>
     <div class="home_top">
       <div class="top_le">
-        <p>深圳</p>
+        <p @click="showCity">{{ city||'深圳' }}</p>
       </div>
-      <div class="top_cen">
-        <img src="../../assets/images/home/logo.png">
+      <div class="top_cen_wrap">
+        <div class="top_cen">
+          <img src="../../assets/images/home/logo.png">
+        </div>
       </div>
-      <div class="top_ri">
-        <!-- <img src="../../assets/images/home/per.png"> -->
-      </div>
+      <!-- <div class="top_ri">
+        <img src="../../assets/images/home/per.png">
+      </div>-->
     </div>
 
     <!-- 精品推荐 -->
     <div class="jinp">
       <div class="tuij">精品推荐</div>
-      <div class="jinp_some" v-for="(item, i) in recommen" :key="i">{{ item.img }}</div>
+      <div class="jinp_some" v-for="(item, i) in recommen" :key="i">
+        <a :href="item.host">{{ item.img }}</a>
+      </div>
     </div>
 
     <div class="swip">
       <van-swipe indicator-color="white" :autoplay="3000">
-        <van-swipe-item  v-for="(image, index) in swipeImg" :key="index">
+        <van-swipe-item v-for="(image, index) in swipeImg" :key="index">
           <div class="banner_box">
-              <router-link to="/home/house">
-                <img v-lazy="image.img">
-              </router-link>
+            <a :href="image.host">
+              <img v-lazy="image.img">
+            </a>
           </div>
         </van-swipe-item>
       </van-swipe>
@@ -32,23 +37,33 @@
 
     <div class="categroy">
       <div class="cate_item" @click="$router.push({path: '/home/house'})">
-        <img src="../../assets/images/home/house.png">
+        <div class="shadow">
+          <img src="../../assets/images/home/house.png">
+        </div>
         <p>房产</p>
       </div>
       <div class="cate_item" @click="$router.push({path: '/home/immig',query: {hostCountryNum:0}})">
-        <img src="../../assets/images/home/yimin.png">
+        <div class="shadow">
+          <img src="../../assets/images/home/yimin.png">
+        </div>
         <p>移民</p>
       </div>
       <div class="cate_item" @click="$router.push({path: '/home/study'})">
-        <img src="../../assets/images/home/liuxue.png">
+        <div class="shadow">
+          <img src="../../assets/images/home/liuxue.png">
+        </div>
         <p>留学</p>
       </div>
       <div class="cate_item" @click="$router.push({path: '/home/studytour'})">
-        <img src="../../assets/images/home/youxue.png">
+        <div class="shadow">
+          <img src="../../assets/images/home/youxue.png">
+        </div>
         <p>游学</p>
       </div>
       <div class="cate_item" @click="$router.push({path: `/news`})">
-        <img src="../../assets/images/home/hot.png">
+        <div class="shadow">
+          <img src="../../assets/images/home/hot.png">
+        </div>
         <p>热门</p>
       </div>
     </div>
@@ -173,7 +188,27 @@
             </div>
           </div>
         </div>
-        
+
+        <van-tabs :line-height="0" @click="lxTabClick">
+          <van-tab v-for="(item, i) in schoolType" :key="i" :title="item.name">
+            <div class="stydu_box">
+              <div class="study_box_wrap">
+                <van-loading color="#ed2530" v-if="lx_data.length == 0"></van-loading>
+                <div
+                  class="stydy_item"
+                  v-for="(data, index) in lx_data"
+                  :key="index"
+                  @click="$router.push({path: `/home/study/${item.id}`})"
+                >
+                  <div class="imgs">
+                    <img v-lazy="data.schoolBadgeImg">
+                  </div>
+                  <p>{{ data.schoolName }}</p>
+                </div>
+              </div>
+            </div>
+          </van-tab>
+        </van-tabs>
       </div>
 
       <!-- 精品海外游学 -->
@@ -228,8 +263,6 @@
               @load="onLoad"
               :offset="10"
             >
-            
-
               <div>
                 <div v-if="list_data.length > 0" v-for="(list, i) in list_data" :key="i">
                   <div class="hot_wrap">
@@ -330,6 +363,7 @@
 import { BSConfigX } from "../../utils/config.js";
 import { Tab, Tabs } from "vant";
 import BScroll from "better-scroll";
+import city from "../../components/city_station";
 import { mapMutations, mapGetters } from "vuex";
 
 import { getDateDiff } from "../../api/api.js";
@@ -338,7 +372,7 @@ export default {
   data() {
     return {
       msg: process.env.VUE_APP_MSG,
-      url: process.env.VUE_APP_URL,
+      url: process.env.VUE_APP_FLAG,
       house: ["精选", "泰国", "马来西亚", "美国", "英国", "柬埔寨", "希腊"],
       jin_lx: [
         "精选",
@@ -351,6 +385,9 @@ export default {
         "亲子"
       ],
       hot: ["24h快讯", "房产", "游学", "移民", "留学", "医疗"],
+
+      // 城市站
+      city: "",
 
       isLoading: false,
       loading: false,
@@ -376,6 +413,11 @@ export default {
       immig_menu: [],
       // 留学
       study_menu: [],
+      schoolType: [],
+      lx_data: [],
+      lx_page: 1,
+      lx_limit: 4,
+      lx_cache: {},
       // 轮播图
       swipeImg: [],
       // 精品推荐
@@ -398,21 +440,26 @@ export default {
     ...mapGetters(["list"])
   },
   methods: {
+    // 获取城市
+    getCity(val) {
+      this.city = val;
+    },
+    // 展示城市站
+    showCity() {
+      let city = this.$refs.city.$el;
+
+      city.classList.add("show");
+      document.body.style = "overflow:hidden";
+    },
     getSwipeImg() {
-      this.$fetch("/dhr/advertise/img", {
-        showCityNum: 1
-      }).then(res => {
-        console.log(res);
+      this.$fetch("/dhr/advertise/img").then(res => {
         if (res.ErrCode == "0000") {
           this.swipeImg = res.Result.data.slice(0, 4);
-          console.log(this.swipeImg);
         }
       });
-      this.$fetch("/dhr/advertise/text?showCityNum=1").then(res => {
-        // console.log(res)
+      this.$fetch("/dhr/advertise/text").then(res => {
         if (res.ErrCode == "0000") {
           this.recommen = res.Result.data;
-          console.log(this.recommen);
         }
       });
     },
@@ -429,6 +476,8 @@ export default {
       this.$fetch("/dhr/client/study_abroad/menu").then(res => {
         if (res.ErrCode == "0000") {
           this.study_menu = res.Result.country;
+
+          this.schoolType = res.Result.schoolType.slice(1);
         }
       });
     },
@@ -445,7 +494,7 @@ export default {
     getMenuData() {
       this.$fetch("/dhr/client/house/menu").then(res => {
         this.house_menu = res.Result;
-        console.log(this.house_menu);
+
         this.houseMenu(this.house_menu);
       });
     },
@@ -453,7 +502,6 @@ export default {
     // 房产
     hsTabClick(i = 0, pageName = "美国") {
       if (!this.getcache("houseList", "house_data", pageName)) return;
-
       this.houseListData(i, pageName);
     },
     houseListData(i = 0, pageName = "美国") {
@@ -466,7 +514,7 @@ export default {
           this.house_data = res.Result.data;
 
           this.houst_cache[pageName] = this.house_data;
-          console.log(this.houst_cache);
+
           sessionStorage.setItem("houseList", JSON.stringify(this.houst_cache));
         } else if (res.ErrCode == "9999") {
           this.$toast("刷新太快了");
@@ -486,10 +534,30 @@ export default {
       }).then(res => {
         if (res.ErrCode == "0000") {
           this.yx_data = res.Result.data;
-
           this.yx_cache[pageName] = this.yx_data;
-          console.log(this.yx_cache);
+
           sessionStorage.setItem("yxList", JSON.stringify(this.yx_cache));
+        } else if (res.ErrCode == "9999") {
+          this.$toast("刷新太快了");
+        }
+      });
+    },
+    // 留学
+    lxTabClick(i = 0, pageName = "不限") {
+      if (!this.getcache("lx_List", "lx_data", pageName)) return;
+      this.lxListData(i, pageName);
+    },
+    lxListData(index = 0, pageName = "不限") {
+      this.$fetch("/dhr/client/study_abroad/list", {
+        page: this.lx_page,
+        limit: this.lx_limit,
+        schoolType: index + 1,
+        by: "index_1"
+      }).then(res => {
+        if (res.ErrCode == "0000") {
+          this.lx_data = res.Result.data;
+          this.lx_cache[pageName] = this.lx_data;
+          sessionStorage.setItem("lx_List", JSON.stringify(this.lx_cache));
         } else if (res.ErrCode == "9999") {
           this.$toast("刷新太快了");
         }
@@ -500,7 +568,7 @@ export default {
       let list = JSON.parse(sessionStorage.getItem(cacheName));
       if (pageName in list) {
         this[data] = list[pageName];
-        console.log(this[data]);
+
         return false;
       } else {
         this[data] = [];
@@ -517,7 +585,16 @@ export default {
       }, 800);
     },
     onLoad(pageName = "24h快讯") {
-      console.log("触发了");
+      let params = {
+        page: this.page,
+        limit: this.limit
+      };
+      if (this.index == 0) {
+        params = Object.assign(params, { by: "createdAt" });
+      } else {
+        params = Object.assign(params, { cate: this.index });
+      }
+
       if (this.isLoading) {
         return false;
       }
@@ -526,17 +603,7 @@ export default {
       }
 
       setTimeout(() => {
-        this.$fetch(
-          `/dhr/client/article/list${
-            this.index
-              ? "?cate=" + this.index + "&showCityNum=0"
-              : "?showCityNum=0"
-          }`,
-          {
-            page: this.page,
-            limit: this.limit
-          }
-        ).then(res => {
+        this.$fetch(`/dhr/client/article/list`, params).then(res => {
           let data = res.Result;
           this.count = data.count / 1;
           this.list_data = this.list_data.concat(data.data);
@@ -545,7 +612,6 @@ export default {
 
           if (this.list_data.length >= this.count) {
             this.finished = true;
-            console.log("无更多数据");
           }
           this.page++;
           this.set_list({
@@ -603,6 +669,7 @@ export default {
       this.getStudyData();
       this.getStudyTourdata();
       this.yxListData();
+      this.lxListData();
       this.getSwipeImg();
     },
     ...mapMutations({
@@ -617,7 +684,8 @@ export default {
   },
   components: {
     [Tab.name]: Tab,
-    [Tabs.name]: Tabs
+    [Tabs.name]: Tabs,
+    city
   }
 };
 </script>
@@ -682,7 +750,7 @@ export default {
     padding-top: 25px;
   }
   // 去掉home的line
-   .van-tabs__line {
+  .van-tabs__line {
     height: 0px !important;
   }
 }
@@ -700,31 +768,41 @@ export default {
   width: 100%;
   .home_top {
     height: 100px;
-    display: flex;
-    justify-content: space-between;
+    // display: flex;
+    // justify-content: space-between;
     align-items: center;
-    padding: 0 30px 0 40px;
+    padding: 0 15px;
     border-top: 1px solid #e5e5e5;
     border-bottom: 1px solid #e5e5e5;
+    text-align: center;
     img {
       display: block;
       width: 100%;
     }
+    .top_cen_wrap {
+      height: 100px;
+      line-height: 100px;
+    }
     .top_cen {
       width: 132px;
       height: 60px;
+      display: inline-block;
+      vertical-align: middle;
     }
 
     .top_le {
+      position: absolute;
+      height: 100px;
+      line-height: 100px;
       padding-left: 30px;
       color: #9399a5;
       font-size: 28px;
-      position: relative;
+      margin-left: 20px;
       &::after {
         position: absolute;
         content: "";
         left: -5px;
-        top: 2px;
+        top: 31px;
         width: 36px;
         height: 36px;
         background: url("../../assets/images/home/location.png") no-repeat
@@ -751,12 +829,15 @@ export default {
 
     .jinp_some {
       margin-right: 12px;
-      height: 48px;
-      line-height: 48px;
-      text-align: center;
-      padding: 0 15px;
-      border: 1px solid #eee;
-      border-radius: 24px;
+      a {
+        display: block;
+        height: 48px;
+        line-height: 48px;
+        text-align: center;
+        padding: 0 15px;
+        border: 1px solid #eee;
+        border-radius: 24px;
+      }
     }
   }
   .swip {
@@ -768,15 +849,19 @@ export default {
 
   .categroy {
     display: flex;
-    height: 150px;
+    height: 188px;
     justify-content: space-around;
     align-items: center;
     box-shadow: 0px 2px 9px 0px rgba(0, 0, 0, 0.05);
     .cate_item {
+      .shadow {
+        border-radius: 50%;
+        box-shadow: 0px 2px 9px 0px rgba(0, 0, 0, 0.05);
+      }
       img {
         display: block;
-        width: 48px;
-        height: 48px;
+        width: 86px;
+        height: 86px;
 
         margin: 0 auto;
       }
@@ -784,6 +869,7 @@ export default {
         font-size: 24px;
         font-weight: 500;
         margin-top: 10px;
+        text-align: center;
       }
     }
   }
@@ -933,7 +1019,11 @@ export default {
               color: #fff;
               left: 0px;
               bottom: 0px;
-              background: linear-gradient(to bottom, rgba(0,0,0,.1),rgba(0,0,0,.5));
+              background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.5)
+              );
             }
 
             &:last-child {
@@ -995,6 +1085,41 @@ export default {
           }
         }
       }
+
+      .stydu_box {
+        overflow-x: auto;
+        margin-top: 38px;
+        text-align: center;
+        &::-webkit-scrollbar {
+          /*隐藏滚轮*/
+          display: none;
+        }
+        .study_box_wrap {
+          // display: flex;
+          display: inline-block;
+          white-space: nowrap;
+        }
+        .stydy_item {
+          display: inline-block;
+          width: 180px;
+          margin-right: 30px;
+
+          .imgs {
+            width: 180px;
+            height: 180px;
+            overflow: hidden;
+            img {
+              width: 100%;
+            }
+          }
+          p {
+            font-size: 30px;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 20px;
+          }
+        }
+      }
     }
 
     // 精品海外游学
@@ -1017,7 +1142,6 @@ export default {
             height: 210px;
             border-radius: 4px;
             overflow: hidden;
-       
           }
 
           .lx_r {

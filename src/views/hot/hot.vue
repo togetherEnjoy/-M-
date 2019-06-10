@@ -1,7 +1,7 @@
 <template>
   <div class="hot">
     <div class="top_bar">
-      <div class="t_l"></div>
+      <div class="t_l" @click="$router.push({path: '/'})"></div>
       <div class="t_c">
         <img src="../../assets/images/hot/tit.png">
       </div>
@@ -28,80 +28,80 @@
           <van-tab v-for="(item,i) in tabs" :title="item.name" :key="i" :id="i">
             <!-- 下拉刷新 -->
             <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
-            <!-- 上拉加载 -->
-            <van-list
-              v-model="loading"
-              :finished="finished"
-              finished-text="没有更多了"
-              @load="onLoad"
-              :offset="100"
-            >
-              <div>
-                <van-swipe indicator-color="white" :autoplay="4000">
-                  <van-swipe-item v-if="list_data.length > 0" v-for="sw in list_data.slice(0, 4)">
-                    <div
-                      class="swip_se"
-                      @click="$router.push({path: `/news/newsd`,query: {id: sw.id, index}})"
-                    >
-                      <div class="img_b">
-                        <img v-lazy="sw.coverImg">
+              <!-- 上拉加载 -->
+              <van-list
+                v-model="loading"
+                :finished="finished"
+                finished-text="没有更多了"
+                @load="onLoad"
+                :offset="100"
+              >
+                <div>
+                  <van-swipe indicator-color="white" :autoplay="4000">
+                    <van-swipe-item v-if="list_data.length > 0" v-for="sw in list_data.slice(0, 4)">
+                      <div
+                        class="swip_se"
+                        @click="$router.push({path: `/news/newsd`,query: {id: sw.id, index}})"
+                      >
+                        <div class="img_b">
+                          <img v-lazy="sw.coverImg">
+                        </div>
+                        <div class="sw_mask"></div>
+                        <p class="sw_txt" v-text="sw.name"></p>
                       </div>
-                      <div class="sw_mask"></div>
-                      <p class="sw_txt" v-text="sw.name"></p>
-                    </div>
-                  </van-swipe-item>
-                </van-swipe>
+                    </van-swipe-item>
+                  </van-swipe>
 
-                <div v-if="list_data.length > 0" v-for="(list, i) in list_data.slice(4)" :key="i">
-                  <div class="hot_wrap">
-                    <div
-                      class="hot_item"
-                      @click="getDetails(list.id, list.name)"
-                      v-if="!list.coverImg1 && !list.coverImg2"
-                    >
-                      <div class="item_left">
-                        <p class="txt" v-text="list.name"></p>
-                        <p class="hover">
-                          {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
-                          <span>评论数：{{list.commentCount}}</span>
-                        </p>
-                      </div>
-                      <div class="item_right">
-                        <img v-lazy="list.coverImg">
-                      </div>
-                    </div>
-
-                    <div
-                      class="hot_all"
-                      @click="$router.push({path:  `/news/newsd`,query: {id: list.id, index}})"
-                      v-if="list.coverImg && list.coverImg1 && list.coverImg2"
-                      :key="i"
-                    >
-                      <div class="all_t">
-                        <p>{{ list.name }}</p>
-                      </div>
-                      <div class="all_c">
-                        <div>
+                  <div v-if="list_data.length > 0" v-for="(list, i) in list_data.slice(4)" :key="i">
+                    <div class="hot_wrap">
+                      <div
+                        class="hot_item"
+                        @click="getDetails(list.id, list.name)"
+                        v-if="!list.coverImg1 && !list.coverImg2"
+                      >
+                        <div class="item_left">
+                          <p class="txt" v-text="list.name"></p>
+                          <p class="hover">
+                            {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                            <span>评论数：{{list.commentCount}}</span>
+                          </p>
+                        </div>
+                        <div class="item_right">
                           <img v-lazy="list.coverImg">
                         </div>
-                        <div>
-                          <img v-lazy="list.coverImg1">
-                        </div>
-                        <div>
-                          <img v-lazy="list.coverImg2">
-                        </div>
                       </div>
-                      <div class="all_b">
-                        <p class="hover">
-                          {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
-                          <span>评论数：{{list.commentCount}}</span>
-                        </p>
+
+                      <div
+                        class="hot_all"
+                        @click="$router.push({path:  `/news/newsd`,query: {id: list.id, index}})"
+                        v-if="list.coverImg && list.coverImg1 && list.coverImg2"
+                        :key="i"
+                      >
+                        <div class="all_t">
+                          <p>{{ list.name }}</p>
+                        </div>
+                        <div class="all_c">
+                          <div>
+                            <img v-lazy="list.coverImg">
+                          </div>
+                          <div>
+                            <img v-lazy="list.coverImg1">
+                          </div>
+                          <div>
+                            <img v-lazy="list.coverImg2">
+                          </div>
+                        </div>
+                        <div class="all_b">
+                          <p class="hover">
+                            {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                            <span>评论数：{{list.commentCount}}</span>
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </van-list>
+              </van-list>
             </van-pull-refresh>
           </van-tab>
         </van-tabs>
@@ -171,7 +171,7 @@ export default {
       count: "",
 
       active: "",
-      pageName: ''
+      pageName: ""
     };
   },
   computed: {
@@ -183,8 +183,6 @@ export default {
     },
     ...mapGetters(["list", "title"])
   },
-  created() {
-  },
   methods: {
     // 上拉加载
     onRefresh() {
@@ -194,27 +192,26 @@ export default {
         self.getList(); //加载数据
       }, 800);
     },
+
+    params() {
+      let params = {
+        page: this.page,
+        limit: this.limit
+      };
+      if (this.index == 0) {
+        params = Object.assign(params, { by: "createdAt" });
+      } else {
+        params = Object.assign(params, { cate: this.index });
+      }
+      return params;
+    },
     onLoad(pageName = "24h快讯") {
-      console.log("触发了");
       if (this.isLoading) {
         return false;
       }
-      if (this.index == 0) {
-        this.index == false;
-      }
 
       setTimeout(() => {
-        this.$fetch(
-          `/dhr/client/article/list${
-            this.index
-              ? "?cate=" + this.index + "&showCityNum=0"
-              : "?showCityNum=0"
-          }`,
-          {
-            page: this.page,
-            limit: this.limit
-          }
-        ).then(res => {
+        this.$fetch(`/dhr/client/article/list`, this.params()).then(res => {
           let data = res.Result;
           this.count = data.count / 1;
           this.list_data = this.list_data.concat(data.data);
@@ -223,11 +220,10 @@ export default {
 
           if (this.list_data.length >= this.count) {
             this.finished = true;
-            console.log("无更多数据");
           }
           this.page++;
           this.set_list({
-            list:   this.list_data || [],
+            list: this.list_data || [],
             pageName: this.pageName || pageName,
             page: this.page,
             count: this.count
@@ -237,9 +233,9 @@ export default {
     },
     tabBtnClick(index, pageName) {
       let list_data = this.list;
-      this.pageName = pageName
+      this.pageName = pageName;
       if (pageName in list_data) {
-        this.list_data = list_data[pageName].list
+        this.list_data = list_data[pageName].list;
         this.page = list_data[pageName].page;
         this.count = list_data[pageName].count;
         this.index = index;
@@ -247,7 +243,6 @@ export default {
         return;
       }
 
-    
       this.page = 1;
       this.list_data = [];
       this.count = "";
@@ -270,17 +265,7 @@ export default {
       if (this.index == 0) {
         this.index == false;
       }
-      this.$fetch(
-        `/dhr/client/article/list${
-          this.index
-            ? "?cate=" + this.index + "&showCityNum=0"
-            : "?showCityNum=0"
-        }`,
-        {
-          page: this.page,
-          limit: this.limit
-        }
-      )
+      this.$fetch(`/dhr/client/article/list`, this.params())
         .then(res => {
           if (res.Result.data.length > 0 && res.ErrCode == "0000") {
             let data = res.Result;
@@ -292,7 +277,6 @@ export default {
             this.page++;
             if (this.list_data.length >= this.count) {
               this.finished = true;
-              console.log("无更多数据");
             }
           }
         })

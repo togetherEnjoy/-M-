@@ -1,5 +1,7 @@
 <template>
   <div class="study_detail">
+    <city ref="city"/>
+    <publicHead :centerImg="centerImg" backURL="/home/study"/>
     <div class="ser_img_wrap">
       <div class="card_item">
         <div class="imgs">
@@ -39,11 +41,13 @@
 
         <div class="s_huan" ref="change">
           <p @click="referer(getStudyDetail)">换一换</p>
-          <span @click="$router.push({path: '/home/studymore', query:{id}})">更多</span>
+          <span
+            @click="$router.push({path: '/home/studymore', query:{id,sourceDescription,showCity}})"
+          >更多</span>
         </div>
       </div>
 
-      <div class="s_item" v-for="(item,i) in mer_data" :key="i">
+      <div class="s_item" v-for="(item,i) in merchant_data" :key="i">
         <div class="heads_img">
           <img v-lazy="item.img">
         </div>
@@ -65,27 +69,96 @@
     </div>
 
     <div class="project" ref="wipe">
-      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" @click="onTabClick" sticky>
+      <van-tabs
+        v-model="active"
+        title-active-color="#ED2530"
+        :line-height="1"
+        @click="onTabClick"
+        sticky
+      >
         <van-tab title="学校介绍">
           <div class="study_de">
             <div class="content">
-              <van-row v-for="i in 4">
+              <van-row>
                 <van-col span="8">
                   <div class="content_item">
                     <h3>录取率</h3>
-                    <p>5%</p>
+                    <p>{{ detail_data.acceptanceRate }}%</p>
                   </div>
                 </van-col>
                 <van-col span="8">
                   <div class="content_item">
-                    <h3>录取率</h3>
-                    <p>5%</p>
+                    <h3>毕业率</h3>
+                    <p>{{ detail_data.graduationRate }}%</p>
                   </div>
                 </van-col>
                 <van-col span="8">
                   <div class="content_item">
-                    <h3>录取率</h3>
-                    <p>5%</p>
+                    <h3>就业率</h3>
+                    <p>{{ detail_data.employmentRate }}%</p>
+                  </div>
+                </van-col>
+              </van-row>
+              <!-- 二行 -->
+              <van-row>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>毕业薪资</h3>
+                    <p>{{ detail_data.salary }}%</p>
+                  </div>
+                </van-col>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>国际学生比例</h3>
+                    <p>{{ detail_data.countryStudentProportion }}%</p>
+                  </div>
+                </van-col>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>学生总数量</h3>
+                    <p>{{ detail_data.studentTotal }}%</p>
+                  </div>
+                </van-col>
+              </van-row>
+              <!-- 三行 -->
+              <van-row>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>本科生数量</h3>
+                    <p>{{ detail_data.undergraduatesTotal }}%</p>
+                  </div>
+                </van-col>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>研究生数量</h3>
+                    <p>{{ detail_data.graduateStudentTotal }}%</p>
+                  </div>
+                </van-col>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>师生比例</h3>
+                    <p>{{ detail_data.staffStudentRatio}}%</p>
+                  </div>
+                </van-col>
+              </van-row>
+              <!-- 四行 -->
+              <van-row>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>男女比例</h3>
+                    <p>{{ detail_data.maleFemaleRatio }}%</p>
+                  </div>
+                </van-col>
+                <van-col span="8">
+                  <div class="content_item">
+                    <h3>办理周期</h3>
+                    <p>{{ detail_data.cycle }}%</p>
+                  </div>
+                </van-col>
+                <van-col span="8">
+                  <div class="content_item">
+                    <!-- <h3>就业率</h3>
+                    <p>5%</p>-->
                   </div>
                 </van-col>
               </van-row>
@@ -190,69 +263,53 @@
       </van-tabs>
     </div>
 
-    <con :simpleName="'海外网'" :head_img="head_img" :hot="hot" :typeOf="2" ref="con"/>
+    <con
+      :simpleName="'海外网'"
+      :head_img="head_img"
+      :id="house_detail.merchant.id"
+      :hot="hot"
+      :typeOf="3"
+      ref="con"
+      :showCity="showCity"
+      :sourceDescription="sourceDescription"
+    />
   </div>
 </template>
 
 <script>
 import { Tab, Tabs, Row, Col } from "vant";
 import con from "../../components/conf";
+import publicHead from "../../components/public_detail_head";
+import city from "../../components/city_station";
 import BScroll from "better-scroll";
 import { BSConfigX } from "../../utils/config.js";
+import { referer } from "../../utils/mixins";
 const url = `/dhr/client/study_abroad/`;
 export default {
+  mixins: [referer],
   data() {
     return {
       active: 0,
       id: this.$route.params.id,
       detail_data: [],
-      referer_can: true,
-
-      // 服务商家
-      mer_data: [],
-      simpleName: '',
-      head_img: '',
-      hot: ''
+      //供应商url
+      refererURL: `/dhr/client/study_abroad/merchant_list`,
+      sourceDescription: location.href,
+      showCity: "",
+      centerImg: require("../../assets/images/study/study.png")
     };
   },
   created() {
     this.getStudyDetail();
-    this.business();
+    this.getMerchantData();
   },
   methods: {
-    // 换一换
-    referer() {
-      const change = this.$refs.change;
-      if (this.referer_can) {
-        this.referer_can = false;
-        change.classList.add("refe");
-        this.business();
-        setTimeout(() => {
-          change.classList.remove("refe");
-          this.referer_can = true;
-        }, 4000);
-      }
-    },
-    // 服务商家
-    business() {
-      this.$fetch("/dhr/client/study_abroad/merchant_list", {
-        id: this.id
-      }).then(res => {
-        if (res.ErrCode == "0000") {
-          this.mer_data = res.Result.data;
-          console.log(this.mer_data);
-          this.simpleName = this.mer_data[0].merchantName;
-          this.head_img = this.mer_data[0].img;
-          this.hot = this.mer_data[0].hot;
-        }
-      });
-    },
-
     getStudyDetail() {
       this.$fetch(url + this.id).then(res => {
-        // console.log(res);
         if (res.ErrCode == "0000") {
           this.detail_data = res.Result;
+
+          this.showCity = this.detail_data.showCity;
         }
       });
     },
@@ -276,13 +333,14 @@ export default {
     [Tabs.name]: Tabs,
     [Row.name]: Row,
     [Col.name]: Col,
-    con
+    con,
+    publicHead,
+    city
   }
 };
 </script>
 <style lang="scss">
 .study_detail {
-  padding-bottom: 98px;
   .van-tabs__wrap--scrollable .van-tab {
     flex-basis: 26% !important;
   }
@@ -315,7 +373,8 @@ export default {
 <style scoped lang="scss">
 .study_detail {
   background-color: #f8f8f8;
-  padding-bottom: 158px;
+  padding-bottom: 178px;
+  padding-top: 100px;
   .ser_img_wrap {
     .card_item {
       color: #fff;
@@ -350,7 +409,7 @@ export default {
           height: 140px;
           border-radius: 50%;
           margin: auto;
-          background: url("../../assets/images/study/学校校徽图.png") no-repeat
+          background: url("../../assets/images/study/badge.png") no-repeat
               center/106px,
             url("../../assets/images/study/yuan.png") no-repeat center/cover;
         }

@@ -1,7 +1,7 @@
 <template>
   <div class="hot_detail" ref="hotD">
     <div class="top_bar">
-      <div class="t_l" @click="$router.push({path: '/'})"></div>
+      <div class="t_l" @click="$router.push({path: '/news'})"></div>
       <div class="t_c">
         <img src="../../assets/images/hot/tit2.png">
       </div>
@@ -99,7 +99,13 @@
     </div>
 
     <!-- 咨询 -->
-    <con :simpleName="simpleName"/>
+    <con
+      :simpleName="content.merchant.simpleName"
+      :showCity="content.showCity"
+      :sourceDescription="href"
+      :typeOf="index"
+      :hot="content.hot"
+    />
 
     <!-- 评论组 -->
     <div class="from_group" @touchmove.prevent ref="inpBox">
@@ -125,6 +131,7 @@ import wxApi from "../../common/wxapi.js";
 export default {
   data() {
     return {
+      href: location.href,
       content: {},
       // 评论内容
       comment_content: "",
@@ -135,7 +142,8 @@ export default {
       limit: 5,
       head_img: require("../../assets/images/hot/logo2.png"),
       hot_content_list: [],
-      simpleName: ""
+
+      index: this.$route.query.index
     };
   },
   mounted() {
@@ -155,33 +163,33 @@ export default {
     },
     wxShareTimeline() {
       let option = {
-        title: '限时团购周 挑战最低价',
-        link: location.href.split('#')[0],
+        title: "限时团购周 挑战最低价",
+        link: location.href.split("#")[0],
         imgUrl: this.content.coverImg,
         success: () => {
-          alert('分享成功')
+          alert("分享成功");
         },
         error: () => {
-          alert('分享失败')
+          alert("分享失败");
         }
-      }
+      };
 
-      wxApi.ShareTimeline(option)
+      wxApi.ShareTimeline(option);
     },
     wxShareAppMessage() {
       let option = {
-        title: '限时团购周 挑战最低价',
-        link: location.href.split('#')[0],
+        title: "限时团购周 挑战最低价",
+        link: location.href.split("#")[0],
         imgUrl: this.content.coverImg,
         success: () => {
-          alert('分享成功')
+          alert("分享成功");
         },
         error: () => {
-          alert('分享失败')
+          alert("分享失败");
         }
-      }
+      };
 
-      wxApi.ShareAppMessage(option)
+      wxApi.ShareAppMessage(option);
     },
 
     reload(id, name) {
@@ -201,7 +209,6 @@ export default {
       this.$fetch(
         `/dhr/client/comment/list?soft_language_id=${this.content.id}`
       ).then(res => {
-        console.log(res);
         this.comment = res.Result.data;
         this.count = res.Result.count;
       });
@@ -234,7 +241,7 @@ export default {
       this.$fetch(`/dhr/client/article/${id}`).then(res => {
         if (res.ErrCode == "0000") {
           this.content = res.Result;
-          console.log(this.content)
+
           this.set_tit(this.content.name); //讲name保存到 vuex中
           this.simpleName = this.content.merchant.simpleName;
           this.getComment();
@@ -262,22 +269,24 @@ export default {
     // 获取列表
     getList() {
       let { index } = this.$route.query;
-      this.$fetch(
-        `/dhr/client/article/list${
-          index ? "?cate=" + index + "&showCityNum=0" : "?showCityNum=0"
-        }`
-      )
+      let params = {
+        page: this.page,
+        limit: this.limit
+      };
+      if (this.index == 0) {
+        params = Object.assign(params, { by: "createdAt" });
+      } else {
+        params = Object.assign(params, { cate: index });
+      }
+      this.$fetch(`/dhr/client/article/list`, params)
 
         .then(res => {
           if (res.Result.data.length > 0) {
             this.list_data = res.Result.data;
             this.hot_content_list = this.list_data;
-            console.log(this.hot_content_list);
           }
         })
-        .catch(err => {
-          console.log(err);
-        });
+        .catch(err => {});
     },
     ...mapMutations({
       set_tit: "SET_TITLE"
@@ -318,6 +327,7 @@ export default {
 .hot_detail {
   overflow: hidden;
   position: relative;
+  padding-bottom: 150px;
   &.open .mask {
     visibility: visible;
     background-color: rgba(0, 0, 0, 0.4);
@@ -498,7 +508,7 @@ export default {
     background-color: #fff;
     margin-top: 30px;
     position: relative;
-    margin-bottom: 138px;
+    // margin-bottom: 168px;
     h3 {
       font-size: 30px;
       font-weight: bold;
@@ -559,7 +569,7 @@ export default {
     font-size: 28px;
     font-weight: 500;
     position: fixed;
-    bottom: 130px;
+    bottom: 180px;
     right: 0px;
     p {
       text-align: center;
@@ -573,73 +583,6 @@ export default {
           center/cover;
         left: 30px;
         top: 20px;
-      }
-    }
-  }
-
-  .zi {
-    display: flex;
-    height: 98px;
-    // margin-top: 60px;
-    background-color: #fff;
-    justify-content: space-between;
-    padding: 0 30px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    .z_l {
-      display: flex;
-      align-self: center;
-      .z_l_img {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        overflow: hidden;
-        align-self: center;
-        img {
-          display: block;
-          width: 70%;
-          object-position: center;
-          margin: 0 auto;
-          // height: 100%;
-        }
-      }
-      .z_l_t {
-        margin-left: 27px;
-
-        h3 {
-          font-size: 22px;
-          font-weight: bold;
-        }
-        p {
-          font-size: 20px;
-          font-weight: 500;
-          color: #9399a5;
-          margin-top: 15px;
-        }
-      }
-    }
-    .z_c,
-    .z_r {
-      width: 420px;
-      height: 80px;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 28px;
-      text-align: center;
-      line-height: 80px;
-      align-self: center;
-    }
-    .z_c {
-      background-color: #3cb584;
-      display: none;
-    }
-    .z_r {
-      background-color: #ed2530;
-      a {
-        color: #fff;
-        display: block;
       }
     }
   }
@@ -659,13 +602,13 @@ export default {
   .from_group {
     width: 100%;
     background-color: #fff;
-    padding: 0 30px 98px;
+    padding: 0 30px 30px;
     position: fixed;
     bottom: 0;
     left: 0;
     transform: translatey(100%);
     transition: all 0.3s ease-out;
-    z-index: 3;
+    z-index: 99999;
     p {
       font-size: 24px;
       color: #ed2530;

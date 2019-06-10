@@ -12,3 +12,5 @@ export const HOUSE_MENU = "HOUSE_MENU" // 房产国家
 
 export const IMMIG_MENU = "IMMIG_MENU"
 
+export const SET_NUMBER = "SET_NUMBER"
+

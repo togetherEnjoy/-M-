@@ -91,7 +91,6 @@ export default {
   },
   methods: {
     onLoad() {
-      console.log("触发");
       this.getAllList(this.result_data);
     },
     // 获取menu
@@ -211,6 +210,7 @@ export default {
 .house {
   background-color: #f8f8f8;
   overflow: hidden;
+  padding-top: 100px;
   .sx_result {
     h3 {
       font-weight: 500;

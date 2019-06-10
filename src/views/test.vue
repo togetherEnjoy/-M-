@@ -9,7 +9,8 @@
   </div>
 </template>
 <script>
-import request from '../utils/request'
+import request,{fetch,post} from '../utils/request'
+console.log(fetch)
 export default {
   data() {
     return {

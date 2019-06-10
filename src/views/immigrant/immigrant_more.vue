@@ -19,6 +19,8 @@
         :id="id"
         ref="con"
         :showFoot="false"
+        :showCity="showCity"
+        :sourceDescription="sourceDescription"
       />
     </div>
   </div>
@@ -47,15 +49,15 @@ export default {
       head_img: "",
       hot: "",
       id: this.$route.query.id,
-
+      showCity: this.$route.query.showCity,
+      sourceDescription: this.$route.query.sourceDescription,
       // 供应商
-      url: `/dhr/business/immigrant/support?showCityNum=1`
+      url: `/dhr/client/immigrant/support`
     };
   },
   methods: {
     getMenu() {
       this.$fetch("/dhr/client/migrate/menu").then(res => {
-        console.log(res);
         if (res.ErrCode == "0000") {
           this.athor = res.Result.country;
         }

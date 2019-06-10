@@ -123,7 +123,7 @@ export default {
           this.loading = false;
           if (this.List_data.length >= this.count) {
             this.finished = true;
-            console.log("无更多数据");
+
           }
           this.page++;
         }
@@ -140,6 +140,7 @@ export default {
 <style scoped lang="scss">
 .studytour {
   background-color: #f8f8f8;
+  padding-top: 100px;
   .lx_content {
     padding: 40px 30px;
     padding-top: 40px;

@@ -11,6 +11,8 @@ export const http = {
     responseType: 'json'
 }
 
+export let showCityNum = 0
+
 export const BSConfigX = {
     scrollX: true,
     eventPassthrough: "vertical",

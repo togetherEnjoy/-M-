@@ -20,7 +20,7 @@ import study from './views/study/study.vue'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'hash',
+  // mode: 'history',
   base: process.env.BASE_URL,
   linkActiveClass: 'active-c',
   routes: [
@@ -51,7 +51,7 @@ export default new Router({
     },
     {
       path: '/',
-      redirect: '/news'
+      redirect: '/home'
     },
     {
       path: '/news',
@@ -138,7 +138,10 @@ export default new Router({
     {
       path: '/home/merchant',
       name: 'merchant',
-      component: resolve => require(['./views/merchant/merchant.vue'], resolve)
+      component: resolve => require(['./views/merchant/merchant.vue'], resolve),
+      meta: {
+        keepAlive: true
+      }
     },
 
 

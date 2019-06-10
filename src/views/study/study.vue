@@ -99,7 +99,6 @@ export default {
   },
   methods: {
     onLoad() {
-      console.log("触发了 onload")
       this.getAllList(this.result_data);
     },
     // // 筛选数据
@@ -110,7 +109,7 @@ export default {
     getStudyData() {
       this.$fetch("/dhr/client/study_abroad/menu").then(res => {
         if (res.ErrCode == "0000") {
-          console.log(res);
+      
           let { IELTS, TOEFL, cost, country, rank, schoolType } = res.Result;
           this.country = country;
           this.athor = schoolType;
@@ -131,6 +130,7 @@ export default {
 <style scoped lang="scss">
 .study {
   background-color: #f8f8f8;
+  padding-top: 100px;
   .study_wrap {
     // padding-top:  
     .like {

@@ -1,5 +1,7 @@
 <template>
   <div class="immg_detail">
+    <city ref="city"/>
+    <publicHead :centerImg="centerImg" backURL="/home/immig"/>
     <div class="ser_img_wrap">
       <div class="card_item">
         <div class="imgs">
@@ -53,7 +55,9 @@
 
         <div class="s_huan" ref="change">
           <p @click="referer">换一换</p>
-          <span @click="$router.push({path: '/home/immigmore', query:{id}})">更多</span>
+          <span
+            @click="$router.push({path: '/home/immigmore', query:{id,sourceDescription,showCity}})"
+          >更多</span>
         </div>
       </div>
 
@@ -82,22 +86,7 @@
     <div class="project">
       <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" sticky>
         <van-tab title="项目介绍">
-          <div class="content" v-html="immig_detail.projectIntroduction">
-            <!-- <p>
-              如果申请墨尔本则需投资40万澳元，悉尼需50万澳元。澳洲188A创业移民，是澳洲188系列签证之一。188A签证是澳洲政府为吸引和鼓励成功商业人士前往澳洲定居，并利用其经验技术在澳继续经营生意或从事投资，设立的临时居留签证（TR）。
-              澳洲188A签证申请人登陆澳洲之后，投资不少于20万澳元新建一门生意，就可符合移民局要求。如果申请墨尔本则需投资40万澳元，悉尼需50万澳元。
-               
-            </p>-->
-
-            <!-- <div class="imgs">
-              <img src="../../assets/images/house/pro.png">
-            </div>
-
-            <p>
-              如果申请墨尔本则需投资40万澳元，悉尼需50万澳元。澳洲188A创业移民，是澳洲188系列签证之一。188A签证是澳洲政府为吸引和鼓励成功商业人士前往澳洲定居，并利用其经验技术在澳继续经营生意或从事投资，设立的临时居留签证（TR）。
-              澳洲188A签证申请人登陆澳洲之后，投资不少于20万澳元新建一门生意，就可符合移民局要求。如果申请墨尔本则需投资40万澳元，悉尼需50万澳元。
-            </p>-->
-          </div>
+          <div class="content" v-html="immig_detail.projectIntroduction"></div>
         </van-tab>
         <van-tab title="申请条件">
           <div class="content" v-html="immig_detail.requirement"></div>
@@ -111,7 +100,16 @@
       </van-tabs>
     </div>
 
-    <con :simpleName="simpleName" :head_img="head_img" :hot="hot" :typeOf="2" ref="con" />
+    <con
+      :simpleName="simpleName"
+      :id="house_detail.merchant.id"
+      :head_img="head_img"
+      :hot="hot"
+      :typeOf="2"
+      ref="con"
+      :showCity="immig_detail.showCity"
+      :sourceDescription="sourceDescription"
+    />
   </div>
 </template>
 
@@ -119,10 +117,12 @@
 import { Tab, Tabs } from "vant";
 import con from "../../components/conf";
 import { setTimeout } from "timers";
-
+import { referer } from "../../utils/mixins";
+import publicHead from "../../components/public_detail_head";
+import city from "../../components/city_station";
 const url = `/dhr/client/migrate/`;
-const gysUrl = `/dhr/business/immigrant/support`;
 export default {
+  mixins: [referer],
   data() {
     return {
       active: 0,
@@ -138,46 +138,20 @@ export default {
       id: this.$route.query.id,
       referer_can: true,
       immig_detail: [],
-      merchant_data: [],
-      simpleName: "",
-      head_img: "",
-      hot: "",
+      // 供应商url
+      refererURL: `/dhr/business/immigrant/support`,
+      sourceDescription: location.href,
+      showCity: "",
 
+      centerImg: require("../../assets/images/immig/immig_center.png")
     };
   },
   methods: {
-    // 换一换
-    referer() {
-      const change = this.$refs.change;
-      if (this.referer_can) {
-        this.referer_can = false;
-        change.classList.add("refe");
-        this.getMerchantData();
-        setTimeout(() => {
-          change.classList.remove("refe");
-          this.referer_can = true;
-        }, 4000);
-      }
-    },
     getImmigDetail() {
       this.$fetch(url + this.id).then(res => {
-        console.log(res);
         if (res.ErrCode == "0000") {
           this.immig_detail = res.Result;
-        }
-      });
-    },
-    // 供应商
-    getMerchantData() {
-      this.$fetch(gysUrl, {
-        id: this.id
-      }).then(res => {
-        if (res.ErrCode == "0000") {
-          this.merchant_data = res.Result.data;
-          console.log(this.merchant_data);
-          this.simpleName = this.merchant_data[0].merchantName;
-          this.head_img = this.merchant_data[0].img;
-          this.hot = this.merchant_data[0].hot;
+          this.showCity = this.immig_detail.showCity;
         }
       });
     },
@@ -194,7 +168,9 @@ export default {
   components: {
     [Tab.name]: Tab,
     [Tabs.name]: Tabs,
-    con
+    con,
+    publicHead,
+    city
   }
 };
 </script>
@@ -206,7 +182,8 @@ export default {
 <style scoped lang="scss">
 .immg_detail {
   background-color: #f8f8f8;
-  padding-bottom: 158px;
+  padding-bottom: 178px;
+  padding-top: 100px;
   .ser_img_wrap {
     .card_item {
       color: #fff;
@@ -287,7 +264,7 @@ export default {
         & > div {
           color: #9399a5;
           margin-top: 30px;
-          font-size: 22px;
+          font-size: 24px;
           flex: 1;
           border-top: 1px solid #eee;
           border-bottom: 1px solid #eee;
@@ -303,7 +280,7 @@ export default {
           }
           .m {
             color: #ed2530;
-            font-size: 24px;
+            font-size: 30px;
             font-weight: bold;
             margin-bottom: 19px;
           }

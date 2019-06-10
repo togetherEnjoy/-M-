@@ -31,7 +31,6 @@ export const screen_data = {
     methods: {
         // 获取list数据
         getAllList(box) {
-            // console.log('获取数据:')
             let params = {
                 page: this.page,
                 limit: this.limit
@@ -85,7 +84,7 @@ export const screen_data = {
             this.getAllList(this.result_data);
         },
         emptyall() {
-           
+
             this.result_data = {}
             this.$children[0].sendObj = this.result_data;
             // 筛选数据
@@ -96,6 +95,70 @@ export const screen_data = {
             this.getAllList(this.result_data);
         },
 
-      
+
+    }
+}
+
+
+/**
+ * 
+ * 移民、留学刷新供应商
+ * 
+ *  */
+
+export const referer = {
+    data() {
+        return {
+            count: null,
+            page: 1,
+            limit: 4,
+            canReferer: true,
+            referer_can: true,
+            merchant_data: [],
+            simpleName: '',
+            head_img: '',
+            hot: ''
+        }
+    },
+    methods: {
+        // 换一换
+        referer() {
+            if (!this.canReferer) return
+            const change = this.$refs.change;
+            if (this.referer_can) {
+                this.referer_can = false;
+                change.classList.add("refe");
+                if (this.page * this.limit >= this.count) {
+                    this.$toast('无更多数据')
+                    this.canReferer = false
+                }
+                this.getMerchantData();
+                this.page++;
+                setTimeout(() => {
+                    change.classList.remove("refe");
+                    this.referer_can = true;
+                }, 4000);
+            }
+        },
+        // 供应商
+        getMerchantData() {
+            this.$fetch(this.refererURL, {
+                id: this.id,
+                page: this.page,
+                limit: this.limit
+            }).then(res => {
+                if (res.ErrCode == "0000") {
+                    this.count = res.Result.count;
+                    this.merchant_data = res.Result.data;
+                    console.log(this.merchant_data);
+
+
+
+                    this.simpleName = this.merchant_data[0].merchantName;
+                    this.head_img = this.merchant_data[0].img;
+                    this.hot = this.merchant_data[0].hot;
+                }
+            });
+        },
     }
 }

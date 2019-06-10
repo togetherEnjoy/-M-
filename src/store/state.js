@@ -7,6 +7,8 @@ const state = {
     screen: [],
     house_menu: [],
     immig_menu: [],
+    
+    number: ''
 }
 
 export default state

@@ -6,6 +6,7 @@
         title-active-color="#ED2530"
         v-model="active"
         @click="tabClick"
+        sticky
       >
         <van-tab v-for="index in immig_country" :title="index.name">
           <div class="card">
@@ -90,10 +91,10 @@ export default {
     // }
   },
   activated() {
-    console.log("actived");
+
   },
   deactivated() {
-    console.log("deactivated");
+    
   },
   created() {
     this.getImmigData();
@@ -107,7 +108,7 @@ export default {
       });
     },
     getImmigListData() {
-      console.log("触发了");
+
 
       setTimeout(() => {
         this.$fetch(url, {
@@ -118,11 +119,11 @@ export default {
           if (res.ErrCode == "0000") {
             this.list_data = this.list_data.concat(res.Result.data);
             this.count = res.Result.count / 1;
-            console.log(this.list_data);
+        
             this.loading = false;
             if (this.list_data.length >= this.count) {
               this.finished = true;
-              console.log("无更多数据");
+         
             }
             this.page++;
           }
@@ -130,7 +131,7 @@ export default {
       }, 500);
     },
     tabClick(i) {
-      console.log(i);
+
       this.list_data = [];
       this.page = 1;
       this.hostCountryNum = i;
@@ -145,9 +146,8 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    console.log(to);
     if (to.path == "/home/immig") {
-      console.log(to);
+
     }
     next();
   },
@@ -243,7 +243,7 @@ export default {
           font-size: 24px;
           .m {
             color: #ed2530;
-            font-size: 24px;
+            font-size: 30px;
             font-weight: bold;
             margin-bottom: 19px;
           }

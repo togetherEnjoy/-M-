@@ -1,5 +1,7 @@
 <template>
   <div class="house_detail">
+    <city ref="city"/>
+    <publicHead :centerImg="centerImg" backURL="/home/house"/>
     <van-swipe @change="onChange">
       <!-- :style="`width:${viewWidth}px`" -->
       <van-swipe-item v-for="item in swipe">
@@ -61,7 +63,7 @@
         <div class="dbl">
           <p class="dbld">
             项目面积：
-            <span>{{  house_detail.minArea}}~{{ house_detail.maxArea }}㎡</span>
+            <span>{{ house_detail.minArea}}~{{ house_detail.maxArea }}㎡</span>
           </p>
           <p class="dbld">
             物业类型：
@@ -83,7 +85,10 @@
           </p>
           <p class="dbld">
             可选户型：
-            <span v-for="(item,i) in useHx(house_detail.optionalRoomType)" :key="i">{{ item }}</span>
+            <span
+              v-for="(item,i) in useHx(house_detail.optionalRoomType)"
+              :key="i"
+            >{{ useHx(house_detail.optionalRoomType).length>0? item+'   ':item }}</span>
           </p>
         </div>
       </div>
@@ -93,52 +98,35 @@
       <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" sticky>
         <van-tab title="项目简介">
           <div class="content" v-html="house_detail.content">
-            <!-- <p>在科学研究方面，美国学者赢得了大量的诺贝尔奖，尤其是在生物和医学领域。美国国家健康研究中心是美国生物医学的聚焦点，并已完成人类基因组计划，使人类对肿瘤、阿兹海默症等疾病的治愈研究进入重要阶段。航空和航天研究的政府机构是美国国家航空航天局。波音公司和洛克希德·马丁公司一类的私营企业也扮演了重要角色。美国国家科学院、美国国家工程院、美国国家医学院和美国国家自然基金会，是美国科学界最高水平的四大学术机构。除自然基金会外，其他三院分别授予院士头衔。</p>
 
-            <div class="imgs">
-              <img src="../../assets/images/house/pro.png">
-            </div>
-
-            <p>在科学研究方面，美国学者赢得了大量的诺贝尔奖，尤其是在生物和医学领域。美国国家健康研究中心是美国生物医学的聚焦点，并已完成人类基因组计划，使人类对肿瘤、阿兹海默症等疾病的治愈研究进入重要阶段。航空和航天研究的政府机构是美国国家航空航天局。波音公司和洛克希德·马丁公司一类的私营企业也扮演了重要角色。美国国家科学院、美国国家工程院、美国国家医学院和美国国家自然基金会，是美国科学界最高水平的四大学术机构。除自然基金会外，其他三院分别授予院士头衔。</p>
-            <p>在科学研究方面，美国学者赢得了大量的诺贝尔奖，尤其是在生物和医学领域。美国国家健康研究中心是美国生物医学的聚焦点，并已完成人类基因组计划，使人类对肿瘤、阿兹海默症等疾病的治愈研究进入重要阶段。航空和航天研究的政府机构是美国国家航空航天局。波音公司和洛克希德·马丁公司一类的私营企业也扮演了重要角色。美国国家科学院、美国国家工程院、美国国家医学院和美国国家自然基金会，是美国科学界最高水平的四大学术机构。除自然基金会外，其他三院分别授予院士头衔。</p> -->
           </div>
         </van-tab>
         <van-tab title="周边设施">
           <div class="zb_content">
             <div class="education">
-              <h3>教育</h3>
-              <p>Pimpama州立小学</p>
-              <p>Pimpama州立中学-高中</p>
-              <p>国王基督徒学院</p>
+              <h3>{{ peripheral.education.name }}</h3>
+              <p v-html="peripheral.education.content"></p>
             </div>
             <div class="shop">
-              <h3>购物</h3>
-              <p>
-                Coomera，Upper Coomera和Pimpama Junction购物中心都位
-                于附近
+              <h3>{{ peripheral.shopping.name }}</h3>
+              <p v-html="peripheral.shopping.content">
               </p>
             </div>
 
             <div class="leisure">
-              <h3>休闲</h3>
-              <p>时代广场–5.8公里</p>
-              <p>中央公园（东南入口）-6.9公里</p>
-              <p>港口公园</p>
+              <h3>{{ peripheral.leisuretime.name }}</h3>
+              <p v-html="peripheral.leisuretime.content"></p>
+            
             </div>
 
             <div class="hospot">
-              <h3>医疗</h3>
-              <p>驾车5分钟到Pimpama医疗中心</p>
-              <p>驾车5分钟到Medicross医疗Coomera</p>
-              <p>驾车25分钟到黄金海岸大学综合医疗中心</p>
+              <h3>{{ peripheral.hospital.name }}</h3>
+              <p v-html="peripheral.hospital.content"></p>
             </div>
 
             <div class="traffic">
-              <h3>交通</h3>
-              <p>驾车5分钟到Ormeau火车站</p>
-              <p>驾车7分钟到Coomera 火车站</p>
-              <p>驾车40分钟到布里斯班CBD</p>
-              <p>驾车30分钟到黄金海岸CBD</p>
+              <h3>{{ peripheral.traffic.name }}</h3>
+              <p v-html="peripheral.traffic.content"></p>
             </div>
           </div>
         </van-tab>
@@ -146,49 +134,92 @@
           <div class="wy_content">
             <div class="kt">
               <h3>空调设施</h3>
-              <p><span v-if="property.airConditioning.SplitType">√</span> 分体式空调</p>
+              <p>
+                <span v-if="property.airConditioning.SplitType">√</span> 分体式空调
+              </p>
             </div>
             <div class="cf">
               <h3>厨房配置</h3>
-              <p><span v-if="property.kitchen.Refrigerator">√</span> 冰箱</p>
-              <p><span v-if="property.kitchen.Oven.Washingmachine">√</span> 烤箱</p>
-              <p><span v-if="property.kitchen.Dishwasher">√</span> 洗碗机</p>
-              <p><span v-if="property.kitchen.MicrowaveOven">√</span> 微波炉</p>
-              <p><span v-if="property.kitchen.Heater">√</span> 热水器</p>
-              <p><span v-if="property.kitchen.Cupboard">√</span> 橱柜</p>
-              <p><span v-if="property.kitchen">√</span> 洗衣机</p>
+              <p>
+                <span v-if="property.kitchen.Refrigerator">√</span> 冰箱
+              </p>
+              <p>
+                <span v-if="property.kitchen.Oven.Washingmachine">√</span> 烤箱
+              </p>
+              <p>
+                <span v-if="property.kitchen.Dishwasher">√</span> 洗碗机
+              </p>
+              <p>
+                <span v-if="property.kitchen.MicrowaveOven">√</span> 微波炉
+              </p>
+              <p>
+                <span v-if="property.kitchen.Heater">√</span> 热水器
+              </p>
+              <p>
+                <span v-if="property.kitchen.Cupboard">√</span> 橱柜
+              </p>
+              <p>
+                <span v-if="property.kitchen.Washingmachine">√</span> 洗衣机
+              </p>
             </div>
             <div class="wy">
               <h3>卫浴配置</h3>
-              <p><span v-if="property.bathroom.Bathtub">√</span> 浴缸</p>
-              <p><span  v-if="property.bathroom.shower">√</span> 淋浴</p>
-              <p><span v-if="property.bathroom.Basin">√</span> 台盆</p>
-              <p><span v-if="property.bathroom.Pedestalpan">√</span> 坐便器</p>
+              <p>
+                <span v-if="property.bathroom.Bathtub">√</span> 浴缸
+              </p>
+              <p>
+                <span v-if="property.bathroom.shower">√</span> 淋浴
+              </p>
+              <p>
+                <span v-if="property.bathroom.Basin">√</span> 台盆
+              </p>
+              <p>
+                <span v-if="property.bathroom.Pedestalpan">√</span> 坐便器
+              </p>
             </div>
 
             <div class="tcc">
               <h3>停车场</h3>
-              <p><span v-show="property.Garden.PrivateCourtyard">√</span> 单车库</p>
-              <p><span>√</span> 双车库</p>
+              <p>
+                <span v-show="property.yard.Doublegarage">√</span> 单车库
+              </p>
+              <p>
+                <span v-show="property.yard.Singlegarage">√</span> 双车库
+              </p>
             </div>
 
             <div class="hy">
               <h3>花园配置</h3>
               <!-- <p>√ 私人庭院</p> -->
-              <p><span v-show="property.Garden.PrivateCourtyard">√</span> 私人庭院</p>
-              <p><span v-if="property.Garden.SwimmingPool">√</span> 游泳池</p>
+              <p>
+                <span v-if="property.Garden.PrivateCourtyard">√</span> 私人庭院
+              </p>
+              <p>
+                <span v-if="property.Garden.SwimmingPool">√</span> 游泳池
+              </p>
             </div>
           </div>
         </van-tab>
       </van-tabs>
     </div>
 
-    <con :simpleName="'海外网'"/>
+    <!--  :sourceDescription="" :showCity="" -->
+    <con
+      :simpleName="house_detail.merchant.simpleName"
+      :id="house_detail.merchant.id"
+      :typeOf="1"
+      :hot="house_detail.hot"
+      :showCity="house_detail.showCity"
+      :sourceDescription="href"
+      :head_img="house_detail.merchant.headPortrait"
+    />
   </div>
 </template>
 
 <script>
 import { Tab, Tabs } from "vant";
+import publicHead from "../../components/public_detail_head";
+import city from "../../components/city_station";
 import con from "../../components/conf";
 export default {
   data() {
@@ -196,34 +227,42 @@ export default {
       current: 0,
       active: 0,
       house_detail: {},
+      // 周边设施
+      peripheral: {},
+
       property: {},
-      swipe: []
+      swipe: [],
+      href: location.href,
+
+      centerImg: require("../../assets/images/house/house_center.png"),
+      backURL: ""
     };
   },
   created() {
-    this.getHouseDetail()
-    this.getSwipeData()
+    this.getHouseDetail();
+    this.getSwipeData();
   },
   methods: {
     // 轮播
     getSwipeData() {
-      this.$fetch('/dhr/advertise/img/home').then(res => {
-        console.log(res)
-        if (res.ErrCode == '0000') {
-          this.swipe = res.Result.data
+      this.$fetch("/dhr/advertise/img/home").then(res => {
+        if (res.ErrCode == "0000") {
+          this.swipe = res.Result.data;
         }
-      })
+      });
     },
     getHouseDetail() {
-      let { id } = this.$route.params
+      let { id } = this.$route.params;
       this.$fetch(`/dhr/client/house/${id}`).then(res => {
-        console.log(res.Result)
-        if (res.ErrCode == '0000') {
-          this.house_detail = res.Result
-          this.property = JSON.parse(res.Result.property)
-          console.log(this.house_detail)
+        if (res.ErrCode == "0000") {
+          this.house_detail = res.Result;
+          
+          this.property = JSON.parse(res.Result.property);
+          console.log( this.property )
+          this.peripheral = JSON.parse(res.Result.peripheral);
+          console.log(this.peripheral)
         }
-      })
+      });
     },
     onChange(index) {
       this.current = index;
@@ -238,37 +277,38 @@ export default {
         case 3:
           return "精品住宅";
         case 4:
-          return "双拼别墅"
+          return "双拼别墅";
       }
     },
     // 可选户型
     useHx(data) {
-      const type = ['一室','二室','三室','四室','四室以上']
-      let newData = data.split(',')
-      let showD = []
+      const type = ["一室", "二室", "三室", "四室", "四室以上"];
+      let newData = data.split(",");
+      let showD = [];
       let map = newData.map((val, index) => {
-        let number = Number(val)
+        let number = Number(val);
         if (number) {
-          showD.unshift(type[index])
+          showD.unshift(type[index]);
         }
-      })
-      return showD
+      });
+      return showD;
     },
     // 交房标准
     deliverCriterion(data) {
-      console.log(data)
       switch (data) {
-        case 1: 
-          return '精装交付';
+        case 1:
+          return "精装交付";
         case 0:
-          return '其他'
+          return "其他";
       }
     }
   },
   components: {
     [Tab.name]: Tab,
     [Tabs.name]: Tabs,
-    con
+    con,
+    publicHead,
+    city
   }
 };
 </script>
@@ -292,30 +332,30 @@ export default {
   .van-tabs__content {
     padding: 0 30px !important;
   }
-
 }
 
 // 去掉tabs的边框
 .van-hairline--top-bottom::after {
-    border-width: 0 !important;
-  }
+  border-width: 0 !important;
+}
 
-  // 加粗选择的tabs
-  .van-tab--active {
-    font-weight: 700 !important;
-  }
+// 加粗选择的tabs
+.van-tab--active {
+  font-weight: 700 !important;
+}
 
-  // tab 下的 line
-  .van-tabs__line {
-    height: 2px !important;
-  }
+// tab 下的 line
+.van-tabs__line {
+  height: 2px !important;
+}
 </style>
 
 
 <style scoped lang="scss">
 .house_detail {
   background-color: #f8f8f8;
-  margin-bottom: 158px;
+  padding-bottom: 178px;
+  padding-top: 100px;
   .hd_img {
     width: 100%;
     height: 500px;
@@ -345,8 +385,8 @@ export default {
           top: 2px;
           width: 24px;
           height: 24px;
-          background: url("../../assets/images/house/posi.png") no-repeat
-            center / cover;
+          background: url("../../assets/images/house/posi.png") no-repeat center /
+            cover;
         }
       }
 
@@ -523,7 +563,7 @@ export default {
       p {
         position: relative;
         padding-left: 25px;
-        span {  
+        span {
           position: absolute;
           left: 0;
           top: 1px;

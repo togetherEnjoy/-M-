@@ -14,15 +14,15 @@
 
       <div class="m_sl">
         <div class="sl_item">
-          <p class="num">290</p>
+          <p class="num">{{ mer_data.browseNumber }}</p>
           <p class="txt">产品数</p>
         </div>
         <div class="sl_item">
-          <p class="num">128</p>
+          <p class="num">{{ mer_data.pageNumber }}</p>
           <p class="txt">文章数</p>
         </div>
         <div class="sl_item">
-          <p class="num">334</p>
+          <p class="num">{{ mer_data.softLanguageBer }}</p>
           <p class="txt">咨询量</p>
         </div>
       </div>
@@ -30,36 +30,40 @@
 
     <div class="house">
       <div class="top_bar">
-        <h1>海外好房</h1>
-        <p style="cursor:pointer" v-on:click="$router.push({path: '/home/house'})">探索更多海外房产</p>
+        <h1>海外{{ titleName }}</h1>
+        <p style="cursor:pointer" v-on:click="$router.push({path: titleURL})">探索更多海外{{ titleName }}</p>
       </div>
 
-      <van-tabs :line-height="0">
+      <van-tabs :line-height="0" :line-width="0" @click="onTabClick">
         <van-tab title="房产">
           <div class="h_cate">
             <div class="house_wrap">
               <div
                 class="list_box"
-                v-for="item in 10"
-                @click="$router.push({name: 'housedetail',params: {id: 123}})"
+                v-for="(item, i) in house_data"
+                :key="i"
+                @click="$router.push({name: 'housedetail',params: {id: item.id}})"
               >
                 <div class="l_left">
-                  <img src="../../assets/images/house/house.png">
-                  <p>美国·迈阿密</p>
+                  <img v-lazy="item.coverImg">
+                  <p>{{ item.belongCountryName }}·{{ item.belongCityName }}</p>
                 </div>
                 <div class="l_right">
-                  <h3 class="tit">迈阿密市中心智能公寓 Yotelpad</h3>
-                  <p class="de">独栋别墅 | 永久产权 | 89-109m</p>
+                  <h3 class="tit">{{ item.title }}</h3>
+                  <p
+                    class="de"
+                  >{{ houstType(item.hoseType) }} | {{ item.propertyRightYears }} | {{ item.minArea }}m-{{ item.maxArea }}m</p>
                   <p class="price">
                     <i class="le">
                       ￥
-                      <span>330</span>
+                      <span>{{ item.price }}</span>
                       万起
                     </i>
 
                     <span class="ri">
                       首付比例
-                      <i>10%</i>
+                      <i>{{ item.downPay }}</i>
+                      %
                     </span>
                   </p>
                 </div>
@@ -70,33 +74,38 @@
 
         <van-tab title="移民">
           <div class="ym">
-            <div class="card_wrap" v-for="i in 3" @click="$router.push({path: '/home/immig/123'})">
+            <div
+              class="card_wrap"
+              v-for="(item,i) in immig_data"
+              :key="i"
+              @click="$router.push({path: '/home/immig/detail',query:{id: item.id}})"
+            >
               <div class="card_item">
                 <div class="imgs">
-                  <img src="../../assets/images/immig/immig.png">
+                  <img v-lazy="item.imgs">
                 </div>
 
                 <div class="txt">
-                  <h1>澳洲创业移民</h1>
-                  <p>移民速度最快的澳洲商业移民签证</p>
+                  <h1>{{ item.name }}</h1>
+                  <p>{{ item.subtitle }}</p>
                 </div>
               </div>
 
               <div class="card_ds">
                 <div>
-                  <p class="m">3-6个月</p>
+                  <p class="m">{{ item.handlingCycle }}个月</p>
                   <p>办理周期</p>
                 </div>
                 <div>
-                  <p class="m">永久居民</p>
+                  <p class="m">{{ item.identityType }}</p>
                   <p>身份类别</p>
                 </div>
                 <div>
-                  <p class="m">20-50万澳币</p>
+                  <p class="m">{{ item.investmentQuota }}万澳币</p>
                   <p>投资额度</p>
                 </div>
                 <div>
-                  <p class="m">无居住要求</p>
+                  <p class="m">{{ item.demand }}</p>
                   <p>居住要求</p>
                 </div>
               </div>
@@ -107,25 +116,26 @@
           <div class="lx">
             <div
               class="study_item"
-              v-for="i in 10"
+              v-for="(item,i) in study_data"
+              :key="i"
               @click="$router.push({path: '/home/study/123'})"
             >
               <div class="imgs">
-                <img src="../../assets/images/study/学校校徽图.png">
+                <img v-lazy="item.schoolBadgeImg">
               </div>
 
               <div class="content">
-                <h3>哈佛大学</h3>
-                <p class="yw">Harvard University</p>
-                <p class="addr">美国 巴恩斯特布尔县</p>
+                <h3>{{ item.schoolName }}</h3>
+                <p class="yw">{{ item.englishName }}</p>
+                <p class="addr">{{ item.hostCountry }} {{ item.hostCity }}</p>
                 <p class="pm">
                   <span>
                     国内综合排名：
-                    <i>2</i>
+                    <i>{{ item.countryRanking }}</i>
                   </span>
                   <span class="r">
                     录取率：
-                    <i>6.0%</i>
+                    <i>{{ item.acceptanceRate }}.0%</i>
                   </span>
                 </p>
               </div>
@@ -136,90 +146,98 @@
           <div class="yx">
             <div
               class="lx_c_item"
-              v-for="item in 4"
-              @click="$router.push({path: '/home/studytour/123'})"
+              v-for="(item, i) in studyTour_data"
+              :key="i"
+              @click="$router.push({path: `/home/studytour/${item.id}`})"
             >
               <div class="imgs">
-                <img src="../../assets/images/home/lx.png">
+                <img v-lazy="item.coverImg">
               </div>
               <div class="lx_r">
-                <p class="tit">
-                  伯克利学分夏校SSD - 你们陪我长
-                  大，我陪你们旅行
-                </p>
+                <p class="tit">{{ item.title }}</p>
 
                 <p class="price">
                   价格：
-                  <i>￥3900</i>
-                  <span>7天6晚</span>
+                  <i>￥{{ item.price }}</i>
+                  <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}</span>
                 </p>
               </div>
             </div>
           </div>
         </van-tab>
-        <van-tab title="医疗"></van-tab>
-        <van-tab title="婚礼"></van-tab>
-        <van-tab title="定制游"></van-tab>
+        <!-- <van-tab title="医疗"></van-tab> -->
+        <!-- <van-tab title="婚礼"></van-tab>
+        <van-tab title="定制游"></van-tab>-->
       </van-tabs>
     </div>
 
     <div class="house hot">
       <div class="top_bar">
         <h1>海外热门</h1>
-        <p style="cursor:pointer" v-on:click="$router.push({path: '/home/house'})">探索更多海外热门</p>
+        <p style="cursor:pointer" v-on:click="$router.push({path: '/news'})">探索更多海外热门</p>
       </div>
 
-      <van-tabs :line-height="0">
-        <van-tab title="精选">
-          <div style="margin-top:30px">
+      <van-tabs :line-height="0" :line-width="0" @click="tabBtnClick" animated>
+        <van-tab v-for="(item, i ) in hot" :key="i" :title="item">
+          <van-list
+            v-model="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+            :offset="10"
+          >
             <div>
-              <div class="hot_wrap">
-                <div class="hot_item">
-                  <div class="item_left">
-                    <p class="txt">海外房迷|澳房市供需逆转陷低迷 高杠杆者或被迫离场？</p>
-                    <p class="hover">
-                      皇包车 · 2天前
-                      <span>评论数：10</span>
-                    </p>
+              <div v-if="list_data.length > 0" v-for="(list, i) in list_data" :key="i">
+                <div class="hot_wrap">
+                  <div
+                    class="hot_item"
+                    @click="getDetails(list.id, list.name)"
+                    v-if="!list.coverImg1 && !list.coverImg2"
+                  >
+                    <div class="item_left">
+                      <p class="txt" v-text="list.name"></p>
+                      <p class="hover">
+                        {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                        <span>评论数：{{list.commentCount}}</span>
+                      </p>
+                    </div>
+                    <div class="item_right">
+                      <img v-lazy="list.coverImg">
+                    </div>
                   </div>
-                  <div class="item_right">
-                    <img src="../../assets/images/hot/1.png">
-                  </div>
-                </div>
 
-                <div class="hot_all">
-                  <div class="all_t">
-                    <p>海外房迷|澳房市供需逆转陷低迷 高杠杆者或被迫离场？</p>
-                  </div>
-                  <div class="all_c">
-                    <div>
-                      <img src="../../assets/images/hot/1.png">
+                  <div
+                    class="hot_all"
+                    @click="$router.push({path:  `/news/newsd`,query: {id: list.id, index}})"
+                    v-if="list.coverImg && list.coverImg1 && list.coverImg2"
+                    :key="i"
+                  >
+                    <div class="all_t">
+                      <p>{{ list.name }}</p>
                     </div>
-                    <div>
-                      <img src="../../assets/images/hot/2.png">
+                    <div class="all_c">
+                      <div>
+                        <img v-lazy="list.coverImg">
+                      </div>
+                      <div>
+                        <img v-lazy="list.coverImg1">
+                      </div>
+                      <div>
+                        <img v-lazy="list.coverImg2">
+                      </div>
                     </div>
-                    <div>
-                      <img src="../../assets/images/hot/3.png">
+                    <div class="all_b">
+                      <p class="hover">
+                        {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                        <span>评论数：{{list.commentCount}}</span>
+                      </p>
                     </div>
-                  </div>
-                  <div class="all_b">
-                    <p class="hover">
-                      皇包车 · 2天前
-                      <span>评论数：5</span>
-                    </p>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </van-list>
         </van-tab>
-        <van-tab title="幼儿"></van-tab>
-        <van-tab title="小学生"></van-tab>
-        <van-tab title="初中生"></van-tab>
-        <van-tab title="高中生"></van-tab>
-        <van-tab title="大学生"></van-tab>
-        <van-tab title="在职人士"></van-tab>
-        <van-tab title="亲子"></van-tab>
       </van-tabs>
     </div>
   </div>
@@ -227,24 +245,231 @@
 
 <script>
 import { Tab, Tabs } from "vant";
+import { getDateDiff } from "../../api/api.js";
+import { mapMutations, mapGetters } from "vuex";
 export default {
-  props: {},
+  inject: ["app"],
   data() {
     return {
       merchant: ["房产", "移民", "留学", "游学", "医疗", "婚礼", "定制游"],
-      hot: [
-        "精选",
-        "幼儿",
-        "小学生",
-        "初中生",
-        "高中生",
-        "大学生",
-        "在职人士",
-        "亲子"
-      ]
+      hot: ["24h快讯", "房产", "游学", "移民", "留学", "医疗"],
+      isLoading: false,
+      loading: false,
+      finished: false,
+      page: 1,
+      index: 0,
+      limit: 10,
+      count: "",
+      list_data: [],
+
+      sendURL: [
+        `/dhr/client/house/list`,
+        `/dhr/client/migrate/list`,
+        `/dhr/client/study_abroad/list`,
+        `/dhr/client/study_tour/list`
+      ],
+      house_data: [],
+      immig_data: [],
+      study_data: [],
+      studyTour_data: [],
+
+      all_data: ["house_data", "immig_data", "study_data", "studyTour_data"],
+
+      titleName: "房产",
+      titleURL: "/home/house",
+      // 缓存
+      all_cache: {},
+
+      mer_data: []
     };
   },
-  methods: {},
+  computed: {
+    list() {
+      return this.list;
+    },
+    ...mapGetters(["list"])
+  },
+
+  methods: {
+    // 获取供应商详情
+    getMerDetail() {
+      const { id } = this.$route.query;
+      this.$post("/dhr/client/house/merchant_page", {
+        id: parseInt(id),
+        showCityNum: this.$store.state.number || 1
+      }).then(res => {
+        console.log(res);
+        if (res.ErrCode == '0000') {
+          this.mer_data = res.Result
+        }
+      });
+    },
+    // house
+    houseListData(i = 0, pageName = "房产") {
+      this.$fetch(this.sendURL[i], {
+        page: 1,
+        limit: 4
+      }).then(res => {
+        if (res.ErrCode == "0000") {
+          this.house_data = res.Result.data;
+          switch (i) {
+            case 0:
+              this.house_data = res.Result.data;
+              this.setcache(this.house_data, pageName);
+              break;
+            case 1:
+              this.immig_data = res.Result.data;
+              console.log(this.immig_data);
+              this.setcache(this.immig_data, pageName);
+              break;
+            case 2:
+              this.study_data = res.Result.data;
+              console.log(this.study_data);
+              this.setcache(this.study_data, pageName);
+              break;
+            case 3:
+              this.studyTour_data = res.Result.data;
+              this.setcache(this.studyTour_data, pageName);
+              break;
+          }
+        } else if (res.ErrCode == "9999") {
+          this.$toast("刷新太快了");
+        }
+      });
+    },
+    houstType(type) {
+      switch (type) {
+        case 1:
+          return "独栋别墅";
+        case 2:
+          return "联排别墅";
+        case 3:
+          return "精品住宅";
+        case 4:
+          return "双拼别墅";
+      }
+    },
+    onTabClick(i, pageName) {
+      this.titleName = pageName;
+      if (i == 0) {
+        this.titleURL = "/home/house";
+      } else if (i == 1) {
+        this.titleURL = "/home/immig";
+      } else if (i == 2) {
+        this.titleURL = "/home/study";
+      } else if (i == 3) {
+        this.titleURL = "/home/studytour";
+      }
+      console.log(this.titleName);
+
+      if (!this.getcache("all_list", this.all_data[i], pageName)) return;
+
+      this.houseListData(i, pageName);
+    },
+    setcache(cache, pageName) {
+      this.all_cache[pageName] = cache;
+      sessionStorage.setItem("all_list", JSON.stringify(this.all_cache));
+    },
+    getcache(cacheName, data, pageName) {
+      let list = JSON.parse(sessionStorage.getItem(cacheName));
+      if (pageName in list) {
+        this[data] = list[pageName];
+        console.log(this[data]);
+        return false;
+      } else {
+        this[data] = [];
+        return true;
+      }
+    },
+
+    onLoad(pageName = "24h快讯") {
+      console.log("触发了");
+      let params = {
+        page: this.page,
+        limit: this.limit
+      };
+      if (this.index == 0) {
+        params = Object.assign(params, { by: "createdAt" });
+      } else {
+        params = Object.assign(params, { cate: this.index });
+      }
+      console.log(params);
+      if (this.isLoading) {
+        return false;
+      }
+      if (this.index == 0) {
+        this.index == false;
+      }
+
+      setTimeout(() => {
+        this.$fetch(`/dhr/client/article/list`, params).then(res => {
+          let data = res.Result;
+          this.count = data.count / 1;
+          this.list_data = this.list_data.concat(data.data);
+          this.loading = false;
+          // localStorage.setItem("list", JSON.stringify(this.list_data));
+
+          if (this.list_data.length >= this.count) {
+            this.finished = true;
+            console.log("无更多数据");
+          }
+          this.page++;
+          this.set_list({
+            list: this.list_data || [],
+            pageName: this.pageName || pageName,
+            page: this.page,
+            count: this.count
+          });
+        });
+      }, 500);
+    },
+    tabBtnClick(index, pageName) {
+      let list_data = this.list;
+      this.pageName = pageName;
+      if (pageName in list_data) {
+        this.list_data = list_data[pageName].list;
+        this.page = list_data[pageName].page;
+        this.count = list_data[pageName].count;
+        this.index = index;
+        this.finished = false;
+        return;
+      }
+
+      this.page = 1;
+      this.list_data = [];
+      this.count = "";
+      this.index = index;
+
+      this.initialization(pageName);
+    },
+    // 加载数据
+    initialization(pageName) {
+      this.loading = true; //下拉加载中
+      this.finished = false; //下拉结束
+      if (this.loading) {
+        this.onLoad(pageName);
+      }
+    },
+    getDetails(id, name) {
+      this.$router.push({
+        path: `/news/newsd`,
+        query: { id, index: this.index }
+      });
+      localStorage.setItem("title", name);
+      this.set_title(name || localStorage.getItem("title"));
+    },
+
+    _getDateDiff(t) {
+      return getDateDiff(t);
+    },
+    ...mapMutations({
+      set_list: "SET_LIST"
+    })
+  },
+  created() {
+    this.houseListData();
+    this.getMerDetail();
+  },
   components: {
     [Tab.name]: Tab,
     [Tabs.name]: Tabs
@@ -280,6 +505,10 @@ export default {
       );
       color: #fff;
     }
+  }
+
+  .van-tabs__content {
+    margin-top: 30px;
   }
 }
 </style>
@@ -515,6 +744,7 @@ export default {
         display: flex;
         border-bottom: 1px solid #e5e5e5;
         .imgs {
+          overflow: hidden;
           width: 140px;
           height: 140px;
           border-radius: 50%;
@@ -557,14 +787,15 @@ export default {
             margin-top: 16px;
             color: #9399a5;
             font-size: 24px;
+            display: flex;
+            justify-content: space-between;
             span {
               i {
                 font-size: 34px;
                 color: #ed2530;
+                width: 80px;
+                display: inline-block;
               }
-            }
-            .r {
-              margin-left: 25px;
             }
           }
         }
@@ -598,9 +829,13 @@ export default {
             margin-bottom: 5px;
             font-size: 22px;
             color: #9399a5;
+            display: flex;
+            align-items: center;
             i {
               color: #ed2530;
               font-size: 34px;
+              font-weight: bold;
+              width: 150px;
             }
             span {
               width: 110px;
@@ -613,6 +848,7 @@ export default {
               line-height: 36px;
               text-align: center;
               margin-left: 20px;
+              font-weight: bold;
             }
           }
         }
