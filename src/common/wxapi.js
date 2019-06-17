@@ -10,40 +10,63 @@ const wxApi = {
     wxRegister(callback) {
         // 这边的接口请换成你们自己的
         http.fetch('/dhr/wechat/jsapi/ticket', {
-            reqUrl: window.location.href
+            reqUrl: window.location.href.split('#')[0]
         }).then((res) => {
+            // PS: 这里根据你接口的返回值来使用
+            let noncestr = 'Wm3WZYTPz0wzccnW',
+                timestamp = new Date().getTime(),
+                jsapi_ticket = res.Result.ticket,
+                url = location.href.split('#')[0]
             console.log(res)
-           // PS: 这里根据你接口的返回值来使用
-           let noncestr = 'Wm3WZYTPz0wzccnW',
-           timestamp = new Date().getTime(),
-           jsapi_ticket = res.Result.ticket,
-           url = location.href.split('#')[0]
-
+            console.log(url)
             let string1 = `jsapi_ticket=${jsapi_ticket}&noncestr=${noncestr}&timestamp=${timestamp}&url=${url}`
-            
+
             let signature = sha1(string1)
-           console.log(signature)
+            console.log(signature)
             wx.config({
                 debug: false, // 开启调试模式
-                appId: res.AppID, // 必填，公众号的唯一标识
+                appId: res.Result.AppID, // 必填，公众号的唯一标识
                 timestamp: timestamp, // 必填，生成签名的时间戳
                 nonceStr: noncestr, // 必填，生成签名的随机串
                 signature: signature, // 必填，签名，见附录1
                 jsApiList: [
                     'onMenuShareTimeline',
+                    'updateAppMessageShareData',
+                    'updateTimelineShareData',
                     'onMenuShareAppMessage'
                 ] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
             })
         }).catch((error) => {
             console.log(error)
         })
+
+        console.log(2)
+
         wx.ready((res) => {
             // 如果需要定制ready回调方法
+            console.log(res)
+            if (callback) {
+                callback()
+            }
+        })
+
+
+        wx.error(res => {
+            console.log('错误信息：' + res)
+        })
+    },
+
+    wxReady(callback) {
+        wx.ready((res) => {
+            // 如果需要定制ready回调方法
+            console.log(res)
             if (callback) {
                 callback()
             }
         })
     },
+
+
     /**
      * [ShareTimeline 微信分享到朋友圈]
      * @param {[type]} option [分享信息]
@@ -51,6 +74,7 @@ const wxApi = {
      * @param {[type]} error   [失败回调]
      */
     ShareTimeline(option) {
+        console.log(option)
         wx.onMenuShareTimeline({
             title: option.title, // 分享标题
             link: option.link, // 分享链接

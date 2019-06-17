@@ -32,6 +32,12 @@ aside,
     tap-highlight-color: transparent;
     -webkit-tap-highlight-color: transparent;
     -webkit-overflow-scrolling: touch;
+    
+}
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background-color: transparent;
 }
 
 body {
@@ -140,4 +146,16 @@ img {
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap
+    }
+    .txt_double {
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    // 隐藏滚动条
+    .scrollBar_none{
+      &::-webkit-scrollbar {
+        /*隐藏滚轮*/
+        display: none;
+      }
     }

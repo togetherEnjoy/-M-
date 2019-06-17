@@ -32,6 +32,12 @@ export default {
 @import "../src/assets/css/reset.scss";
 #app {
   background-color: #fff;
-  height: 100vh;
+  // height: 100vh;
+  
+  // position: absolute;
+  // right: 0;
+  // left: 0;
+  // top: 0;
+  // bottom: 0;
 }
 </style>

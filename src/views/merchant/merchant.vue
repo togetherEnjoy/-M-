@@ -3,9 +3,9 @@
     <div class="head_wrap">
       <div class="hbc">
         <div class="imgs">
-          <img src="../../assets/images/merchant/logo.png">
+          <h3 v-if="mer_data.merchant">{{ mer_data.merchant.simpleName }}</h3>
         </div>
-        <span></span>
+        <span @click="makeShare"></span>
       </div>
 
       <div class="bigimg">
@@ -14,7 +14,7 @@
 
       <div class="m_sl">
         <div class="sl_item">
-          <p class="num">{{ mer_data.browseNumber }}</p>
+          <p class="num">{{ mer_data.softLanguageBer }}</p>
           <p class="txt">产品数</p>
         </div>
         <div class="sl_item">
@@ -22,7 +22,7 @@
           <p class="txt">文章数</p>
         </div>
         <div class="sl_item">
-          <p class="num">{{ mer_data.softLanguageBer }}</p>
+          <p class="num">{{ mer_data.browseNumber }}</p>
           <p class="txt">咨询量</p>
         </div>
       </div>
@@ -31,7 +31,10 @@
     <div class="house">
       <div class="top_bar">
         <h1>海外{{ titleName }}</h1>
-        <p style="cursor:pointer" v-on:click="$router.push({path: titleURL})">探索更多海外{{ titleName }}</p>
+        <p
+          style="cursor:pointer"
+          @click="$router.push({path: titleURL,query:{merchant_id:$route.query.id}})"
+        >探索更多海外{{ titleName }}</p>
       </div>
 
       <van-tabs :line-height="0" :line-width="0" @click="onTabClick">
@@ -56,14 +59,12 @@
                   <p class="price">
                     <i class="le">
                       ￥
-                      <span>{{ item.price }}</span>
-                      万起
+                      <span>{{ item.price }}</span>万起
                     </i>
 
                     <span class="ri">
                       首付比例
-                      <i>{{ item.downPay }}</i>
-                      %
+                      <i>{{ item.downPay }}%</i>
                     </span>
                   </p>
                 </div>
@@ -78,7 +79,7 @@
               class="card_wrap"
               v-for="(item,i) in immig_data"
               :key="i"
-              @click="$router.push({path: '/home/immig/detail',query:{id: item.id}})"
+              @click="$router.push({path: '/home/immig/detail'})"
             >
               <div class="card_item">
                 <div class="imgs">
@@ -118,10 +119,12 @@
               class="study_item"
               v-for="(item,i) in study_data"
               :key="i"
-              @click="$router.push({path: '/home/study/123'})"
+              @click="$router.push({path: `/home/study/${item.id}`})"
             >
               <div class="imgs">
-                <img v-lazy="item.schoolBadgeImg">
+                <div class="imgs_box">
+                  <img v-lazy="item.schoolBadgeImg">
+                </div>
               </div>
 
               <div class="content">
@@ -157,8 +160,11 @@
                 <p class="tit">{{ item.title }}</p>
 
                 <p class="price">
-                  价格：
-                  <i>￥{{ item.price }}</i>
+                  价格&nbsp;
+                  <i>
+                    <b>￥</b>
+                    {{ item.price }}
+                  </i>
                   <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}</span>
                 </p>
               </div>
@@ -171,7 +177,7 @@
       </van-tabs>
     </div>
 
-    <div class="house hot">
+    <div class="hai_hot house">
       <div class="top_bar">
         <h1>海外热门</h1>
         <p style="cursor:pointer" v-on:click="$router.push({path: '/news'})">探索更多海外热门</p>
@@ -197,7 +203,7 @@
                     <div class="item_left">
                       <p class="txt" v-text="list.name"></p>
                       <p class="hover">
-                        {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                        {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
                         <span>评论数：{{list.commentCount}}</span>
                       </p>
                     </div>
@@ -228,7 +234,7 @@
                     </div>
                     <div class="all_b">
                       <p class="hover">
-                        {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                        {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
                         <span>评论数：{{list.commentCount}}</span>
                       </p>
                     </div>
@@ -247,6 +253,7 @@
 import { Tab, Tabs } from "vant";
 import { getDateDiff } from "../../api/api.js";
 import { mapMutations, mapGetters } from "vuex";
+import NativeShare from "nativeshare";
 export default {
   inject: ["app"],
   data() {
@@ -264,8 +271,8 @@ export default {
 
       sendURL: [
         `/dhr/client/house/list`,
-        `/dhr/client/migrate/list`,
-        `/dhr/client/study_abroad/list`,
+        `/dhr/client/migrate/merchant/list`,
+        `/dhr/client/study_abroad/merchant/list`,
         `/dhr/client/study_tour/list`
       ],
       house_data: [],
@@ -279,7 +286,6 @@ export default {
       titleURL: "/home/house",
       // 缓存
       all_cache: {},
-
       mer_data: []
     };
   },
@@ -291,6 +297,44 @@ export default {
   },
 
   methods: {
+    // 通用分享
+    makeShare(command) {
+      let nativeShare = new NativeShare();
+      let shareData = {
+        title: "NativeShare",
+        desc: "NativeShare是一个整合了各大移动端浏览器调用原生分享的插件",
+        // 如果是微信该link的域名必须要在微信后台配置的安全域名之内的。
+        link: "https://github.com/fa-ge/NativeShare",
+        icon:
+          "https://pic3.zhimg.com/v2-080267af84aa0e97c66d5f12e311c3d6_xl.jpg",
+        // 不要过于依赖以下两个回调，很多浏览器是不支持的
+        success: function() {
+          alert("success");
+        },
+        fail: function() {
+          alert("fail");
+        }
+      };
+      nativeShare.setShareData(shareData);
+
+      // return nativeShare
+      try {
+        nativeShare.call(command);
+      } catch (err) {
+        // 如果不支持，你可以在这里做降级处理
+        alert(err.message);
+      }
+    },
+
+    call(command) {
+      try {
+        this.makeShare().call(command);
+      } catch (err) {
+        // 如果不支持，你可以在这里做降级处理
+        alert(err.message);
+      }
+    },
+
     // 获取供应商详情
     getMerDetail() {
       const { id } = this.$route.query;
@@ -299,19 +343,22 @@ export default {
         showCityNum: this.$store.state.number || 1
       }).then(res => {
         console.log(res);
-        if (res.ErrCode == '0000') {
-          this.mer_data = res.Result
+        if (res.ErrCode == "0000") {
+          this.mer_data = res.Result;
         }
       });
     },
     // house
     houseListData(i = 0, pageName = "房产") {
+      const { id } = this.$route.query;
       this.$fetch(this.sendURL[i], {
         page: 1,
-        limit: 4
+        limit: 4,
+        merchant_id: id
       }).then(res => {
         if (res.ErrCode == "0000") {
           this.house_data = res.Result.data;
+          console.log(this.house_data);
           switch (i) {
             case 0:
               this.house_data = res.Result.data;
@@ -319,12 +366,11 @@ export default {
               break;
             case 1:
               this.immig_data = res.Result.data;
-              console.log(this.immig_data);
+
               this.setcache(this.immig_data, pageName);
               break;
             case 2:
               this.study_data = res.Result.data;
-              console.log(this.study_data);
               this.setcache(this.study_data, pageName);
               break;
             case 3:
@@ -487,7 +533,7 @@ export default {
     margin-right: 18px;
     font-weight: 500;
     white-space: nowrap;
-    padding: 19px 28px;
+    padding: 15px 28px;
     border-radius: 4px;
     background-color: #f5f5f5;
     font-size: 28px;
@@ -526,7 +572,10 @@ export default {
       padding: 0 30px;
       .imgs {
         width: 177px;
-        height: 35px;
+        // height: 35px;
+        h3 {
+          font-size: 36px;
+        }
       }
       span {
         height: 36px;
@@ -561,10 +610,104 @@ export default {
     }
   }
 
+  // 海外热门
+  .hai_hot {
+    margin-top: 30px;
+    .house_ca {
+      margin-top: 38px;
+    }
+
+    .hot_wrap {
+      background-color: #fff;
+      // padding-bottom: 60px;
+      position: relative;
+      &::after {
+        position: absolute;
+        content: "";
+        left: 0;
+        right: 30px;
+        bottom: 0;
+        background-color: #eee;
+        height: 1px;
+      }
+      .hot_item {
+        display: flex;
+        padding: 30px 30px 30px 0;
+        justify-content: space-between;
+        .item_left {
+          margin-right: 21px;
+          width: 429px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          .txt {
+            font-size: 30px;
+            line-height: 40px;
+            font-weight: bold;
+            height: 77px;
+          }
+        }
+
+        .item_right {
+          width: 210px;
+          height: 140px;
+          border-radius: 4px;
+          overflow: hidden;
+          img {
+            display: block;
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+
+      .hover {
+        line-height: 24px;
+        color: #9399a5;
+        font-size: 22px;
+        span {
+          margin-left: 30px;
+        }
+      }
+
+      .hot_all {
+        padding: 30px 30px 30px 0;
+        .all_t {
+          p {
+            font-size: 30px;
+            line-height: 40px;
+            font-weight: bold;
+          }
+        }
+
+        .all_c {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 25px;
+          div {
+            width: 210px;
+            height: 140px;
+            border-radius: 4px;
+            overflow: hidden;
+          }
+          img {
+            display: block;
+            width: 100%;
+          }
+        }
+
+        .all_b {
+          padding-top: 15px;
+        }
+      }
+    }
+  }
+
   .house {
     background-color: #fff;
     margin-top: 30px;
-    padding: 50px 0 50px 30px;
+    padding: 40px 0 50px 30px;
     overflow: hidden;
     .h_cate {
       margin-top: 39px;
@@ -603,27 +746,38 @@ export default {
         display: flex;
         padding: 30px 0;
         border-bottom: 1px solid #e6e6e6;
+        &:first-child {
+          padding-top: 0;
+        }
         .l_left {
           width: 240px;
           height: 160px;
           border-radius: 5px;
           overflow: hidden;
           position: relative;
-
+          img {
+            height: 100%;
+          }
           p {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
+            width: 100%;
+            padding: 10px 0 10px 30px;
+            bottom: 0px;
+            left: 0px;
             font-size: 20px;
             color: #fff;
-            padding-left: 30px;
+            background: linear-gradient(
+              180deg,
+              rgba(0, 0, 0, 0.2),
+              rgba(0, 0, 0, 0.8)
+            );
             &::after {
               position: absolute;
               content: "";
               width: 24px;
               height: 24px;
-              left: 0;
-              top: 2px;
+              left: 5px;
+              top: 12px;
               background: url("../../assets/images/house/posi.png") no-repeat
                 center / cover;
             }
@@ -632,29 +786,38 @@ export default {
         .l_right {
           padding-left: 20px;
           font-size: 22px;
+          flex: 1;
+          overflow: hidden;
           .tit {
-            font-size: 28px;
-            font-weight: 500;
+            font-size: 30px;
+            font-weight: bold;
           }
           .de {
             color: #9399a5;
             margin-top: 20px;
+            font-size: 24px;
           }
           .price {
             margin-top: 30px;
+            display: flex;
+            font-size: 24px;
             .le {
+              flex: 0.7;
               color: #ed2530;
 
               span {
-                font-size: 28px;
+                font-size: 34px;
+                font-weight: bold;
               }
             }
             .ri {
+              flex: 1;
               color: #9399a5;
               margin-left: 20px;
               i {
                 color: #ed2530;
-                font-size: 28px;
+                font-size: 34px;
+                font-weight: bold;
               }
             }
           }
@@ -667,6 +830,9 @@ export default {
       .card_wrap {
         padding: 30px 0 20px 0;
         border-bottom: 1px solid #e5e5e5;
+        &:first-child {
+          padding-top: 0;
+        }
         .card_item {
           color: #fff;
           position: relative;
@@ -725,10 +891,10 @@ export default {
           text-align: center;
           & > div {
             color: #9399a5;
-            font-size: 22px;
+            font-size: 24px;
             .m {
               color: #ed2530;
-              font-size: 24px;
+              font-size: 30px;
               font-weight: bold;
               margin-bottom: 19px;
             }
@@ -737,23 +903,28 @@ export default {
       }
     }
     .lx {
-      padding-top: 20px;
       padding-right: 30px;
       .study_item {
         padding: 30px 0;
         display: flex;
         border-bottom: 1px solid #e5e5e5;
+        &:first-child {
+          padding-top: 0;
+        }
         .imgs {
-          overflow: hidden;
           width: 140px;
           height: 140px;
           border-radius: 50%;
           border: 5px solid rgba(228, 228, 228, 1);
+          overflow: hidden;
           display: flex;
           align-items: center;
           justify-content: center;
-          img {
-            width: 80%;
+          .imgs_box {
+            width: 106px;
+            height: 106px;
+            border-radius: 50%;
+            overflow: hidden;
           }
         }
         .content {
@@ -795,6 +966,7 @@ export default {
                 color: #ed2530;
                 width: 80px;
                 display: inline-block;
+                font-weight: bold;
               }
             }
           }
@@ -802,16 +974,22 @@ export default {
       }
     }
     .yx {
-      padding-top: 20px;
       padding-right: 30px;
       .lx_c_item {
         display: flex;
         padding: 15px 0;
+        &:first-child {
+          padding-top: 0;
+        }
         .imgs {
           width: 210px;
           height: 210px;
           border-radius: 5px;
           overflow: hidden;
+
+          // img {
+          //   height: 100%;
+          // }
         }
 
         .lx_r {
@@ -831,11 +1009,17 @@ export default {
             color: #9399a5;
             display: flex;
             align-items: center;
+            b {
+              color: #ed2530;
+              font-size: 24px;
+              margin-top: 5px;
+              font-weight: normal;
+            }
             i {
               color: #ed2530;
               font-size: 34px;
-              font-weight: bold;
               width: 150px;
+              font-weight: bold;
             }
             span {
               width: 110px;
@@ -848,7 +1032,7 @@ export default {
               line-height: 36px;
               text-align: center;
               margin-left: 20px;
-              font-weight: bold;
+              border-radius: 4px;
             }
           }
         }

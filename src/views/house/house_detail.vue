@@ -4,12 +4,12 @@
     <publicHead :centerImg="centerImg" backURL="/home/house"/>
     <van-swipe @change="onChange">
       <!-- :style="`width:${viewWidth}px`" -->
-      <van-swipe-item v-for="item in swipe">
+      <van-swipe-item v-for="item in banner_img">
         <div class="hd_img">
-          <img v-lazy="item.img">
+          <img v-lazy="item">
         </div>
       </van-swipe-item>
-      <div class="custom-indicator" slot="indicator">{{ current + 1 }}/{{ swipe.length }}</div>
+      <div class="custom-indicator" slot="indicator">{{ current + 1 }}/{{ banner_img.length }}</div>
     </van-swipe>
 
     <div class="details">
@@ -88,7 +88,7 @@
             <span
               v-for="(item,i) in useHx(house_detail.optionalRoomType)"
               :key="i"
-            >{{ useHx(house_detail.optionalRoomType).length>0? item+'   ':item }}</span>
+            >{{ useHx(house_detail.optionalRoomType).length>0? item+' ':item }}</span>
           </p>
         </div>
       </div>
@@ -97,36 +97,32 @@
     <div class="project">
       <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" sticky>
         <van-tab title="项目简介">
-          <div class="content" v-html="house_detail.content">
-
-          </div>
+          <div class="content" v-html="house_detail.content"></div>
         </van-tab>
         <van-tab title="周边设施">
           <div class="zb_content">
             <div class="education">
-              <h3>{{ peripheral.education.name }}</h3>
-              <p v-html="peripheral.education.content"></p>
+              <h3 v-if="peripheral">{{ peripheral.education.name }}</h3>
+              <p v-if="peripheral" v-html="peripheral.education.content"></p>
             </div>
             <div class="shop">
-              <h3>{{ peripheral.shopping.name }}</h3>
-              <p v-html="peripheral.shopping.content">
-              </p>
+              <h3 v-if="peripheral">{{ peripheral.shopping.name }}</h3>
+              <p v-if="peripheral" v-html="peripheral.shopping.content"></p>
             </div>
 
             <div class="leisure">
-              <h3>{{ peripheral.leisuretime.name }}</h3>
-              <p v-html="peripheral.leisuretime.content"></p>
-            
+              <h3 v-if="peripheral">{{ peripheral.leisuretime.name }}</h3>
+              <p v-if="peripheral" v-html="peripheral.leisuretime.content"></p>
             </div>
 
             <div class="hospot">
-              <h3>{{ peripheral.hospital.name }}</h3>
-              <p v-html="peripheral.hospital.content"></p>
+              <h3 v-if="peripheral">{{ peripheral.hospital.name }}</h3>
+              <p v-if="peripheral" v-html="peripheral.hospital.content"></p>
             </div>
 
             <div class="traffic">
-              <h3>{{ peripheral.traffic.name }}</h3>
-              <p v-html="peripheral.traffic.content"></p>
+              <h3 v-if="peripheral">{{ peripheral.traffic.name }}</h3>
+              <p v-if="peripheral" v-html="peripheral.traffic.content"></p>
             </div>
           </div>
         </van-tab>
@@ -203,11 +199,11 @@
       </van-tabs>
     </div>
 
-    <!--  :sourceDescription="" :showCity="" -->
     <con
       :simpleName="house_detail.merchant.simpleName"
       :id="house_detail.merchant.id"
       :typeOf="1"
+      :myphone="house_detail.merchant.phone"
       :hot="house_detail.hot"
       :showCity="house_detail.showCity"
       :sourceDescription="href"
@@ -227,6 +223,8 @@ export default {
       current: 0,
       active: 0,
       house_detail: {},
+      // 轮播图
+      banner_img: [],
       // 周边设施
       peripheral: {},
 
@@ -243,24 +241,26 @@ export default {
     this.getSwipeData();
   },
   methods: {
-    // 轮播
-    getSwipeData() {
-      this.$fetch("/dhr/advertise/img/home").then(res => {
-        if (res.ErrCode == "0000") {
-          this.swipe = res.Result.data;
-        }
-      });
-    },
+
     getHouseDetail() {
       let { id } = this.$route.params;
       this.$fetch(`/dhr/client/house/${id}`).then(res => {
         if (res.ErrCode == "0000") {
           this.house_detail = res.Result;
-          
+          console.log(this.house_detail)
+          let json = JSON.parse;
+          let img = Object.values(json(this.house_detail.templateImgs));
+
+          let img1 = Object.values(json(this.house_detail.appearanceImg));
+          let img2 = Object.values(json(json(this.house_detail.apartmentImgs)));
+          let img3 = Object.values(json(this.house_detail.peripheralImgs));
+          let img4 = Object.values(json(this.house_detail.localtionImgs));
+          this.banner_img = this.banner_img.concat(img, img1, img2, img3, img4)
+          this.banner_img.push(this.house_detail.coverImg)
+
+
           this.property = JSON.parse(res.Result.property);
-          console.log( this.property )
           this.peripheral = JSON.parse(res.Result.peripheral);
-          console.log(this.peripheral)
         }
       });
     },
@@ -315,7 +315,6 @@ export default {
 
 <style lang="scss">
 .house_detail {
-  width: 100%;
   overflow-x: hidden;
   .custom-indicator {
     position: absolute;
@@ -354,7 +353,7 @@ export default {
 <style scoped lang="scss">
 .house_detail {
   background-color: #f8f8f8;
-  padding-bottom: 178px;
+  padding-bottom: 208px;
   padding-top: 100px;
   .hd_img {
     width: 100%;
@@ -409,6 +408,7 @@ export default {
             color: #9399a5;
             font-weight: 500;
             margin-top: 10px;
+            font-size: 24px;
           }
         }
       }
@@ -461,7 +461,7 @@ export default {
 
         .dbld {
           color: #9399a5;
-          font-size: 24px;
+          font-size: 28px;
           margin-bottom: 30px;
           span {
             color: #0d1c31;
@@ -482,7 +482,7 @@ export default {
     line-height: 48px;
     font-size: 24px;
     .content {
-      padding-top: 20px;
+      padding: 30px 0;
       font-size: 30px;
       .imgs {
         width: 480px;

@@ -1,10 +1,11 @@
 <template>
   <div class="zi">
     <div class="zi_box" v-if="showFoot">
+
       <div class="z_l">
         <div class="z_l_img" @click="$router.push({path: '/home/merchant',query:{id}})">
           <div>
-            <img :src="head_img">
+            <img v-lazy="head_img">
           </div>
         </div>
         <div class="z_l_t">
@@ -14,12 +15,12 @@
       </div>
 
       <div class="btn_wrap">
-        <div class="z_c" @click="eject">
+        <div class="z_c" @click="eject();clickRate(id)">
           <p>在线问</p>
         </div>
-        <div class="z_r">
+        <div class="z_r" @click="clickRate(id)">
           <p>
-            <a href="tel:400 877 1008">打电话</a>
+            <a :href="`tel:${myphone}`">打电话</a>
           </p>
         </div>
       </div>
@@ -79,6 +80,7 @@ export default {
         return 10;
       }
     },
+    myphone: {},
     // 产品类型
     typeOf: {},
     showCity: "",
@@ -91,8 +93,15 @@ export default {
     };
   },
   methods: {
+    // 点击率
+    clickRate() {
+      this.$fetch('dhr/client/merchant_number',{
+        id: this.id
+      }).then(res => {
+        console.log(res)
+      })
+    },
     // 供应商
-
     eject() {
       this.showAndHide("add");
       let mask = this.$refs.mask;
@@ -119,7 +128,8 @@ export default {
           typeOf: this.typeOf,
           showCity: this.showCity,
           showCityNum: 1,
-          sourceDescription: this.sourceDescription
+          sourceDescription: this.sourceDescription,
+          merchant_id: this.id
         }).then(res => {
           console.log(res);
           if (res.ErrCode == "0000") {
@@ -149,9 +159,9 @@ export default {
   width: 100%;
   z-index: 9999;
   .zi_box {
+    box-shadow: 0 -1px 1px  rgba(0, 0, 0, .1);
     display: flex;
     height: 150px;
-    // margin-top: 60px;
     background-color: #fff;
     justify-content: space-between;
     padding: 0 30px;
@@ -181,7 +191,7 @@ export default {
       img {
         display: block;
         width: 100%;
-        // height: 100%;
+        height: 100%;
       }
     }
     .z_l_t {
@@ -195,7 +205,7 @@ export default {
         font-size: 22px;
         font-weight: 500;
         color: #9399a5;
-        margin-top: 15px;
+        margin-top: 10px;
       }
     }
   }

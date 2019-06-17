@@ -67,8 +67,22 @@ if (process.env.NODE_ENV === 'production') {
 Vue.prototype.$http = axios
 Vue.prototype.$fetch = fetch
 Vue.prototype.$post = post
-
 Vue.config.productionTip = false
+
+
+// router.beforeEach(function (to, from, next) {
+//   // loading 相关
+//   const agent = navigator.userAgent
+//   const isiOS = !!agent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/) // ios终端
+//   // XXX: 修复iOS版微信HTML5 History兼容性问题
+//   if (isiOS && to.path !== location.pathname) {
+//     // 此处不可使用location.replace
+//     location.assign(to.fullPath)
+//   } else {
+//     next()
+//   }
+// })
+
 
 
 Vue.filter('goTime', (value) => {

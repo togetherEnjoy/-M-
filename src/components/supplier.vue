@@ -39,20 +39,20 @@
       >
         <div class="s_item" v-for="(item, i) in allListData" :key="i">
           <div class="heads_img">
-            <img v-lazy="item.img">
+            <img v-lazy="item.headPortrait">
           </div>
 
           <div class="text">
-            <h3>{{ item.merchantName }}</h3>
-            <p>咨询量：{{ item.hot }}</p>
+            <h3>{{ item.companyName }}</h3>
+            <p>咨询量：{{ item.actualNumber }}</p>
           </div>
 
           <div class="func">
-            <span @click="zixun">
+            <span @click="zixun(); clickRate(item.id)">
               <i class="email"></i>
             </span>
-            <span class="pb">
-              <a href="tel:400 877 1008" class="phone"></a>
+            <span class="pb" @click="clickRate(item.id)">
+              <a :href="`tel:${item.phone}`" class="phone"></a>
             </span>
           </div>
         </div>
@@ -63,9 +63,9 @@
 
 <script>
 import smenu from "./slideMenu";
-import { screen_data } from "../utils/mixins";
+import { screen_data,clickRate } from "../utils/mixins";
 export default {
-  mixins: [screen_data],
+  mixins: [screen_data,clickRate],
   props: {
     item: {
       type: Array
@@ -76,6 +76,7 @@ export default {
     two: {
       type: Array
     },
+    myPhone: {},
 
     id: {},
     url: {},
@@ -168,7 +169,7 @@ export default {
         }
         p {
           font-size: 24px;
-          margin-top: 20px;
+          margin-top: 15px;
           font-weight: 500;
           color: #9399a5;
         }
@@ -190,7 +191,7 @@ export default {
           }
         }
         .pb {
-          margin-left: 20px;
+          margin-left: 30px;
         }
         .email {
           background: url("../assets/images/immig/email.png") no-repeat center /

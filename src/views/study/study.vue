@@ -28,7 +28,11 @@
       </div>
     </div>
 
-    <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click.stop.prevent="emptyall">
+    <div
+      class="thinklike"
+      v-if="Object.keys(result_data).length > 0"
+      @click.stop.prevent="emptyall"
+    >
       <span></span>
       清空所有条件
     </div>
@@ -49,7 +53,9 @@
           @click="$router.push({path: `/home/study/${item.id}`})"
         >
           <div class="imgs">
-            <img v-lazy="item.schoolBadgeImg">
+            <div class="imgs_box">
+              <img v-lazy="item.schoolBadgeImg">
+            </div>
           </div>
 
           <div class="content">
@@ -91,25 +97,29 @@ export default {
       ys: [],
       fy: [],
       study_menu: [],
-      url: `/dhr/client/study_abroad/list`
+      url: `/dhr/client/study_abroad/list`,
+      merchantUrl: `/dhr/client/study_abroad/merchant/list`
     };
   },
   created() {
     this.getStudyData();
+    this.searchCountry();
   },
   methods: {
     onLoad() {
+      if (this.$route.query.id+1) {
+        let id = this.$route.query.id;
+        this.result_data.hostCountryNum = this.filterCountry(id);
+      }
+
+      // console.log(222)
       this.getAllList(this.result_data);
     },
-    // // 筛选数据
-    // screenTheData() {
-    //   this.getAllList(this.result_data);
-    // },
     // 获取留学国家
     getStudyData() {
       this.$fetch("/dhr/client/study_abroad/menu").then(res => {
         if (res.ErrCode == "0000") {
-      
+          console.log(res.Result);
           let { IELTS, TOEFL, cost, country, rank, schoolType } = res.Result;
           this.country = country;
           this.athor = schoolType;
@@ -117,10 +127,53 @@ export default {
           this.tf = TOEFL;
           this.ys = IELTS;
           this.fy = cost;
+          console.log(this.tf);
         }
       });
+    },
+
+    searchCountry() {
+      let id = this.$route.query.id;
+      console.log(id);
+    },
+
+    filterCountry(id) {
+      switch (id) {
+        case 0:
+          return {
+            id: 0,
+            html: "美国",
+            type: "hostCountryNum"
+          };
+        case 1:
+          return {
+            id: 1,
+            html: "英国",
+            type: "hostCountryNum"
+          };
+        case 2:
+          return {
+            id: 2,
+            html: "加拿大",
+            type: "hostCountryNum"
+          };
+        case 3:
+          return {
+            id: 3,
+            html: "澳大利亚",
+            type: "hostCountryNum"
+          };
+      }
     }
   },
+  activated() {
+  },
+  watch: {
+    $route(val) {
+      // console.log(val);
+    }
+  },
+
   components: {
     smenu
   }
@@ -132,7 +185,7 @@ export default {
   background-color: #f8f8f8;
   padding-top: 100px;
   .study_wrap {
-    // padding-top:  
+    // padding-top:
     .like {
       font-size: 30px;
       font-weight: 500;
@@ -154,8 +207,14 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
+        .imgs_box {
+          width: 106px;
+          height: 106px;
+          border-radius: 50%;
+          overflow: hidden;
+        }
         img {
-          width: 80%;
+          width: 100%;
         }
       }
       .content {
@@ -197,6 +256,7 @@ export default {
               color: #ed2530;
               width: 80px;
               display: inline-block;
+              font-weight: bold;
             }
           }
         }
@@ -206,6 +266,7 @@ export default {
   .sx_result {
     h3 {
       font-weight: 500;
+      font-size: 30px;
     }
     padding: 30px;
     background-color: #fff;
@@ -227,6 +288,7 @@ export default {
           font-size: 24px;
           color: #9399a5;
           position: relative;
+          border-radius: 4px;
           i {
             position: absolute;
             width: 26px;
@@ -244,7 +306,7 @@ export default {
               width: 10px;
               height: 10px;
               right: 2px;
-              top: 8px;
+              top: 11px;
               background: url("../../assets/images/study/close.png") no-repeat
                 center/ cover;
             }

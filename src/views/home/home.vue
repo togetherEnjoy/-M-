@@ -29,6 +29,7 @@
           <div class="banner_box">
             <a :href="image.host">
               <img v-lazy="image.img">
+              <!-- <img src="../../assets/images/home/" alt=""> -->
             </a>
           </div>
         </van-swipe-item>
@@ -42,7 +43,7 @@
         </div>
         <p>房产</p>
       </div>
-      <div class="cate_item" @click="$router.push({path: '/home/immig',query: {hostCountryNum:0}})">
+      <div class="cate_item" @click="$router.push({path: '/home/immig',query: {hostCountryNum:''}})">
         <div class="shadow">
           <img src="../../assets/images/home/yimin.png">
         </div>
@@ -75,7 +76,7 @@
           <h1>海外好房</h1>
           <p style="cursor:pointer" v-on:click="$router.push({path: '/home/house'})">探索更多海外房产</p>
         </div>
-        <van-tabs :line-height="0" @click="hsTabClick">
+        <van-tabs :line-height="0" @click="hsTabClick" color="#000">
           <van-tab v-for="(item, i) in house_menu.country" :key="i" :title="item.name">
             <div class="h_cate">
               <div class="house_content" ref="house_content">
@@ -107,37 +108,37 @@
         </van-tabs>
       </div>
 
-      <!-- 热门移民国家 -->
+      <!-- 热门移民 -->
       <div class="yim">
         <div class="top_bar">
           <h1>热门移民</h1>
-          <p @click="$router.push({path: '/home/immig',query: {hostCountryNum: 0}})">探索更多移民国家</p>
+          <p @click="$router.push({path: '/home/immig',query: {hostCountryNum: ''}})">探索更多移民国家</p>
         </div>
         <div class="yim_box" ref="yim">
           <ul>
             <li
-              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[0].id}})"
-            >
-              <img src="../../assets/images/home/meiguo.png">
-              <p v-if="immig_menu.length>0">{{ immig_menu[0].name }}</p>
-            </li>
-            <li
               @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[1].id}})"
             >
-              <img src="../../assets/images/home/aodaliya.png">
+              <img src="../../assets/images/home/meiguo.png">
               <p v-if="immig_menu.length>0">{{ immig_menu[1].name }}</p>
             </li>
             <li
               @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[2].id}})"
             >
-              <img src="../../assets/images/home/jianada.png">
+              <img src="../../assets/images/home/aodaliya.png">
               <p v-if="immig_menu.length>0">{{ immig_menu[2].name }}</p>
             </li>
             <li
               @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[3].id}})"
             >
-              <img src="../../assets/images/home/yidali.png">
+              <img src="../../assets/images/home/jianada.png">
               <p v-if="immig_menu.length>0">{{ immig_menu[3].name }}</p>
+            </li>
+            <li
+              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[4].id}})"
+            >
+              <img src="../../assets/images/home/yidali.png">
+              <p v-if="immig_menu.length>0">{{ immig_menu[4].name }}</p>
             </li>
           </ul>
         </div>
@@ -192,7 +193,7 @@
         <van-tabs :line-height="0" @click="lxTabClick">
           <van-tab v-for="(item, i) in schoolType" :key="i" :title="item.name">
             <div class="stydu_box">
-              <div class="study_box_wrap">
+              <div class="study_box_wrap scrollBar_none">
                 <van-loading color="#ed2530" v-if="lx_data.length == 0"></van-loading>
                 <div
                   class="stydy_item"
@@ -201,7 +202,9 @@
                   @click="$router.push({path: `/home/study/${item.id}`})"
                 >
                   <div class="imgs">
-                    <img v-lazy="data.schoolBadgeImg">
+                    <div class="img_box">
+                      <img v-lazy="data.schoolBadgeImg">
+                    </div>
                   </div>
                   <p>{{ data.schoolName }}</p>
                 </div>
@@ -235,8 +238,9 @@
                     <p class="tit">{{ item.name }}</p>
 
                     <p class="price">
-                      价格：
-                      <i>￥{{ item.price }}</i>
+                      价格 &nbsp;
+                      <b>￥</b>
+                      <i>{{ item.price }}</i>
                       <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}天</span>
                     </p>
                   </div>
@@ -254,7 +258,7 @@
           <p @click="$router.push({path: '/news'})">探索更多海外热门</p>
         </div>
 
-        <van-tabs :line-height="0" @click="tabBtnClick" animated>
+        <van-tabs :line-height="0" @click="tabBtnClick">
           <van-tab v-for="(item, i ) in hot" :key="i" :title="item">
             <van-list
               v-model="loading"
@@ -272,9 +276,9 @@
                       v-if="!list.coverImg1 && !list.coverImg2"
                     >
                       <div class="item_left">
-                        <p class="txt" v-text="list.name"></p>
+                        <p class="txt txt_double" v-text="list.name"></p>
                         <p class="hover">
-                          {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                          {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
                           <span>评论数：{{list.commentCount}}</span>
                         </p>
                       </div>
@@ -305,7 +309,7 @@
                       </div>
                       <div class="all_b">
                         <p class="hover">
-                          {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                          {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
                           <span>评论数：{{list.commentCount}}</span>
                         </p>
                       </div>
@@ -384,7 +388,7 @@ export default {
         "在职人士",
         "亲子"
       ],
-      hot: ["24h快讯", "房产", "游学", "移民", "留学", "医疗"],
+      hot: ["24h快讯", "房产", "移民", "游学", "留学", "医疗"],
 
       // 城市站
       city: "",
@@ -454,7 +458,9 @@ export default {
     getSwipeImg() {
       this.$fetch("/dhr/advertise/img").then(res => {
         if (res.ErrCode == "0000") {
-          this.swipeImg = res.Result.data.slice(0, 4);
+          
+          this.swipeImg = res.Result.data;
+          console.log( res.Result.data)
         }
       });
       this.$fetch("/dhr/advertise/text").then(res => {
@@ -663,14 +669,14 @@ export default {
       return getDateDiff(t);
     },
     init() {
+       this.getSwipeImg();
       this.getMenuData();
       this.houseListData();
       this.getImmigData();
       this.getStudyData();
       this.getStudyTourdata();
       this.yxListData();
-      this.lxListData();
-      this.getSwipeImg();
+      this.lxListData();    
     },
     ...mapMutations({
       set_list: "SET_LIST",
@@ -719,7 +725,7 @@ export default {
     margin-right: 18px;
     font-weight: 500;
     white-space: nowrap;
-    padding: 19px 28px;
+    padding: 15px 28px;
     border-radius: 4px;
     background-color: #f5f5f5;
     font-size: 28px;
@@ -945,9 +951,23 @@ export default {
             /*隐藏滚轮*/
             display: none;
           }
+          &::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            background-color: transparent;
+          }
         }
         .show_box {
           // margin-top: 40px;
+          &::-webkit-scrollbar {
+            /*隐藏滚轮*/
+            display: none;
+          }
+          &::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            background-color: rgba(240, 240, 240, 0);
+          }
           display: inline-block;
           white-space: nowrap;
           .show_item {
@@ -982,6 +1002,7 @@ export default {
 
               span {
                 font-size: 34px;
+                font-weight: bold;
               }
             }
           }
@@ -1107,7 +1128,18 @@ export default {
           .imgs {
             width: 180px;
             height: 180px;
+            border-radius: 4px;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #e4e4e4;
+            .img_box {
+              width: 106px;
+              height: 106px;
+              border-radius: 50%;
+              overflow: hidden;
+            }
             img {
               width: 100%;
             }
@@ -1146,7 +1178,7 @@ export default {
 
           .lx_r {
             flex: 1;
-            padding: 20px 0;
+            // padding: px 0;
             margin-left: 20px;
             display: flex;
             flex-direction: column;
@@ -1161,10 +1193,15 @@ export default {
               color: #9399a5;
               display: flex;
               align-items: center;
+              b {
+                font-size: 22px;
+                color: #ed2530;
+              }
               i {
                 color: #ed2530;
                 font-size: 34px;
                 width: 150px;
+                font-weight: bold;
               }
               span {
                 width: 110px;
@@ -1173,10 +1210,12 @@ export default {
                 vertical-align: text-bottom;
                 border: 1px solid #5c98f8;
                 color: #5c98f8;
-                font-size: 22px;
+                font-size: 24px;
+
                 line-height: 36px;
                 text-align: center;
                 margin-left: 20px;
+                border-radius: 4px;
               }
             }
           }
@@ -1219,6 +1258,7 @@ export default {
               font-size: 30px;
               line-height: 40px;
               font-weight: bold;
+              height: 77px;
             }
           }
 
@@ -1271,7 +1311,7 @@ export default {
           }
 
           .all_b {
-            padding-top: 20px;
+            padding-top: 15px;
           }
         }
       }

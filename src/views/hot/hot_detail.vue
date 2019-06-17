@@ -81,7 +81,9 @@
       <div class="c_item" v-for="comm in comment">
         <div class="human">
           <div class="heads">
-            <img src="../../assets/images/hot/common.png">
+            <div class="heads_box">
+              <img src="../../assets/images/hot/common.png">
+            </div>
           </div>
           <p>热心网友</p>
         </div>
@@ -102,6 +104,8 @@
     <con
       :simpleName="content.merchant.simpleName"
       :showCity="content.showCity"
+      :head_img="content.merchant.headPortrait"
+      :myphone="content.merchant.phone"
       :sourceDescription="href"
       :typeOf="index"
       :hot="content.hot"
@@ -164,13 +168,13 @@ export default {
     wxShareTimeline() {
       let option = {
         title: "限时团购周 挑战最低价",
-        link: location.href.split("#")[0],
+        link: window.location.href,
         imgUrl: this.content.coverImg,
         success: () => {
-          alert("分享成功");
+          console.log("分享成功");
         },
         error: () => {
-          alert("分享失败");
+          console.log("分享失败");
         }
       };
 
@@ -179,13 +183,16 @@ export default {
     wxShareAppMessage() {
       let option = {
         title: "限时团购周 挑战最低价",
-        link: location.href.split("#")[0],
+        link: location.href,
         imgUrl: this.content.coverImg,
+        desc: "略略略",
         success: () => {
-          alert("分享成功");
+          console.log("分享成功");
+          this.$toast("分享成功");
         },
         error: () => {
-          alert("分享失败");
+          console.log("分享失败");
+          this.$toast("分享失败");
         }
       };
 
@@ -241,7 +248,7 @@ export default {
       this.$fetch(`/dhr/client/article/${id}`).then(res => {
         if (res.ErrCode == "0000") {
           this.content = res.Result;
-
+          console.log(this.content);
           this.set_tit(this.content.name); //讲name保存到 vuex中
           this.simpleName = this.content.merchant.simpleName;
           this.getComment();
@@ -325,9 +332,9 @@ export default {
 
 <style scoped lang="scss">
 .hot_detail {
-  overflow: hidden;
-  position: relative;
-  padding-bottom: 150px;
+  overflow: auto;
+  // position: relative;
+  padding-bottom: 190px;
   &.open .mask {
     visibility: visible;
     background-color: rgba(0, 0, 0, 0.4);
@@ -338,15 +345,18 @@ export default {
   }
 
   width: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
+  // -webkit-overflow-scrolling: touch;
+  // position: absolute;
+  // left: 0;
+  // top: 0;
+  // right: 0;
+  // bottom: 0;
   background-color: #f6f6f6;
-  z-index: 100;
+  // z-index: 1;
   .top_bar {
-    padding: 0 15px;
-    margin-top: 10px;
-    height: 80px;
+    padding: 0 30px;
+    // margin-top: 10px;
+    height: 90px;
     background-color: #fff;
     display: flex;
     justify-content: space-between;
@@ -392,7 +402,7 @@ export default {
     background-color: #fff;
     padding: 30px;
     h3 {
-      font-size: 40px;
+      font-size: 30px;
       line-height: 60px;
       font-weight: bold;
     }
@@ -496,8 +506,8 @@ export default {
   .hover {
     line-height: 24px;
     color: #9399a5;
-    font-size: 22px;
-    margin-top: 50px;
+    font-size: 24px;
+    margin-top: 20px;
     span {
       margin-left: 30px;
     }
@@ -524,16 +534,21 @@ export default {
           border-radius: 50%;
           background-color: #9399a5;
           overflow: hidden;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .heads_box {
+
+          }
           img {
-            display: block;
-            margin: 7px auto 0;
+            // display: block;
             width: 30px;
             height: 39px;
           }
         }
         p {
           font-weight: 500;
-          font-size: 24px;
+          font-size: 30px;
           margin-left: 10px;
           align-self: center;
         }
@@ -549,6 +564,9 @@ export default {
       font-weight: 500;
       color: #9399a5;
       line-height: 48px;
+      p {
+        font-size: 24px;
+      }
     }
 
     .lookmore {

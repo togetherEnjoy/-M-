@@ -23,25 +23,96 @@ export const screen_data = {
             count: "",
             loading: false,
             finished: false,
+            merchant_id: '',
 
             allListData: [],
             result_data: {}
         }
     },
+    created() {
+        this.isFirstEnter = true
+        this.firstOnload = true
+    },
+
+    activated() {
+        console.log('activated执行')
+        this.merchant_id = this.$route.query.merchant_id ? this.$route.query.merchant_id : false
+
+        // console.log(this.merchant_id)
+        if (!this.$route.meta.isBack || this.isFirstEnter) {
+            this.loading = true
+            if (!this.firstOnload) {
+                this.allListData = []
+                this.page = 1
+                this.onLoad()
+            }
+        } else {
+            this.loading = false
+        }
+        this.finished = false
+        this.firstOnload = false
+        this.$route.meta.isBack = false
+        this.isFirstEnter = false
+    },
+
+    beforeRouteEnter(to, from, next) {
+        // console.log(from);
+        // console.log(to);
+        if (from.name == "merchant") {
+            next(vm => {
+                vm.url = vm.merchantUrl
+            });
+        }
+
+        if (from.meta.details && to.meta.keepAlive) {
+            to.meta.isBack = true
+            next()
+        }
+
+        if (from.meta.homePage) {
+            next(vm => {
+                vm.merchant_id = false
+                vm.url = vm.url
+            })
+        }
+
+
+
+        next()
+    },
+    beforeRouteLeave(to, from, next) {
+
+        if (sessionStorage.getItem('merchant_id')) {
+            sessionStorage.removeItem('merchant_id')
+        }
+        next()
+    },
     methods: {
         // 获取list数据
         getAllList(box) {
+            console.log(box)
             let params = {
                 page: this.page,
                 limit: this.limit
             };
             if (box) {
+                console.log(box)
                 let data = {};
                 for (let k in box) {
                     data[k] = box[k].id;
                 }
                 params = Object.assign(params, data);
+                console.log(params)
             }
+
+            const mid = this.merchant_id
+
+            if (mid) {
+                params = Object.assign(params, {
+                    merchant_id: mid
+                })
+            }
+
             setTimeout(() => {
                 this.$fetch(this.url, params).then(res => {
                     if (res.ErrCode == "0000") {
@@ -137,7 +208,7 @@ export const referer = {
                 setTimeout(() => {
                     change.classList.remove("refe");
                     this.referer_can = true;
-                }, 4000);
+                }, 1000);
             }
         },
         // 供应商
@@ -148,17 +219,32 @@ export const referer = {
                 limit: this.limit
             }).then(res => {
                 if (res.ErrCode == "0000") {
+                    console.log(res.Result)
                     this.count = res.Result.count;
                     this.merchant_data = res.Result.data;
                     console.log(this.merchant_data);
 
-
-
-                    this.simpleName = this.merchant_data[0].merchantName;
-                    this.head_img = this.merchant_data[0].img;
-                    this.hot = this.merchant_data[0].hot;
+                    if (this.merchant_data.length > 0) {
+                        this.simpleName = this.merchant_data[0].companyName || '';
+                        this.head_img = this.merchant_data[0].headPortrait || '';
+                        this.hot = this.merchant_data[0].actualNumber;
+                    }
                 }
             });
         },
+    }
+}
+
+
+// 点击率
+export const clickRate = {
+    methods: {
+        clickRate(id) {
+            this.$fetch('dhr/client/merchant_number', {
+                id
+            }).then(res => {
+                console.log(res)
+            })
+        }
     }
 }

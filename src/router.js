@@ -33,7 +33,8 @@ export default new Router({
       name: 'home',
       component: home,
       meta: {
-        keepAlive: true
+        keepAlive: true,
+        homePage: true
       }
     },
     {
@@ -48,6 +49,9 @@ export default new Router({
       path: "/home/house/:id",
       name: 'housedetail',
       component: housedetail,
+      meta: {
+        details: true
+      }
     },
     {
       path: '/',
@@ -61,14 +65,6 @@ export default new Router({
         keepAlive: true,
         isBack: false
       },
-
-      // children: [
-      //   {
-      //     path: 'newsd',
-      //     name: 'hotdetail',
-      //     component: hotdetail
-      //   }
-      // ]
     },
 
     {
@@ -86,7 +82,7 @@ export default new Router({
       name: 'immig',
       component: immig,
       meta: {
-        keepAlive: false
+        keepAlive: true
       }
     },
     {
@@ -94,7 +90,7 @@ export default new Router({
       name: 'immigdetail',
       component: immigdetail,
       meta: {
-        keepAlive: false
+        details: true
       }
     },
     {
@@ -106,7 +102,6 @@ export default new Router({
       path: '/home/study',
       name: 'study',
       component: study,
-      children: [],
       meta: {
         keepAlive: true
       }
@@ -115,7 +110,10 @@ export default new Router({
     {
       path: '/home/study/:id',
       name: 'studydetail',
-      component: resolve => require(['./views/study/study_detail.vue'], resolve)
+      component: resolve => require(['./views/study/study_detail.vue'], resolve),
+      meta: {
+        details: true
+      }
     },
     {
       path: '/home/studymore',
@@ -133,14 +131,17 @@ export default new Router({
     {
       path: '/home/studytour/:id',
       name: 'studytourdetail',
-      component: resolve => require(['./views/studytour/studytour_detail.vue'], resolve)
+      component: resolve => require(['./views/studytour/studytour_detail.vue'], resolve),
+      meta: {
+        details: true
+      }
     },
     {
       path: '/home/merchant',
       name: 'merchant',
       component: resolve => require(['./views/merchant/merchant.vue'], resolve),
       meta: {
-        keepAlive: true
+        keepAlive: false
       }
     },
 

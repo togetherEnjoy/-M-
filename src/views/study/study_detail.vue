@@ -11,7 +11,7 @@
         <div class="cont_txt">
           <div
             class="badge"
-            :style="{'background': `url('${detail_data.schoolBadgeImg}'),url('../../assets/images/study/yuan.png') no-repeat center/cover`}"
+            :style="{'background': `url('${detail_data.schoolBadgeImg}')no-repeat center/cover,url('../../assets/images/study/yuan.png') no-repeat center/cover`}"
           ></div>
           <p class="dx">{{ detail_data.schoolName }}</p>
           <p class="yw">{{ detail_data.englishName }}</p>
@@ -49,20 +49,20 @@
 
       <div class="s_item" v-for="(item,i) in merchant_data" :key="i">
         <div class="heads_img">
-          <img v-lazy="item.img">
+          <img v-lazy="item.headPortrait">
         </div>
 
         <div class="text">
-          <h3>{{ item.merchantName }}</h3>
-          <p>咨询量：{{ item.hot }}</p>
+          <h3>{{ item.companyName }}</h3>
+          <p>咨询量：{{ item.actualNumber }}</p>
         </div>
 
         <div class="func">
-          <span @click="showToast">
+          <span @click="showToast;clickRate(item.id)">
             <i class="email"></i>
           </span>
-          <span class="pb">
-            <a href="tel:400 877 1008" class="phone"></a>
+          <span class="pb" @click="clickRate(item.id)">
+            <a :href="`tel:${item.phone}`" class="phone"></a>
           </span>
         </div>
       </div>
@@ -83,19 +83,19 @@
                 <van-col span="8">
                   <div class="content_item">
                     <h3>录取率</h3>
-                    <p>{{ detail_data.acceptanceRate }}%</p>
+                    <p>{{ detail_data.acceptanceRate | filter_emp }}</p>
                   </div>
                 </van-col>
                 <van-col span="8">
                   <div class="content_item">
                     <h3>毕业率</h3>
-                    <p>{{ detail_data.graduationRate }}%</p>
+                    <p>{{ detail_data.graduationRate | filter_emp }}</p>
                   </div>
                 </van-col>
                 <van-col span="8">
                   <div class="content_item">
                     <h3>就业率</h3>
-                    <p>{{ detail_data.employmentRate }}%</p>
+                    <p>{{ detail_data.employmentRate | filter_emp }}</p>
                   </div>
                 </van-col>
               </van-row>
@@ -104,19 +104,19 @@
                 <van-col span="8">
                   <div class="content_item">
                     <h3>毕业薪资</h3>
-                    <p>{{ detail_data.salary }}%</p>
+                    <p>{{ detail_data.salary |filter_emp }}</p>
                   </div>
                 </van-col>
                 <van-col span="8">
                   <div class="content_item">
                     <h3>国际学生比例</h3>
-                    <p>{{ detail_data.countryStudentProportion }}%</p>
+                    <p>{{ detail_data.countryStudentProportion | filter_emp }}</p>
                   </div>
                 </van-col>
                 <van-col span="8">
                   <div class="content_item">
                     <h3>学生总数量</h3>
-                    <p>{{ detail_data.studentTotal }}%</p>
+                    <p>{{ detail_data.studentTotal | filter_emp }}</p>
                   </div>
                 </van-col>
               </van-row>
@@ -125,19 +125,19 @@
                 <van-col span="8">
                   <div class="content_item">
                     <h3>本科生数量</h3>
-                    <p>{{ detail_data.undergraduatesTotal }}%</p>
+                    <p>{{ detail_data.undergraduatesTotal | filter_emp }}</p>
                   </div>
                 </van-col>
                 <van-col span="8">
                   <div class="content_item">
                     <h3>研究生数量</h3>
-                    <p>{{ detail_data.graduateStudentTotal }}%</p>
+                    <p>{{ detail_data.graduateStudentTotal |filter_emp }}</p>
                   </div>
                 </van-col>
                 <van-col span="8">
                   <div class="content_item">
                     <h3>师生比例</h3>
-                    <p>{{ detail_data.staffStudentRatio}}%</p>
+                    <p>{{ detail_data.staffStudentRatio |filter_emp}}</p>
                   </div>
                 </van-col>
               </van-row>
@@ -146,13 +146,13 @@
                 <van-col span="8">
                   <div class="content_item">
                     <h3>男女比例</h3>
-                    <p>{{ detail_data.maleFemaleRatio }}%</p>
+                    <p>{{ detail_data.maleFemaleRatio|filter_emp }}</p>
                   </div>
                 </van-col>
                 <van-col span="8">
                   <div class="content_item">
                     <h3>办理周期</h3>
-                    <p>{{ detail_data.cycle }}%</p>
+                    <p>{{ detail_data.cycle|filter_emp }}</p>
                   </div>
                 </van-col>
                 <van-col span="8">
@@ -264,10 +264,12 @@
     </div>
 
     <con
-      :simpleName="'海外网'"
+      v-if="merchant_data[0]"
+      :simpleName="simpleName"
       :head_img="head_img"
-      :id="house_detail.merchant.id"
+      :id="merchant_data[0].id"
       :hot="hot"
+      :myphone="merchant_data[0].phone"
       :typeOf="3"
       ref="con"
       :showCity="showCity"
@@ -283,17 +285,17 @@ import publicHead from "../../components/public_detail_head";
 import city from "../../components/city_station";
 import BScroll from "better-scroll";
 import { BSConfigX } from "../../utils/config.js";
-import { referer } from "../../utils/mixins";
+import { referer, clickRate } from "../../utils/mixins";
 const url = `/dhr/client/study_abroad/`;
 export default {
-  mixins: [referer],
+  mixins: [referer,clickRate],
   data() {
     return {
       active: 0,
       id: this.$route.params.id,
       detail_data: [],
       //供应商url
-      refererURL: `/dhr/client/study_abroad/merchant_list`,
+      refererURL: `/dhr/client/study/support`,
       sourceDescription: location.href,
       showCity: "",
       centerImg: require("../../assets/images/study/study.png")
@@ -308,8 +310,9 @@ export default {
       this.$fetch(url + this.id).then(res => {
         if (res.ErrCode == "0000") {
           this.detail_data = res.Result;
-
+          console.log(this.detail_data);
           this.showCity = this.detail_data.showCity;
+           console.log(this.showCity);
         }
       });
     },
@@ -326,6 +329,11 @@ export default {
     showToast() {
       let con = this.$refs.con;
       con.eject();
+    }
+  },
+  filters: {
+    filter_emp(val) {
+      return val ? val + "%" : "暂无";
     }
   },
   components: {
@@ -372,8 +380,14 @@ export default {
 
 <style scoped lang="scss">
 .study_detail {
+  // position: absolute;
+  // top: 0px;
+  // left: 0px;
+  // right: 0px;
+  // bottom: 0px;
+  // height: 100%;
   background-color: #f8f8f8;
-  padding-bottom: 178px;
+  padding-bottom: 208px;
   padding-top: 100px;
   .ser_img_wrap {
     .card_item {
@@ -420,7 +434,7 @@ export default {
         .yw,
         .addr,
         .website {
-          font-size: 22px;
+          font-size: 24px;
         }
         .yw {
           margin-top: 17px;
@@ -535,7 +549,7 @@ export default {
         }
         p {
           font-size: 24px;
-          margin-top: 20px;
+          margin-top: 15px;
           font-weight: 500;
           color: #9399a5;
         }
@@ -557,7 +571,7 @@ export default {
           }
         }
         .pb {
-          margin-left: 20px;
+          margin-left: 30px;
         }
         .email {
           background: url("../../assets/images/immig/email.png") no-repeat
@@ -579,7 +593,7 @@ export default {
     line-height: 48px;
     font-size: 24px;
     .study_de {
-      padding-top: 20px;
+      padding: 30px 0;
     }
     .content {
       background-color: #fff;
@@ -589,11 +603,11 @@ export default {
         font-weight: 500;
         padding: 15px 0;
         h3 {
-          font-size: 22px;
+          font-size: 24px;
           color: #9399a5;
         }
         p {
-          font-size: 24px;
+          font-size: 30px;
           color: #0d1c31;
         }
       }

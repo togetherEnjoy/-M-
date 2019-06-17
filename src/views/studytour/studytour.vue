@@ -52,7 +52,7 @@
             <p class="tit">{{ item.title }}</p>
 
             <p class="price">
-              价格：
+              价格  &nbsp;
               <b>￥</b><i>{{ item.price }}</i>
               <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}天</span>
             </p>
@@ -87,7 +87,8 @@ export default {
       isList: true,
 
       yx_menu: [],
-      url: `/dhr/client/study_tour/list`
+      url: `/dhr/client/study_tour/list`,
+      merchantUrl:`/dhr/client/study_tour/list`
     };
   },
   created() {
@@ -112,23 +113,23 @@ export default {
         }
       });
     },
-    getStudyTourList() {
-      this.$fetch("/dhr/client/study_tour/list", {
-        page: this.page,
-        limit: this.limit
-      }).then(res => {
-        if (res.ErrCode == "0000") {
-          this.count = res.Result.count / 1;
-          this.List_data = this.List_data.concat(res.Result.data);
-          this.loading = false;
-          if (this.List_data.length >= this.count) {
-            this.finished = true;
+    // getStudyTourList() {
+    //   this.$fetch("/dhr/client/study_tour/list", {
+    //     page: this.page,
+    //     limit: this.limit
+    //   }).then(res => {
+    //     if (res.ErrCode == "0000") {
+    //       this.count = res.Result.count / 1;
+    //       this.List_data = this.List_data.concat(res.Result.data);
+    //       this.loading = false;
+    //       if (this.List_data.length >= this.count) {
+    //         this.finished = true;
 
-          }
-          this.page++;
-        }
-      });
-    }
+    //       }
+    //       this.page++;
+    //     }
+    //   });
+    // }
   },
 
   components: {
@@ -142,8 +143,7 @@ export default {
   background-color: #f8f8f8;
   padding-top: 100px;
   .lx_content {
-    padding: 40px 30px;
-    padding-top: 40px;
+    padding: 15px 30px 40px;
     background-color: #fff;
     margin-top: 30px;
     .like {
@@ -202,6 +202,7 @@ export default {
             line-height: 36px;
             text-align: center;
             margin-left: 20px;
+            border-radius: 4px;
           }
         }
       }
@@ -210,6 +211,7 @@ export default {
   .sx_result {
     h3 {
       font-weight: 500;
+      font-size: 30px;
     }
     padding: 30px;
     background-color: #fff;
@@ -220,6 +222,7 @@ export default {
       flex-wrap: wrap;
       padding: 30px 0 40px;
       p {
+        border-radius: 4px;
         width: 150px;
         height: 50px;
         border: 1px solid rgba(229, 229, 229, 1);
@@ -246,7 +249,7 @@ export default {
             width: 10px;
             height: 10px;
             right: 2px;
-            top: 8px;
+            top:11px;
             background: url("../../assets/images/study/close.png") no-repeat
               center/ cover;
           }

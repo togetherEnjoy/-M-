@@ -20,7 +20,7 @@
           :title-active-color="'#ED2530'"
           :title-inactive-color="'#0D1C31'"
           :line-width="0"
-          animated
+         
           lazy-render
           @click="tabBtnClick"
           sticky
@@ -62,7 +62,7 @@
                         <div class="item_left">
                           <p class="txt" v-text="list.name"></p>
                           <p class="hover">
-                            {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                            {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
                             <span>评论数：{{list.commentCount}}</span>
                           </p>
                         </div>
@@ -93,7 +93,7 @@
                         </div>
                         <div class="all_b">
                           <p class="hover">
-                            {{ list.simpleName }} {{_getDateDiff(list.createdAt)}}
+                            {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
                             <span>评论数：{{list.commentCount}}</span>
                           </p>
                         </div>
@@ -387,7 +387,7 @@ export default {
 .hot {
   width: 100%;
   .top_bar {
-    padding: 0 15px;
+    padding: 0 30px;
     height: 90px;
     background-color: #ed2530;
     display: flex;

@@ -13,7 +13,7 @@
             v-for="(item, i) in country"
             :key="i"
             :class="{active: i == 0}"
-            @click="checkCountry(i,$event)"
+            @click="checkCountry(i,item.id,$event)"
           >{{ item.name }}</li>
         </ul>
       </div>
@@ -63,7 +63,7 @@
       </div>
     </div>
 
-    <div :class="navs===3? 'some three cs': 'some three'" :style="more? 'height:inherit' : '100%'">
+    <div :class="navs===3? 'some three cs': 'some three'" :style="more? 'height:initial' : '100%'">
       <div ref="bs4" v-if="!more" style="height: 100%;overflow:hidden" class="three">
         <ul>
           <li
@@ -121,174 +121,7 @@ export default {
     },
     country: {
       type: Array,
-      default() {
-        return [
-          {
-            name: "不限",
-            city: [
-              {
-                id: 0,
-                name: "不限"
-              }
-            ],
-            id: 0
-          },
-          {
-            name: "泰国",
-            city: [
-              {
-                id: 0,
-                name: "不限"
-              },
-              {
-                id: 1,
-                name: "加利福尼亚州"
-              },
-              {
-                id: 2,
-                name: "马萨诸塞州"
-              },
-              {
-                id: 3,
-                name: "新泽西州"
-              }
-            ],
-            id: 1
-          },
-          {
-            name: "马来西亚",
-            city: [
-              {
-                id: 0,
-                name: "不限"
-              },
-              {
-                id: 0,
-                name: "加利福尼亚州"
-              },
-              {
-                id: 0,
-                name: "马萨诸塞州"
-              },
-              {
-                id: 0,
-                name: "新泽西州"
-              }
-            ],
-            id: 2
-          },
-          {
-            name: "日本",
-            city: [
-              {
-                id: 0,
-                name: "不限"
-              },
-              {
-                id: 0,
-                name: "加利福尼亚州"
-              },
-              {
-                id: 0,
-                name: "马萨诸塞州"
-              },
-              {
-                id: 0,
-                name: "新泽西州"
-              }
-            ],
-            id: 3
-          },
-          {
-            name: "美国",
-            city: [
-              {
-                id: 0,
-                name: "不限"
-              },
-              {
-                id: 0,
-                name: "加利福尼亚州"
-              },
-              {
-                id: 0,
-                name: "马萨诸塞州"
-              },
-              {
-                id: 0,
-                name: "新泽西州"
-              }
-            ],
-            id: 4
-          },
-          {
-            name: "英国",
-            city: [
-              {
-                id: 0,
-                name: "不限"
-              },
-              {
-                id: 0,
-                name: "加利福尼亚州"
-              },
-              {
-                id: 0,
-                name: "马萨诸塞州"
-              },
-              {
-                id: 0,
-                name: "新泽西州"
-              }
-            ],
-            id: 5
-          },
-          {
-            name: "澳大利亚",
-            city: [
-              {
-                id: 0,
-                name: "不限"
-              },
-              {
-                id: 0,
-                name: "加利福尼亚州"
-              },
-              {
-                id: 0,
-                name: "马萨诸塞州"
-              },
-              {
-                id: 0,
-                name: "新泽西州"
-              }
-            ],
-            id: 6
-          },
-          {
-            name: "希腊",
-            city: [
-              {
-                id: 0,
-                name: "不限"
-              },
-              {
-                id: 0,
-                name: "加利福尼亚州"
-              },
-              {
-                id: 0,
-                name: "马萨诸塞州"
-              },
-              {
-                id: 0,
-                name: "新泽西州"
-              }
-            ],
-            id: 7
-          }
-        ];
-      }
+     
     },
     athor: {
       type: Array,
@@ -500,10 +333,10 @@ export default {
       this.$refs.mask.classList.add("show");
       this.navs = i;
     },
-    checkCountry(i, e) {
+    checkCountry(i,id, e) {
       let target = e.target;
       let all_li = target.parentNode.children;
-
+      let html = target.innerHTML
       let li = [...all_li];
       li.forEach(val => {
         if (val.classList.contains("active")) {
@@ -513,11 +346,14 @@ export default {
       target.classList.add("active");
       this.checked = i;
       this.$set(this.sendObj, "hostCountryNum", {
-        id: i,
-        html: "",
+        id,
+        html:html,
         type: "hostCountryNum"
       });
       this.$emit("get_result", this.sendObj);
+      this.$parent.getAllList(this.sendObj);
+      this.$parent.allListData = [];
+      document.body.style.overflow = "initial";
     },
     checkCtry(id, e) {
       let html = e.target.innerHTML;
@@ -532,7 +368,7 @@ export default {
       if (e.target.parentNode.id == "fir") {
         this.$set(this.sendObj, "hostCountryNum", {
           id: 0,
-          html: "",
+          html: "美国",
           type: "hostCountryNum"
         });
       }
@@ -817,6 +653,8 @@ export default {
           font-size: 24px;
           margin-right: 30px;
           color: #9399a5;
+          border-radius: 4px;
+          overflow: hidden;
 
           &:nth-child(4n) {
             margin-right: 0;
@@ -826,7 +664,7 @@ export default {
           }
 
           &.check {
-            background-color: #ed2530;
+            background: linear-gradient(90deg, #ed4d56, #ed2530);
             color: #fff;
             border: none;
           }
@@ -844,6 +682,7 @@ export default {
         text-align: center;
         font-size: 30px;
         font-weight: 500;
+        border-radius: 4px;
       }
       .cz {
         border: 1px solid rgba(237, 37, 48, 1);

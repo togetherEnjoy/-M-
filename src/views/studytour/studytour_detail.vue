@@ -18,8 +18,8 @@
         </div>
 
         <p class="price">
-          价格：
-          <i>￥{{ List_data.price }}</i>
+          价格
+          <i><b>￥</b>{{ List_data.price }}</i>
           <span>{{ app._goTime(List_data.startTime,List_data.endTime) | goTime() }}天</span>
         </p>
       </div>
@@ -81,9 +81,11 @@
     </div>
 
     <con
+      v-if="List_data.merchant"
       :simpleName="List_data.merchant.simpleName"
       :typeOf="4"
-      :id="house_detail.merchant.id"
+      :id="List_data.merchant.id"
+      :myphone="List_data.merchant.phone"
       :hot="List_data.hot"
       :showCity="List_data.showCity"
       :sourceDescription="href"
@@ -122,6 +124,7 @@ export default {
       this.$fetch(`/dhr/client/study_tour/${id}`).then(res => {
         if (res.ErrCode == "0000") {
           this.List_data = res.Result;
+          console.log(this.List_data);
           this.detailedDescription = JSON.parse(res.Result.detailedDescription);
         }
       });
@@ -150,9 +153,14 @@ export default {
 
 <style scoped lang="scss">
 .studytour_detail {
-  padding-bottom: 178px;
+  padding-bottom: 208px;
   padding-top: 100px;
   background-color: #f8f8f8;
+  // position: absolute;
+  // top: 0px;
+  // left: 0px;
+  // right: 0px;
+  // bottom: 0px;
   .ser_img_wrap {
     .card_item {
       color: #fff;
@@ -185,12 +193,18 @@ export default {
 
       .price {
         margin-bottom: 5px;
-        font-size: 22px;
+        font-size: 24px;
         color: #9399a5;
         margin-top: 15px;
+
         i {
           color: #ed2530;
           font-size: 34px;
+          font-weight: bold;
+          b {
+            font-size: 24px;
+            
+          }
         }
         span {
           width: 110px;
@@ -199,19 +213,24 @@ export default {
           vertical-align: text-bottom;
           border: 1px solid #5c98f8;
           color: #5c98f8;
-          font-size: 22px;
+          font-size: 24px;
           line-height: 36px;
           text-align: center;
           margin-left: 20px;
+          border-radius: 4px;
         }
       }
     }
     .tour_det_b {
       display: flex;
       padding-top: 40px;
+      .left {
+        flex: 0.7;
+      }
       div {
-        font-size: 24px;
+        font-size: 28px;
         flex: 1;
+
         p {
           color: #9399a5;
           &:first-child {
@@ -224,7 +243,7 @@ export default {
         }
         i {
           display: inline-block;
-          width: 100px;
+          width: 110px;
           text-align: justify;
           text-align-last: justify;
         }
@@ -232,7 +251,7 @@ export default {
         .justify {
           position: relative;
           display: inline-block;
-          height: 28px;
+          height: 32px;
           text-align: justify;
           overflow: hidden;
           &:after {
@@ -251,14 +270,13 @@ export default {
   .project {
     margin-top: 30px;
     background-color: #fff;
-    padding: 0 30px;
     color: #9399a5;
     line-height: 48px;
     font-size: 24px;
 
     .xcbox {
       font-weight: 500;
-      padding-top: 20px;
+      padding: 20px 30px;
       .day {
         margin-top: 20px;
         &:first-child {
@@ -282,7 +300,7 @@ export default {
       }
     }
     .fybox {
-      padding-top: 20px;
+      padding: 20px 30px;
       font-size: 30px;
       h3 {
         color: #0d1c31;

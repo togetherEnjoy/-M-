@@ -86,9 +86,13 @@ export default {
     return {
       item: ["国家", "购房需求", "物业类型", "总价"],
       url: `/dhr/client/house/list`,
-      menu: [] // 顶部筛选
+      merchantUrl: `/dhr/client/house/list`,
+      menu: [], // 顶部筛选
+      // merchant_id: $route.query.merchant_id ? $route.query.merchant_id: false
     };
   },
+ 
+
   methods: {
     onLoad() {
       this.getAllList(this.result_data);
@@ -116,6 +120,7 @@ export default {
 
   created() {
     this.getMenuData();
+
   },
   components: {
     smenu
@@ -214,6 +219,7 @@ export default {
   .sx_result {
     h3 {
       font-weight: 500;
+      font-size: 30px;
     }
     padding: 30px;
     background-color: #fff;
@@ -225,6 +231,8 @@ export default {
       padding: 30px 0 40px;
       .sel {
         margin-right: 30px;
+        border-radius: 4px;
+        overflow: hidden;
         p {
           width: 150px;
           height: 50px;
@@ -251,7 +259,7 @@ export default {
               width: 10px;
               height: 10px;
               right: 2px;
-              top: 8px;
+              top: 11px;
               background: url("../../assets/images/study/close.png") no-repeat
                 center/ cover;
             }
@@ -296,7 +304,7 @@ export default {
   .house_wrap {
     background-color: #fff;
     margin-top: 30px;
-    padding: 0 30px;
+    padding: 0 30px 30px;
     .list_box {
       display: flex;
       padding: 30px 0;
@@ -312,18 +320,24 @@ export default {
         }
         p {
           position: absolute;
-          bottom: 10px;
-          left: 10px;
+          width: 100%;
+          padding: 10px 0 10px 30px;
+          bottom: 0px;
+          left: 0px;
           font-size: 20px;
           color: #fff;
-          padding-left: 30px;
+          background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.2),
+            rgba(0, 0, 0, 0.8)
+          );
           &::after {
             position: absolute;
             content: "";
             width: 24px;
             height: 24px;
-            left: 0;
-            top: 2px;
+            left: 5px;
+            top: 12px;
             background: url("../../assets/images/house/posi.png") no-repeat
               center / cover;
           }
@@ -335,29 +349,34 @@ export default {
         flex: 1;
         overflow: hidden;
         .tit {
-          font-size: 28px;
-          font-weight: 500;
+          font-size: 30px;
+          font-weight: bold;
         }
         .de {
           color: #9399a5;
           margin-top: 20px;
+          font-size: 24px;
         }
         .price {
           margin-top: 30px;
+          display: flex;
+          font-size: 24px;
           .le {
+            flex: 0.7;
             color: #ed2530;
 
             span {
-              font-size: 28px;
+              font-size: 34px;
               font-weight: bold;
             }
           }
           .ri {
+            flex: 1;
             color: #9399a5;
             margin-left: 20px;
             i {
               color: #ed2530;
-              font-size: 28px;
+              font-size: 34px;
               font-weight: bold;
             }
           }

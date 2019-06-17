@@ -9,13 +9,13 @@
         sticky
       >
         <van-tab v-for="index in immig_country" :title="index.name">
-          <div class="card">
+          <div class="card" :index_id="index.id">
             <van-list
               v-model="loading"
               :finished="finished"
               finished-text="没有更多了"
               @load="getImmigListData"
-              :offset="100"
+              :offset="10"
             >
               <div class="card_wrap" v-for="(immig, i) in list_data" :key="i">
                 <div @click="$router.push({path:'/home/immig/detail', query: {id: immig.id}})">
@@ -61,80 +61,82 @@
 <script>
 import { Tab, Tabs } from "vant";
 import { mapGetters } from "vuex";
+import { screen_data } from "../../utils/mixins";
 
-const url = `/dhr/client/migrate/list`;
 export default {
-  props: {},
   data() {
     return {
-      country: ["全部", "希腊", "圣基茨", "美国", "澳大利亚", "加拿大"],
       page: 1,
       limit: 5,
       count: "",
       hostCountryNum: this.$route.query.hostCountryNum,
+      url: `/dhr/client/migrate/list`,
+      merchantUrl: `/dhr/client/migrate/merchant/list`,
+
+      merchant_id: false,
+      // active: '',
       // vant
       loading: false,
       finished: false,
-      active: this.$route.query.hostCountryNum || 0,
+      active: 0,
       list_data: [],
 
       immig_country: []
     };
   },
-  computed: {
-    // immig_country() {
-    //   return this.immig_menu;
-    // },
-    // ...mapGetters(["immig_menu"])
-    // active() {
-    //   return this.$route.query.hostCountryNum || 0
+  watch: {
+    // active(val) {
+    //   console.log(val)
+    //   this.active = val + 1
     // }
   },
-  activated() {
 
-  },
-  deactivated() {
-    
-  },
-  created() {
-    this.getImmigData();
-  },
   methods: {
     getImmigData() {
       this.$fetch("/dhr/client/migrate/menu").then(res => {
         if (res.ErrCode == "0000") {
           this.immig_country = res.Result.country;
+          console.log(this.immig_country);
         }
       });
     },
     getImmigListData() {
+      console.log("加载数据。。。。");
+      let params = {
+        page: this.page,
+        limit: this.limit,
+        hostCountryNum: this.hostCountryNum
+      };
 
-
+      if (this.merchant_id) {
+        params = Object.assign(params, {
+          merchant_id: this.merchant_id
+        });
+      }
+      console.log(params);
       setTimeout(() => {
-        this.$fetch(url, {
-          page: this.page,
-          limit: this.limit,
-          hostCountryNum: this.hostCountryNum
-        }).then(res => {
+        this.$fetch(this.url, params).then(res => {
           if (res.ErrCode == "0000") {
             this.list_data = this.list_data.concat(res.Result.data);
             this.count = res.Result.count / 1;
-        
+
             this.loading = false;
             if (this.list_data.length >= this.count) {
               this.finished = true;
-         
             }
             this.page++;
           }
         });
       }, 500);
     },
-    tabClick(i) {
 
+    tabClick(i) {
       this.list_data = [];
       this.page = 1;
-      this.hostCountryNum = i;
+
+      this.hostCountryNum = this.immig_country[i].id;
+
+      console.log(this.hostCountryNum);
       this.initialization();
     },
     initialization() {
@@ -145,12 +147,67 @@ export default {
       }
     }
   },
-  beforeRouteEnter(to, from, next) {
-    if (to.path == "/home/immig") {
 
+  created() {
+    this.isFirstEnter = true;
+    this.firstOnload = true;
+    this.getImmigData();
+    this.initialization();
+  },
+
+  activated() {
+   console.log(sessionStorage.getItem('active'))
+    this.active = parseInt(this.$route.query.hostCountryNum) + 1 
+ console.log(this.active)
+    this.hostCountryNum = this.$route.query.hostCountryNum
+    this.merchant_id = this.$route.query.merchant_id
+      ? this.$route.query.merchant_id
+      : false;
+
+    console.log(this.merchant_id);
+    if (!this.$route.meta.isBack || this.isFirstEnter) {
+      this.loading = true;
+      if (!this.firstOnload) {
+        this.list_data = [];
+        this.page = 1;
+
+        this.initialization();
+      }
+    } else {
+      this.loading = false;
     }
+    this.finished = false;
+    this.firstOnload = false;
+    this.$route.meta.isBack = false;
+    this.isFirstEnter = false;
+  },
+
+  beforeRouteEnter(to, from, next) {
+    // console.log(from);
+    // console.log(to);
+    if (from.name == "merchant") {
+      next(vm => {
+        vm.url = vm.merchantUrl;
+      });
+    }
+
+    if (from.meta.details && to.meta.keepAlive) {
+      to.meta.isBack = true;
+      next();
+    }
+
+    if (from.meta.homePage) {
+      next(vm => {
+        vm.merchant_id = false;
+        vm.url = vm.url;
+
+        console.log(vm.url);
+      });
+    }
+
     next();
   },
+
   components: {
     [Tab.name]: Tab,
     [Tabs.name]: Tabs
@@ -160,13 +217,19 @@ export default {
 
 <style lang="scss">
 .immigrant {
+  height: 100vh;
+
   .van-tabs__nav--line {
     padding: 0.4rem 0.4rem 0.4rem 0 !important;
+  }
+
+  .van-tabs__wrap--scrollable .van-tab {
+    flex: 0 0 22% !important;
   }
 }
 
 .van-list__finished-text {
-  padding-top: 30px;
+  padding: 30px 0 !important;
 }
 </style>
 
@@ -174,13 +237,14 @@ export default {
 <style scoped lang="scss">
 .immigrant {
   background-color: #f8f8f8;
+  padding-bottom: 60px;
 
   .card {
     margin-top: 30px;
     padding: 0 30px;
     background-color: #fff;
     .card_wrap {
-      padding: 30px 0 20px 0;
+      padding: 30px 0 30px 0;
       border-bottom: 1px solid #e5e5e5;
       .card_item {
         color: #fff;
@@ -238,6 +302,7 @@ export default {
         justify-content: space-around;
         align-items: center;
         text-align: center;
+        padding-top: 10px;
         & > div {
           color: #9399a5;
           font-size: 24px;

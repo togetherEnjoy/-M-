@@ -27,22 +27,22 @@
         <div class="card_ds">
           <div>
             <div class="c_ch os">
-              <p class="m">{{ immig_detail.handlingCycle }}个月</p>
               <p>办理周期</p>
+              <p class="m">{{ immig_detail.handlingCycle }}个月</p>
             </div>
             <div class="c_ch">
-              <p class="m">{{ immig_detail.identityType }}</p>
-              <p>身份类别</p>
+              <p>投资额度</p>
+              <p class="m">{{ immig_detail.investmentQuota }}万澳币</p>
             </div>
           </div>
           <div>
             <div class="c_ch os">
-              <p class="m">{{ immig_detail.investmentQuota }}万澳币</p>
-              <p>投资额度</p>
+              <p>身份类别</p>
+              <p class="m">{{ immig_detail.identityType }}</p>
             </div>
             <div class="c_ch">
-              <p class="m">{{ immig_detail.demand }}</p>
               <p>居住要求</p>
+              <p class="m">{{ immig_detail.demand }}</p>
             </div>
           </div>
         </div>
@@ -52,7 +52,6 @@
     <div class="supplier">
       <div class="s_tit">
         <h3>移民供应商</h3>
-
         <div class="s_huan" ref="change">
           <p @click="referer">换一换</p>
           <span
@@ -63,21 +62,21 @@
 
       <div class="s_item" v-for="(item,i) in merchant_data.slice(0, 4)" :key="i">
         <div class="heads_img">
-          <img v-lazy="item.img">
+          <img v-lazy="item.headPortrait">
         </div>
 
         <div class="text">
-          <h3>{{ item.merchantName }}</h3>
-          <p>咨询量：{{ item.hot }}</p>
+          <h3>{{ item.companyName }}</h3>
+          <p>咨询量：{{ item.actualNumber }}</p>
         </div>
 
         <div class="func">
-          <span @click="showToast">
+          <span @click="showToast();clickRate(item.id)">
             <i class="email"></i>
           </span>
-          <span class="pb">
+          <span class="pb" @click="clickRate(item.id)">
             <!-- <i class="phone"></i> -->
-            <a href="tel:400 877 1008" class="phone"></a>
+            <a :href="`tel:${item.phone}`" class="phone"></a>
           </span>
         </div>
       </div>
@@ -101,10 +100,12 @@
     </div>
 
     <con
+      v-if="merchant_data[0]"
       :simpleName="simpleName"
-      :id="house_detail.merchant.id"
+      :id="merchant_data[0].id"
       :head_img="head_img"
       :hot="hot"
+      :myphone="merchant_data[0].phone"
       :typeOf="2"
       ref="con"
       :showCity="immig_detail.showCity"
@@ -117,12 +118,12 @@
 import { Tab, Tabs } from "vant";
 import con from "../../components/conf";
 import { setTimeout } from "timers";
-import { referer } from "../../utils/mixins";
+import { referer, clickRate } from "../../utils/mixins";
 import publicHead from "../../components/public_detail_head";
 import city from "../../components/city_station";
 const url = `/dhr/client/migrate/`;
 export default {
-  mixins: [referer],
+  mixins: [referer,clickRate],
   data() {
     return {
       active: 0,
@@ -139,7 +140,8 @@ export default {
       referer_can: true,
       immig_detail: [],
       // 供应商url
-      refererURL: `/dhr/business/immigrant/support`,
+      refererURL: `/dhr/client/immigrant/support`,
+
       sourceDescription: location.href,
       showCity: "",
 
@@ -148,9 +150,11 @@ export default {
   },
   methods: {
     getImmigDetail() {
+      console.log(this.id)
       this.$fetch(url + this.id).then(res => {
         if (res.ErrCode == "0000") {
           this.immig_detail = res.Result;
+          console.log(this.immig_detail);
           this.showCity = this.immig_detail.showCity;
         }
       });
@@ -182,8 +186,14 @@ export default {
 <style scoped lang="scss">
 .immg_detail {
   background-color: #f8f8f8;
-  padding-bottom: 178px;
+  padding-bottom: 208px;
   padding-top: 100px;
+  // position: absolute;
+  // top: 0px;
+  // left: 0px;
+  // right: 0px;
+  // bottom: 0px;
+  // height: 100%;
   .ser_img_wrap {
     .card_item {
       color: #fff;
@@ -248,6 +258,7 @@ export default {
           color: #ed2530;
           i {
             font-size: 34px;
+            font-weight: bold;
           }
         }
         .yi {
@@ -282,7 +293,7 @@ export default {
             color: #ed2530;
             font-size: 30px;
             font-weight: bold;
-            margin-bottom: 19px;
+            margin-top: 19px;
           }
         }
       }
@@ -317,7 +328,7 @@ export default {
             background: url("../../assets/images/immig/refresh.png") no-repeat
               center / cover;
             left: 0;
-            top: 6px;
+            top: 8px;
           }
         }
         span {
@@ -327,7 +338,7 @@ export default {
         &.refe {
           p {
             &::after {
-              animation: referer linear 3s forwards;
+              animation: referer ease-in 1s forwards;
             }
           }
         }
@@ -357,7 +368,7 @@ export default {
         }
         p {
           font-size: 24px;
-          margin-top: 20px;
+          margin-top: 15px;
           font-weight: 500;
           color: #9399a5;
         }
@@ -379,7 +390,7 @@ export default {
           }
         }
         .pb {
-          margin-left: 20px;
+          margin-left: 30px;
         }
         .email {
           background: url("../../assets/images/immig/email.png") no-repeat
@@ -396,12 +407,12 @@ export default {
   .project {
     margin-top: 30px;
     background-color: #fff;
-    padding: 0 30px;
     color: #9399a5;
     line-height: 48px;
-    font-size: 24px;
+    font-size: 30px;
     .content {
-      padding-top: 20px;
+      padding: 20px 30px;
+      font-size: 30px;
       .imgs {
         width: 480px;
         height: 320px;
