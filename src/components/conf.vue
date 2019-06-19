@@ -4,9 +4,9 @@
 
       <div class="z_l">
         <div class="z_l_img" @click="$router.push({path: '/home/merchant',query:{id}})">
-          <div>
+          
             <img v-lazy="head_img">
-          </div>
+          
         </div>
         <div class="z_l_t">
           <h3>{{ simpleName }}</h3>
@@ -184,10 +184,6 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      div {
-        // width: 50px;
-        // height: 50px;
-      }
       img {
         display: block;
         width: 100%;
@@ -195,6 +191,7 @@ export default {
       }
     }
     .z_l_t {
+      flex: 1;
       margin-left: 15px;
 
       h3 {

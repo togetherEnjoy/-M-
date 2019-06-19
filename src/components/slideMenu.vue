@@ -27,7 +27,6 @@
         >
           <li
             v-for="(ci, i) in item.city"
-            :class="{active: i==0}"
             :key="i"
             @click="checkCtry(ci.id, $event)"
             ref="ctry"
@@ -120,8 +119,7 @@ export default {
       type: Array
     },
     country: {
-      type: Array,
-     
+      type: Array
     },
     athor: {
       type: Array,
@@ -197,7 +195,11 @@ export default {
     },
     params1: "",
     params2: "",
-    params3: ""
+    params3: "",
+    what: {},
+    oneData: {},
+    twoData: {},
+    threeData: {}
   },
   data() {
     return {
@@ -215,7 +217,8 @@ export default {
       g_house: "",
       g_type: "",
 
-      sendObj: {}
+      sendObj: {},
+      moreData: {}
     };
   },
   mounted() {
@@ -231,8 +234,12 @@ export default {
     screen() {
       return this.screen;
     },
+    getCountry() {
+      return this.set_country;
+    },
     ...mapGetters({
-      screen: "screen"
+      screen: "screen",
+      setCountry: "set_country"
     })
   },
 
@@ -244,6 +251,9 @@ export default {
         html: e.target.innerHTML,
         type: "TOEFL"
       });
+      this.moreData.TOEFL = {
+        name: e.target.innerHTML
+      };
       console.log(this.sendObj);
     },
     yscheck(i, e) {
@@ -253,6 +263,9 @@ export default {
         html: e.target.innerHTML,
         type: "IELTS"
       });
+      this.moreData.IELTS = {
+        name: e.target.innerHTML
+      };
     },
     fycheck(i, e) {
       this.checkall(e);
@@ -261,6 +274,9 @@ export default {
         html: e.target.innerHTML,
         type: "cost"
       });
+      this.moreData.cost = {
+        name: e.target.innerHTML
+      };
     },
 
     reset() {
@@ -270,14 +286,35 @@ export default {
           val.classList.remove("check");
         }
       });
+      this.$delete(this.sendObj, "TOEFL");
+      this.$delete(this.sendObj, "IELTS");
+      this.$delete(this.sendObj, "cost");
+      this.moreData = {}
+        console.log(this.moreData);
     },
     confirm() {
+        console.log(this.moreData);
       let par = this.$refs.par;
       par.forEach(val => {
         if (val.classList.contains("active")) {
           val.classList.remove("active");
         }
       });
+
+     
+      if (Object.keys(this.moreData).length > 1 ) {
+         console.log(this.moreData);
+         par[3].classList.add('sect')
+         par[3].children[0].innerHTML = '更多'
+      } else if(Object.keys(this.moreData).length == 0) {
+        par[3].classList.remove('sect')
+      } 
+      
+      else {
+        par[3].classList.add('sect')
+        console.log(Object.values(this.moreData)[0])
+        par[3].children[0].innerHTML = Object.values(this.moreData)[0].name
+      }
 
       this.$refs.mask.classList.remove("show");
       this.navs = "";
@@ -302,6 +339,8 @@ export default {
       e.target.classList.add("check");
     },
     chang(i, e) {
+      // console.log(e.target.innerHTML=  666)
+
       this.$nextTick(() => {
         if (this.aBScroll1 && this.$refs.bs1) {
           this.aBScroll1 = new BScroll(this.$refs.bs1, BSConfigY);
@@ -333,10 +372,29 @@ export default {
       this.$refs.mask.classList.add("show");
       this.navs = i;
     },
-    checkCountry(i,id, e) {
+    checkCountry(i, id, e) {
+      let par = this.$refs.par;
       let target = e.target;
+
+      if (target.innerHTML == "不限") {
+        par[0].classList.remove("sect");
+        par[0].children[0].innerHTML = "国家";
+        this.$delete(this.sendObj, "belongCity");
+        this.$delete(this.sendObj, "belongCountry");
+
+        
+        this.$parent.allListData = [];
+        this.$parent.page =1
+        
+        this.$parent.getAllList(this.sendObj);
+        this.close_all();
+      } else {
+        par[0].children[0].innerHTML = target.innerHTML;
+        this.set_country(target.innerHTML);
+      }
+
       let all_li = target.parentNode.children;
-      let html = target.innerHTML
+      let html = target.innerHTML;
       let li = [...all_li];
       li.forEach(val => {
         if (val.classList.contains("active")) {
@@ -345,17 +403,25 @@ export default {
       });
       target.classList.add("active");
       this.checked = i;
-      this.$set(this.sendObj, "hostCountryNum", {
+      this.$set(this.sendObj, "belongCountry", {
         id,
-        html:html,
-        type: "hostCountryNum"
+        html: html,
+        type: "belongCountry"
       });
       this.$emit("get_result", this.sendObj);
-      this.$parent.getAllList(this.sendObj);
-      this.$parent.allListData = [];
       document.body.style.overflow = "initial";
     },
+
     checkCtry(id, e) {
+      let par = this.$refs.par;
+      let target = e.target;
+      par[0].classList.add("sect");
+      if (target.innerHTML != "不限") {
+        par[0].children[0].innerHTML = target.innerHTML;
+      } else {
+        par[0].children[0].innerHTML = this.setCountry;
+      }
+
       let html = e.target.innerHTML;
       this.countryresult = html;
       let ctry = this.$refs.ctry;
@@ -366,17 +432,17 @@ export default {
       });
       e.target.classList.add("active");
       if (e.target.parentNode.id == "fir") {
-        this.$set(this.sendObj, "hostCountryNum", {
+        this.$set(this.sendObj, "belongCountry", {
           id: 0,
           html: "美国",
-          type: "hostCountryNum"
+          type: "belongCountry"
         });
       }
 
-      this.$set(this.sendObj, "hostCityNum", {
+      this.$set(this.sendObj, "belongCity", {
         id: id,
         html: html,
-        type: "hostCityNum"
+        type: "belongCity"
       });
       this.close_all();
       this.$parent.page = 1;
@@ -410,7 +476,7 @@ export default {
         html: html,
         type: name
       });
-      
+
       this.close_all();
       this.$parent.page = 1;
       this.$parent.allListData = [];
@@ -420,16 +486,21 @@ export default {
     },
 
     oneClick(id, e) {
+      this.setHTML(1, 0, e, this.oneData);
+
+      console.log(e.target);
       let type = 1;
       let name = this.params1;
       this.teds(name, type, id, e);
     },
     twoClick(id, e) {
+      this.setHTML(2, 1, e, this.twoData);
       let type = 2;
       let name = this.params2;
       this.teds(name, type, id, e);
     },
     threeClick(id, e) {
+      this.setHTML(3, 2, e, this.threeData);
       let type = 3;
       let name = this.params3;
       this.teds(name, type, id, e);
@@ -449,8 +520,33 @@ export default {
         }
       });
     },
+
+    setHTML(one, two, e, InnerHTML) {
+      let par = this.$refs.par;
+
+      if (this.what == 1) {
+        if (e.target.innerHTML != "不限") {
+          par[one].children[0].innerHTML = e.target.innerHTML;
+          par[one].classList.add("sect");
+        } else {
+          par[one].children[0].innerHTML = InnerHTML;
+          par[one].classList.remove("sect");
+        }
+      }
+      if (this.what == 2) {
+        if (e.target.innerHTML != "不限") {
+          par[two].children[0].innerHTML = e.target.innerHTML;
+          par[two].classList.add("sect");
+        } else {
+          par[two].children[0].innerHTML = InnerHTML;
+          par[two].classList.remove("sect");
+        }
+      }
+    },
+
     ...mapMutations({
-      screen_result: "SCREEN_RESULT"
+      screen_result: "SCREEN_RESULT",
+      set_country: "SET_COUNTRY"
     })
   },
   components: {}
@@ -475,9 +571,20 @@ export default {
     position: relative;
     z-index: 3;
     #items {
+      flex: 1;
       display: flex;
+      justify-content: center;
       align-items: center;
       cursor: pointer;
+      &.sect {
+        color: #ed2530 !important;
+        .txt {
+          &::after {
+            background: url("../assets/images/house/red_s.png") no-repeat center /
+              cover;
+          }
+        }
+      }
       .txt {
         font-size: 28px;
         font-weight: 500;

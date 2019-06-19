@@ -154,19 +154,10 @@
         <div class="lx_box">
           <div
             class="lx_item"
-            @click="$router.push({path: '/home/study',query: {id: study_menu[0].id}})"
-          >
-            <div>
-              <img src="../../assets/images/home/m_l.png">
-              <p v-if="study_menu.length>0">{{ study_menu[0].name }}学院</p>
-            </div>
-          </div>
-          <div
-            class="lx_item"
             @click="$router.push({path: '/home/study',query: {id: study_menu[1].id}})"
           >
             <div>
-              <img src="../../assets/images/home/ao_l.png">
+              <img src="../../assets/images/home/m_l.png">
               <p v-if="study_menu.length>0">{{ study_menu[1].name }}学院</p>
             </div>
           </div>
@@ -175,7 +166,7 @@
             @click="$router.push({path: '/home/study',query: {id: study_menu[2].id}})"
           >
             <div>
-              <img src="../../assets/images/home/yin_l.png">
+              <img src="../../assets/images/home/ao_l.png">
               <p v-if="study_menu.length>0">{{ study_menu[2].name }}学院</p>
             </div>
           </div>
@@ -184,8 +175,17 @@
             @click="$router.push({path: '/home/study',query: {id: study_menu[3].id}})"
           >
             <div>
-              <img src="../../assets/images/home/jia_l.png">
+              <img src="../../assets/images/home/yin_l.png">
               <p v-if="study_menu.length>0">{{ study_menu[3].name }}学院</p>
+            </div>
+          </div>
+          <div
+            class="lx_item"
+            @click="$router.push({path: '/home/study',query: {id: study_menu[4].id}})"
+          >
+            <div>
+              <img src="../../assets/images/home/jia_l.png">
+              <p v-if="study_menu.length>0">{{ study_menu[4].name }}学院</p>
             </div>
           </div>
         </div>
@@ -474,6 +474,7 @@ export default {
       this.$fetch("/dhr/client/study_tour/menu").then(res => {
         if (res.ErrCode == "0000") {
           this.yx_menu = res.Result.recruitStudent;
+          console.log( this.yx_menu)
         }
       });
     },
@@ -506,11 +507,15 @@ export default {
     },
 
     // 房产
-    hsTabClick(i = 0, pageName = "美国") {
+    hsTabClick(i = '', pageName = "不限") {
       if (!this.getcache("houseList", "house_data", pageName)) return;
+      console.log(i)
+      if (i) {
+        i -= 1
+      }
       this.houseListData(i, pageName);
     },
-    houseListData(i = 0, pageName = "美国") {
+    houseListData(i = '', pageName = "不限") {
       this.$fetch("/dhr/client/house/list", {
         belongCountry: i,
         page: 1,
@@ -528,15 +533,18 @@ export default {
       });
     },
     // 游学
-    yxBtnClick(index = 0, pageName = "幼儿") {
+    yxBtnClick(index = '', pageName = "不限") {
       if (!this.getcache("yxList", "yx_data", pageName)) return;
+      // if (index) {
+      //   index = index
+      // }
       this.yxListData(index, pageName);
     },
-    yxListData(index = 0, pageName = "幼儿") {
+    yxListData(index = '', pageName = "不限") {
       this.$fetch("/dhr/client/study_tour/list", {
         page: this.yx_page,
         limit: this.yx_limit,
-        recruitStudent: index + 1
+        recruitStudent: index
       }).then(res => {
         if (res.ErrCode == "0000") {
           this.yx_data = res.Result.data;
@@ -985,6 +993,7 @@ export default {
               overflow: hidden;
             }
             .tit {
+              height: 57px;
               font-size: 30px;
               font-weight: bold;
               margin-top: 18px;

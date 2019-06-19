@@ -26,7 +26,10 @@ export const screen_data = {
             merchant_id: '',
 
             allListData: [],
-            result_data: {}
+            result_data: {},
+
+            // 刷新
+            comReferer: true,
         }
     },
     created() {
@@ -35,6 +38,7 @@ export const screen_data = {
     },
 
     activated() {
+        this.result_data = {}
         console.log('activated执行')
         this.merchant_id = this.$route.query.merchant_id ? this.$route.query.merchant_id : false
 
@@ -73,36 +77,48 @@ export const screen_data = {
             next(vm => {
                 vm.merchant_id = false
                 vm.url = vm.url
+                vm.reload()
             })
         }
 
 
 
-        next()
+        next(
+            vm => {
+                vm.reload()
+
+            }
+        )
     },
     beforeRouteLeave(to, from, next) {
 
         if (sessionStorage.getItem('merchant_id')) {
             sessionStorage.removeItem('merchant_id')
         }
+
+        document.body.style.overflow = 'initial'
         next()
     },
     methods: {
+        reload() {
+            this.comReferer = false;
+            this.$nextTick(() => (this.comReferer = true));
+        },
         // 获取list数据
         getAllList(box) {
-            console.log(box)
+            // console.log(box)
             let params = {
                 page: this.page,
                 limit: this.limit
             };
             if (box) {
-                console.log(box)
+                // console.log(box)
                 let data = {};
                 for (let k in box) {
                     data[k] = box[k].id;
                 }
                 params = Object.assign(params, data);
-                console.log(params)
+                // console.log(params)
             }
 
             const mid = this.merchant_id
@@ -119,16 +135,20 @@ export const screen_data = {
                         this.allListData = this.allListData.concat(res.Result.data);
                         console.log(this.allListData)
                         this.count = res.Result.count / 1;
-                        // console.log('count-----' + this.count)
+
+
+                        console.log('count-----' + this.count)
                         // console.log("data----" + this.allListData.length)
                         this.loading = false;
+                        this.page++;
                         if (this.allListData.length >= this.count) {
                             this.finished = true;
+                  
                             console.log("无更多数据");
                         } else {
                             this.finished = false
                         }
-                        this.page++;
+                      
                     }
                 });
             }, 500);
@@ -136,6 +156,7 @@ export const screen_data = {
 
         get_result(data) {
             this.result_data = data;
+            // console.log(this.result_data)
             this.page = 1;
         },
 

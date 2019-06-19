@@ -1,6 +1,7 @@
 <template>
   <div class="house">
     <smenu
+      v-if="comReferer"
       :item="item"
       :country="menu.country"
       :athor="menu.housingDemand"
@@ -9,10 +10,14 @@
       :params1="'housingDemand'"
       :params2="'hoseType'"
       :params3="'cost'"
+      :what="1"
+      oneData="购房需求"
+      twoData="物业类型"
+      threeData="总价"
       @get_result="get_result"
     />
 
-    <div class="sx_result" v-if="Object.keys(result_data).length > 0">
+    <!-- <div class="sx_result" v-if="Object.keys(result_data).length > 0 && result_data">
       <h3>筛选结果</h3>
       <div class="condition">
         <div v-for="(item,i) of result_data" :key="i" class="sel" v-if="item.html != ''">
@@ -24,15 +29,15 @@
           </p>
         </div>
       </div>
-    </div>
-
+    </div>-->
+    <!-- 
     <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click="emptyall">
       <span></span>
       清空所有条件
-    </div>
+    </div>-->
 
     <div class="house_wrap">
-      <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3>
+      <!-- <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3> -->
       <van-list
         v-model="loading"
         :finished="finished"
@@ -84,14 +89,15 @@ export default {
   mixins: [screen_data],
   data() {
     return {
+      // 刷新
+      comReferer: true,
       item: ["国家", "购房需求", "物业类型", "总价"],
       url: `/dhr/client/house/list`,
       merchantUrl: `/dhr/client/house/list`,
-      menu: [], // 顶部筛选
+      menu: [] // 顶部筛选
       // merchant_id: $route.query.merchant_id ? $route.query.merchant_id: false
     };
   },
- 
 
   methods: {
     onLoad() {
@@ -101,7 +107,7 @@ export default {
     getMenuData() {
       this.$fetch("/dhr/client/house/menu").then(res => {
         this.menu = res.Result;
-        console.log(this.menu);
+        // console.log(this.menu);
       });
     },
     houstType(type) {
@@ -115,12 +121,17 @@ export default {
         case 4:
           return "双拼别墅";
       }
+    },
+    reload() {
+      this.comReferer = false;
+      this.$nextTick(() => (this.comReferer = true));
     }
   },
 
+
+
   created() {
     this.getMenuData();
-
   },
   components: {
     smenu

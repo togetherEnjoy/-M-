@@ -5,7 +5,7 @@
         <div class="imgs">
           <h3 v-if="mer_data.merchant">{{ mer_data.merchant.simpleName }}</h3>
         </div>
-        <span @click="makeShare"></span>
+        <!-- <span @click="makeShare"></span> -->
       </div>
 
       <div class="bigimg">
@@ -429,10 +429,12 @@ export default {
     },
 
     onLoad(pageName = "24h快讯") {
+         const { id } = this.$route.query;
       console.log("触发了");
       let params = {
         page: this.page,
-        limit: this.limit
+        limit: this.limit,
+        merchant_id: id
       };
       if (this.index == 0) {
         params = Object.assign(params, { by: "createdAt" });

@@ -8,7 +8,8 @@ const state = {
     house_menu: [],
     immig_menu: [],
     
-    number: ''
+    number: '',
+    set_country: ''
 }
 
 export default state

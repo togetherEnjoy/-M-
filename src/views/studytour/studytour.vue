@@ -1,6 +1,7 @@
 <template>
   <div class="studytour">
     <smenu
+     v-if="comReferer"
       :item="item"
       :athor="athor"
       :two="two"
@@ -9,9 +10,13 @@
       :params1="'recruitStudent'"
       :params2="'countyNum'"
       :params3="'theme'"
+      :what="2"
+      oneData="招生对象"
+      twoData="游学国家"
+      threeData="游学主题"
       @get_result="get_result"
     />
-    <div class="sx_result" v-if="Object.keys(result_data).length > 0">
+    <!-- <div class="sx_result" v-if="Object.keys(result_data).length > 0">
       <h3>筛选结果</h3>
       <div class="condition">
         <div v-for="(item,i) of result_data" :key="i" class="sel" v-if="item.html != ''">
@@ -23,15 +28,15 @@
           </p>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click="emptyall">
+    <!-- <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click="emptyall">
       <span></span>
       清空所有条件
-    </div>
+    </div> -->
 
     <div class="lx_content">
-      <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3>
+      <!-- <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3> -->
       <van-list
         v-model="loading"
         :finished="finished"

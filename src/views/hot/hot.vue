@@ -302,7 +302,7 @@ export default {
     })
   },
   beforeRouteLeave(to, from, next) {
-    document.title = this.title;
+    // document.title = this.title;
     next();
   },
   components: {

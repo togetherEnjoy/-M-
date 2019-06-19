@@ -14,3 +14,5 @@ export const IMMIG_MENU = "IMMIG_MENU"
 
 export const SET_NUMBER = "SET_NUMBER"
 
+export  const SET_COUNTRY = 'SET_COUNTRY'
+

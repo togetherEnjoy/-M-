@@ -8,13 +8,13 @@
     </div>
 
     <div class="loca_hot">
-      <div class="loca_city">
+      <!-- <div class="loca_city">
         <h3>定位城市</h3>
         <div class="city_wrap">
           <div class="l_city">{{nowCity}}</div>
           <p>重新定位</p>
         </div>
-      </div>
+      </div> -->
       <div class="hot_city">
         <h3>热门城市</h3>
         <ul>
@@ -59,9 +59,11 @@ export default {
         }
       });
       e.target.classList.add("redd");
+     
       this.nowCity = city;
       bus.$emit("sendCity", this.nowCity);
       this.$store.commit("SET_NUMBER", num);
+       this.close_city()
     },
     getCityCount() {
       this.$fetch("/dhr/showCity").then(res => {

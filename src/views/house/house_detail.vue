@@ -16,7 +16,7 @@
       <div class="d_t">
         <h3>{{ house_detail.title }}</h3>
         <div class="addr">
-          <p>{{ house_detail.belongCountryName }} • {{ house_detail.belongCityName }} {{ house_detail.labels }}</p>
+          <p>{{ house_detail.belongCountryName }} • {{ house_detail.belongCityName }} </p>
         </div>
 
         <div class="cans">
@@ -83,7 +83,7 @@
             交房时间：
             <span>{{ house_detail.deliveryTime }}</span>
           </p>
-          <p class="dbld">
+          <p class="dbld" v-if="house_detail.optionalRoomType">
             可选户型：
             <span
               v-for="(item,i) in useHx(house_detail.optionalRoomType)"
@@ -95,34 +95,34 @@
     </div>
 
     <div class="project">
-      <van-tabs v-model="active" title-active-color="#ED2530" :line-height="1" sticky>
+      <van-tabs v-model="active"  sticky  :line-height="1">
         <van-tab title="项目简介">
           <div class="content" v-html="house_detail.content"></div>
         </van-tab>
         <van-tab title="周边设施">
           <div class="zb_content">
             <div class="education">
-              <h3 v-if="peripheral">{{ peripheral.education.name }}</h3>
-              <p v-if="peripheral" v-html="peripheral.education.content"></p>
+              <h3 v-if="peripheral.education">{{ peripheral.education.name }}</h3>
+              <p v-if="peripheral.education" v-html="peripheral.education.content"></p>
             </div>
             <div class="shop">
-              <h3 v-if="peripheral">{{ peripheral.shopping.name }}</h3>
-              <p v-if="peripheral" v-html="peripheral.shopping.content"></p>
+              <h3 v-if="peripheral.education">{{ peripheral.shopping.name }}</h3>
+              <p v-if="peripheral.education" v-html="peripheral.shopping.content"></p>
             </div>
 
             <div class="leisure">
-              <h3 v-if="peripheral">{{ peripheral.leisuretime.name }}</h3>
-              <p v-if="peripheral" v-html="peripheral.leisuretime.content"></p>
+              <h3 v-if="peripheral.education">{{ peripheral.leisuretime.name }}</h3>
+              <p v-if="peripheral.education" v-html="peripheral.leisuretime.content"></p>
             </div>
 
             <div class="hospot">
-              <h3 v-if="peripheral">{{ peripheral.hospital.name }}</h3>
-              <p v-if="peripheral" v-html="peripheral.hospital.content"></p>
+              <h3 v-if="peripheral.education">{{ peripheral.hospital.name }}</h3>
+              <p v-if="peripheral.education" v-html="peripheral.hospital.content"></p>
             </div>
 
             <div class="traffic">
-              <h3 v-if="peripheral">{{ peripheral.traffic.name }}</h3>
-              <p v-if="peripheral" v-html="peripheral.traffic.content"></p>
+              <h3 v-if="peripheral.education">{{ peripheral.traffic.name }}</h3>
+              <p v-if="peripheral.education" v-html="peripheral.traffic.content"></p>
             </div>
           </div>
         </van-tab>
@@ -238,7 +238,7 @@ export default {
   },
   created() {
     this.getHouseDetail();
-    this.getSwipeData();
+    // this.getSwipeData();
   },
   methods: {
 
@@ -315,7 +315,7 @@ export default {
 
 <style lang="scss">
 .house_detail {
-  overflow-x: hidden;
+  // overflow-x: hidden;
   .custom-indicator {
     position: absolute;
     width: 90px;

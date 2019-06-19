@@ -24,6 +24,9 @@ const mutations = {
     },
     [types.SET_NUMBER] (state, number) {
         state.number = number
+    },
+    [types.SET_COUNTRY] (state,  country) {
+        state.set_country = country
     }
 
 }

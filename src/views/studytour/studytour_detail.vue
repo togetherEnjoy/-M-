@@ -19,7 +19,10 @@
 
         <p class="price">
           价格
-          <i><b>￥</b>{{ List_data.price }}</i>
+          <i>
+            <b>￥</b>
+            {{ List_data.price }}
+          </i>
           <span>{{ app._goTime(List_data.startTime,List_data.endTime) | goTime() }}天</span>
         </p>
       </div>
@@ -42,7 +45,8 @@
           </p>
           <p>
             出行日期:
-            <span>{{ _UTCformat(List_data.startTime) }} {{ _UTCformat(List_data.endTime).substr(5)}}</span>
+            <span>{{ _UTCformat(List_data.startTime,List_data.endTime) }}</span>
+            <!-- <span>{{ _UTCformat(List_data.startTime) }} {{ _UTCformat(List_data.endTime).substr(5)}}</span> -->
           </p>
         </div>
       </div>
@@ -109,7 +113,9 @@ export default {
       detailedDescription: {},
       href: location.href,
       centerImg: require("../../assets/images/studytour/tour.png"),
-      backURL: "/home/studytour"
+      backURL: "/home/studytour",
+
+      UTCTime: ''
     };
   },
 
@@ -129,8 +135,10 @@ export default {
         }
       });
     },
-    _UTCformat(t) {
-      return UTCformat(t);
+    _UTCformat(start, end) {
+      this.UTCTime = UTCformat(start) + " " + UTCformat(end).substr(5);
+      console.log(this.UTCTime)
+      return this.UTCTime;
     }
   },
   filters: {
@@ -203,7 +211,6 @@ export default {
           font-weight: bold;
           b {
             font-size: 24px;
-            
           }
         }
         span {

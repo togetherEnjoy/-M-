@@ -1,6 +1,7 @@
 <template>
   <div class="study">
     <smenu
+      v-if="comReferer"
       :item="item"
       :country="country"
       :athor="athor"
@@ -11,10 +12,14 @@
       :more="true"
       :params1="'schoolType'"
       :params2="'rank'"
+      :what="1"
+      oneData="类别"
+      twoData="国内排名"
+      threeData="更多"
       @get_result="get_result"
     />
 
-    <div class="sx_result" v-if="Object.keys(result_data).length > 0">
+    <!-- <div class="sx_result" v-if="Object.keys(result_data).length > 0">
       <h3>筛选结果</h3>
       <div class="condition">
         <div v-for="(item,i) of result_data" :key="i" class="sel" v-if="item.html != ''">
@@ -26,8 +31,8 @@
           </p>
         </div>
       </div>
-    </div>
-
+    </div>-->
+    <!-- 
     <div
       class="thinklike"
       v-if="Object.keys(result_data).length > 0"
@@ -35,10 +40,10 @@
     >
       <span></span>
       清空所有条件
-    </div>
+    </div>-->
 
     <div class="study_wrap">
-      <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3>
+      <!-- <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3> -->
       <van-list
         v-model="loading"
         :finished="finished"
@@ -107,7 +112,7 @@ export default {
   },
   methods: {
     onLoad() {
-      if (this.$route.query.id+1) {
+      if (this.$route.query.id + 1) {
         let id = this.$route.query.id;
         this.result_data.hostCountryNum = this.filterCountry(id);
       }
@@ -166,8 +171,7 @@ export default {
       }
     }
   },
-  activated() {
-  },
+  activated() {},
   watch: {
     $route(val) {
       // console.log(val);

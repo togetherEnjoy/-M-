@@ -102,7 +102,9 @@
 
     <!-- 咨询 -->
     <con
+      v-if="content.merchant"
       :simpleName="content.merchant.simpleName"
+      :id="content.merchant.id"
       :showCity="content.showCity"
       :head_img="content.merchant.headPortrait"
       :myphone="content.merchant.phone"
