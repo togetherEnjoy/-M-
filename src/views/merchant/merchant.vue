@@ -7,18 +7,29 @@
         </div>
         <!-- <span @click="makeShare"></span> -->
       </div>
-
-      <div class="bigimg">
-        <img src="../../assets/images/merchant/banner.png">
+      <div v-if="banner.length <= 0">
+        <img src="../../assets/images/merchant/banner.png" />
+      </div>
+      <div class="bigimg" v-if="banner.length>0">
+        <van-swipe indicator-color="white" :autoplay="3000">
+          <van-swipe-item v-for="(item, index) in banner" :key="index">
+            <div class="banner_box">
+              <a href="javascript:;">
+                <img v-lazy="item" />
+                <!-- <img src="../../assets/images/home/" alt=""> -->
+              </a>
+            </div>
+          </van-swipe-item>
+        </van-swipe>
       </div>
 
       <div class="m_sl">
         <div class="sl_item">
-          <p class="num">{{ mer_data.softLanguageBer }}</p>
+          <p class="num">{{ mer_data.pageNumber }}</p>
           <p class="txt">产品数</p>
         </div>
         <div class="sl_item">
-          <p class="num">{{ mer_data.pageNumber }}</p>
+          <p class="num">{{ mer_data.softLanguageBer }}</p>
           <p class="txt">文章数</p>
         </div>
         <div class="sl_item">
@@ -30,7 +41,7 @@
 
     <div class="house">
       <div class="top_bar">
-        <h1>海外{{ titleName }}</h1>
+        <h1>产品精选</h1>
         <p
           style="cursor:pointer"
           @click="$router.push({path: titleURL,query:{merchant_id:$route.query.id}})"
@@ -45,14 +56,14 @@
                 class="list_box"
                 v-for="(item, i) in house_data"
                 :key="i"
-                @click="$router.push({name: 'housedetail',params: {id: item.id}})"
+                @click="$router.push({name: 'housedetail',query: {id: item.id}})"
               >
                 <div class="l_left">
-                  <img v-lazy="item.coverImg">
+                  <img v-lazy="item.coverImg" />
                   <p>{{ item.belongCountryName }}·{{ item.belongCityName }}</p>
                 </div>
                 <div class="l_right">
-                  <h3 class="tit">{{ item.title }}</h3>
+                  <h3 class="tit text_overflow">{{ item.title }}</h3>
                   <p
                     class="de"
                   >{{ houstType(item.hoseType) }} | {{ item.propertyRightYears }} | {{ item.minArea }}m-{{ item.maxArea }}m</p>
@@ -79,11 +90,11 @@
               class="card_wrap"
               v-for="(item,i) in immig_data"
               :key="i"
-              @click="$router.push({path: '/home/immig/detail'})"
+              @click="$router.push({path: '/sz/immig/detail',query: {id: item.id,merchant_id:mer_data.merchant.id}})"
             >
               <div class="card_item">
                 <div class="imgs">
-                  <img v-lazy="item.imgs">
+                  <img v-lazy="item.imgs" />
                 </div>
 
                 <div class="txt">
@@ -94,19 +105,19 @@
 
               <div class="card_ds">
                 <div>
-                  <p class="m">{{ item.handlingCycle }}个月</p>
+                  <p class="m text_overflow">{{ item.handlingCycle }}个月</p>
                   <p>办理周期</p>
                 </div>
                 <div>
-                  <p class="m">{{ item.identityType }}</p>
+                  <p class="m text_overflow">{{ item.identityType }}</p>
                   <p>身份类别</p>
                 </div>
                 <div>
-                  <p class="m">{{ item.investmentQuota }}万澳币</p>
+                  <p class="m text_overflow">{{ item.investmentQuota }}万澳币</p>
                   <p>投资额度</p>
                 </div>
                 <div>
-                  <p class="m">{{ item.demand }}</p>
+                  <p class="m text_overflow">{{ item.demand }}</p>
                   <p>居住要求</p>
                 </div>
               </div>
@@ -119,11 +130,11 @@
               class="study_item"
               v-for="(item,i) in study_data"
               :key="i"
-              @click="$router.push({path: `/home/study/${item.id}`})"
+              @click="$router.push({path: `/sz/study/detail`,query: {id:item.id,merchant_id:mer_data.merchant.id}})"
             >
               <div class="imgs">
                 <div class="imgs_box">
-                  <img v-lazy="item.schoolBadgeImg">
+                  <img v-lazy="item.schoolBadgeImg" />
                 </div>
               </div>
 
@@ -151,10 +162,10 @@
               class="lx_c_item"
               v-for="(item, i) in studyTour_data"
               :key="i"
-              @click="$router.push({path: `/home/studytour/${item.id}`})"
+              @click="$router.push({path: `/sz/studytour/${item.id}`})"
             >
               <div class="imgs">
-                <img v-lazy="item.coverImg">
+                <img v-lazy="item.coverImg" />
               </div>
               <div class="lx_r">
                 <p class="tit">{{ item.title }}</p>
@@ -165,7 +176,7 @@
                     <b>￥</b>
                     {{ item.price }}
                   </i>
-                  <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}</span>
+                  <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}天</span>
                 </p>
               </div>
             </div>
@@ -179,8 +190,8 @@
 
     <div class="hai_hot house">
       <div class="top_bar">
-        <h1>海外热门</h1>
-        <p style="cursor:pointer" v-on:click="$router.push({path: '/news'})">探索更多海外热门</p>
+        <h1>海外头条</h1>
+        <!-- <p style="cursor:pointer" v-on:click="$router.push({path: '/sz/news'})">探索更多海外热门</p> -->
       </div>
 
       <van-tabs :line-height="0" :line-width="0" @click="tabBtnClick" animated>
@@ -192,7 +203,7 @@
             @load="onLoad"
             :offset="10"
           >
-            <div>
+            <div class="list_item">
               <div v-if="list_data.length > 0" v-for="(list, i) in list_data" :key="i">
                 <div class="hot_wrap">
                   <div
@@ -201,20 +212,20 @@
                     v-if="!list.coverImg1 && !list.coverImg2"
                   >
                     <div class="item_left">
-                      <p class="txt" v-text="list.name"></p>
+                      <p class="txt txt_double" v-text="list.name"></p>
                       <p class="hover">
-                        {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
-                        <span>评论数：{{list.commentCount}}</span>
+                        {{ list.merchant.simpleName }} · {{_getDateDiff(list.createdAt)}}
+                        <span>评论数：{{list.comment.length}}</span>
                       </p>
                     </div>
                     <div class="item_right">
-                      <img v-lazy="list.coverImg">
+                      <img v-lazy="list.coverImg" />
                     </div>
                   </div>
 
                   <div
                     class="hot_all"
-                    @click="$router.push({path:  `/news/newsd`,query: {id: list.id, index}})"
+                    @click="$router.push({path:  `/sz/news/newsd`,query: {id: list.id, index}})"
                     v-if="list.coverImg && list.coverImg1 && list.coverImg2"
                     :key="i"
                   >
@@ -223,19 +234,19 @@
                     </div>
                     <div class="all_c">
                       <div>
-                        <img v-lazy="list.coverImg">
+                        <img v-lazy="list.coverImg" />
                       </div>
                       <div>
-                        <img v-lazy="list.coverImg1">
+                        <img v-lazy="list.coverImg1" />
                       </div>
                       <div>
-                        <img v-lazy="list.coverImg2">
+                        <img v-lazy="list.coverImg2" />
                       </div>
                     </div>
                     <div class="all_b">
                       <p class="hover">
-                        {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
-                        <span>评论数：{{list.commentCount}}</span>
+                        {{ list.merchant.simpleName }} · {{_getDateDiff(list.createdAt)}}
+                        <span>评论数：{{list.comment.length}}</span>
                       </p>
                     </div>
                   </div>
@@ -246,6 +257,33 @@
         </van-tab>
       </van-tabs>
     </div>
+
+    <con
+      v-if="mer_data.merchant"
+      :id="mer_data.merchant.id"
+      :simpleName="mer_data.merchant.simpleName"
+      :hot="mer_data.browseNumber"
+      :head_img="mer_data.merchant.headPortrait"
+      :myphone="mer_data.merchant.xuNiPhone"
+      :typeOf="1"
+      :sourceTitle="mer_data.merchant.simpleName + '商户主页'"
+      :showCity="$store.state.cityName"
+      :sourceDescription="href"
+    />
+
+    <!-- <con
+      v-if="merchant_data[0]"
+      :simpleName="simpleName"
+      :head_img="head_img"
+      :id="merchant_data[0].id"
+      :hot="hot"
+      :myphone="merchant_data[0].phone"
+      :typeOf="5"
+      ref="con"
+      :showCity="showCity"
+      :sourceDescription="sourceDescription"
+      :sourceTitle="detail_data.schoolName"
+    />-->
   </div>
 </template>
 
@@ -254,10 +292,14 @@ import { Tab, Tabs } from "vant";
 import { getDateDiff } from "../../api/api.js";
 import { mapMutations, mapGetters } from "vuex";
 import NativeShare from "nativeshare";
+import con from "../../components/conf";
+import { setShareTitle } from "../../utils/mixins";
 export default {
+  mixins: [setShareTitle],
   inject: ["app"],
   data() {
     return {
+      href: location.href,
       merchant: ["房产", "移民", "留学", "游学", "医疗", "婚礼", "定制游"],
       hot: ["24h快讯", "房产", "游学", "移民", "留学", "医疗"],
       isLoading: false,
@@ -268,6 +310,7 @@ export default {
       limit: 10,
       count: "",
       list_data: [],
+      banner: [],
 
       sendURL: [
         `/dhr/client/house/list`,
@@ -283,10 +326,14 @@ export default {
       all_data: ["house_data", "immig_data", "study_data", "studyTour_data"],
 
       titleName: "房产",
-      titleURL: "/home/house",
+      titleURL: "/sz/house",
       // 缓存
       all_cache: {},
-      mer_data: []
+      mer_data: [],
+
+      // 商家名
+      companyName: "",
+      describe: ""
     };
   },
   computed: {
@@ -296,6 +343,21 @@ export default {
     ...mapGetters(["list"])
   },
 
+  metaInfo() {
+    return {
+      title: `${this.simpleName}${this.describe ? "-" + this.describe : ""}`,
+      meta: [
+        {
+          name: "keywords",
+          content: `${this.companyName}，业务一，业务二`
+        },
+        {
+          name: "description",
+          content: ``
+        }
+      ]
+    };
+  },
   methods: {
     // 通用分享
     makeShare(command) {
@@ -345,6 +407,28 @@ export default {
         console.log(res);
         if (res.ErrCode == "0000") {
           this.mer_data = res.Result;
+
+          console.log(this.mer_data);
+
+          if (res.Result.merchant.headImg) {
+            this.banner = this.banner.concat(
+              Object.values(JSON.parse(res.Result.merchant.headImg))
+            );
+          }
+          this.simpleName = this.mer_data.merchant.simpleName;
+          this.companyName = this.mer_data.merchant.companyName;
+
+          console.log(this.simpleName);
+          this.describe = this.mer_data.merchant.describe
+            ? this.mer_data.merchant.describe
+            : "";
+          console.log(this.describe);
+          // ios
+          this.iosTitleImg(
+            this.simpleName + this.describe,
+            this.companyName + this.describe,
+            this.mer_data.merchant.headPortrait
+          );
         }
       });
     },
@@ -398,13 +482,13 @@ export default {
     onTabClick(i, pageName) {
       this.titleName = pageName;
       if (i == 0) {
-        this.titleURL = "/home/house";
+        this.titleURL = "/sz/house";
       } else if (i == 1) {
-        this.titleURL = "/home/immig";
+        this.titleURL = "/sz/immig";
       } else if (i == 2) {
-        this.titleURL = "/home/study";
+        this.titleURL = "/sz/study";
       } else if (i == 3) {
-        this.titleURL = "/home/studytour";
+        this.titleURL = "/sz/studytour";
       }
       console.log(this.titleName);
 
@@ -429,12 +513,13 @@ export default {
     },
 
     onLoad(pageName = "24h快讯") {
-         const { id } = this.$route.query;
+      const { id } = this.$route.query;
       console.log("触发了");
       let params = {
         page: this.page,
         limit: this.limit,
-        merchant_id: id
+        merchant_id: id,
+        checkState: 1
       };
       if (this.index == 0) {
         params = Object.assign(params, { by: "createdAt" });
@@ -455,19 +540,22 @@ export default {
           this.count = data.count / 1;
           this.list_data = this.list_data.concat(data.data);
           this.loading = false;
+          console.log(this.list_data);
           // localStorage.setItem("list", JSON.stringify(this.list_data));
 
-          if (this.list_data.length >= this.count) {
+          if (this.list_data.length >= this.count || data.data.length == 0) {
             this.finished = true;
             console.log("无更多数据");
           }
           this.page++;
-          this.set_list({
-            list: this.list_data || [],
-            pageName: this.pageName || pageName,
-            page: this.page,
-            count: this.count
-          });
+          if (this.list_data.length > 0) {
+            this.set_list({
+              list: this.list_data || [],
+              pageName: this.pageName || pageName,
+              page: this.page,
+              count: this.count
+            });
+          }
         });
       }, 500);
     },
@@ -500,11 +588,11 @@ export default {
     },
     getDetails(id, name) {
       this.$router.push({
-        path: `/news/newsd`,
+        path: `/sz/news/newsd`,
         query: { id, index: this.index }
       });
-      localStorage.setItem("title", name);
-      this.set_title(name || localStorage.getItem("title"));
+      // localStorage.setItem("title", name);
+      // this.set_title(name || localStorage.getItem("title"));
     },
 
     _getDateDiff(t) {
@@ -520,7 +608,8 @@ export default {
   },
   components: {
     [Tab.name]: Tab,
-    [Tabs.name]: Tabs
+    [Tabs.name]: Tabs,
+    con
   }
 };
 </script>
@@ -529,6 +618,9 @@ export default {
   .van-tabs__nav--line {
     padding: 30px 0 !important;
     // margin-right: 30px;
+  }
+  .van-list {
+    padding-bottom: 150px;
   }
   .van-tab {
     display: inline-block;
@@ -573,7 +665,7 @@ export default {
       align-items: center;
       padding: 0 30px;
       .imgs {
-        width: 177px;
+        // width: 177px;
         // height: 35px;
         h3 {
           font-size: 36px;
@@ -588,6 +680,14 @@ export default {
     }
     .bigimg {
       height: 265px;
+      .banner_box {
+        height: 265px;
+
+        img {
+          height: 100%;
+          width: 100%;
+        }
+      }
     }
     .m_sl {
       display: flex;
@@ -614,6 +714,9 @@ export default {
 
   // 海外热门
   .hai_hot {
+    .list_item {
+      // padding-bottom: 150px;
+    }
     margin-top: 30px;
     .house_ca {
       margin-top: 38px;
@@ -855,6 +958,7 @@ export default {
             }
           }
           .txt {
+            width: 90%;
             position: absolute;
             left: 50%;
             top: 50%;
@@ -892,6 +996,7 @@ export default {
           align-items: center;
           text-align: center;
           & > div {
+            width: 25%;
             color: #9399a5;
             font-size: 24px;
             .m {
@@ -914,6 +1019,7 @@ export default {
           padding-top: 0;
         }
         .imgs {
+          margin-top: 8px;
           width: 140px;
           height: 140px;
           border-radius: 50%;

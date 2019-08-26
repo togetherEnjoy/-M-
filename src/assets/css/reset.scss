@@ -40,12 +40,13 @@ aside,
   background-color: transparent;
 }
 
-body {
+html,body {
     font-size: 12px;
     font-family: "Microsoft YaHei", sans-serif;
     color: #0D1C31;
-    -webkit-overflow-scrolling: touch;
+    // -webkit-overflow-scrolling: touch;
     overflow:auto;
+    // scroll-behavior: smooth;
     
 }
 
@@ -148,8 +149,11 @@ img {
       white-space:nowrap
     }
     .txt_double {
-      overflow:hidden;
-      text-overflow:ellipsis;
+      overflow: hidden;
+      text-overflow: ellipsis;
+       display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
 
     // 隐藏滚动条
@@ -159,3 +163,18 @@ img {
         display: none;
       }
     }
+    .login-enter-active{
+      transition: all .5s;
+    }
+
+    .login-enter-active-to,.login-leave-active {
+      // opacity: 0;
+      transform: translateX(0);
+      transition: all .5s;
+    }
+    .login-enter,.login-leave-to {
+      // opacity: 0;
+      // position:absolute;
+      transform: translateX(-100%);
+    }
+

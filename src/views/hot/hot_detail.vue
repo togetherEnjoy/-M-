@@ -1,9 +1,9 @@
 <template>
   <div class="hot_detail" ref="hotD">
     <div class="top_bar">
-      <div class="t_l" @click="$router.push({path: '/news'})"></div>
+      <div class="t_l" @click="$router.push({path: `/`})"></div>
       <div class="t_c">
-        <img src="../../assets/images/hot/tit2.png">
+        <img src="../../assets/images/hot/blacktit.png" />
       </div>
       <div class="t_r">
         <span class="search"></span>
@@ -38,13 +38,13 @@
             <div class="item_left">
               <p class="txt">{{ list.name }}</p>
               <p class="hover">
-                <i v-if="list.simpleName">{{ list.simpleName }}</i>
+                <i v-if="list.merchant.simpleName">{{ list.merchant.simpleName }}</i>
                 · {{ _getDateDiff(list.createdAt) }}
-                <span>评论数：{{ list.commentCount }}</span>
+                <span>评论数：{{ list.comment.length }}</span>
               </p>
             </div>
             <div class="item_right">
-              <img :src="list.coverImg">
+              <img :src="list.coverImg" />
             </div>
           </div>
 
@@ -54,20 +54,20 @@
             </div>
             <div class="all_c">
               <div>
-                <img :src="list.coverImg">
+                <img :src="list.coverImg" />
               </div>
               <div>
-                <img :src="list.coverImg1">
+                <img :src="list.coverImg1" />
               </div>
               <div>
-                <img :src="list.coverImg2">
+                <img :src="list.coverImg2" />
               </div>
             </div>
             <div class="all_b">
               <p class="hover">
-                <i>{{ list.simpleName }}</i>
+                <i>{{ list.merchant.simpleName }}</i>
                 · {{ _getDateDiff(list.createdAt) }}
-                <span>评论数：{{ list.commentCount }}</span>
+                <span>评论数：{{ list.comment.length }}</span>
               </p>
             </div>
           </div>
@@ -82,7 +82,7 @@
         <div class="human">
           <div class="heads">
             <div class="heads_box">
-              <img src="../../assets/images/hot/common.png">
+              <img src="../../assets/images/hot/common.png" />
             </div>
           </div>
           <p>热心网友</p>
@@ -103,14 +103,16 @@
     <!-- 咨询 -->
     <con
       v-if="content.merchant"
-      :simpleName="content.merchant.simpleName"
+      :simpleName="simpleName"
       :id="content.merchant.id"
       :showCity="content.showCity"
       :head_img="content.merchant.headPortrait"
-      :myphone="content.merchant.phone"
+      :myphone="content.merchant.xuNiPhone||phone"
       :sourceDescription="href"
-      :typeOf="index"
+      :typeOf="5"
       :hot="content.hot"
+      :sourceTitle="content.name"
+      :sourceDetailed="1"
     />
 
     <!-- 评论组 -->
@@ -122,6 +124,10 @@
     </div>
 
     <div class="mask" @click="down" @touchmove.prevent></div>
+
+    
+      <top  v-show="stop"/>
+
   </div>
 </template>
 
@@ -134,7 +140,11 @@ import { mapGetters, mapMutations } from "vuex";
 import { type } from "os";
 import con from "../../components/conf";
 import wxApi from "../../common/wxapi.js";
+import { setCountryMode, phone, setShareTitle } from "../../utils/mixins";
+import top from "../../components/scrolltop";
+
 export default {
+  mixins: [setCountryMode, phone, setShareTitle],
   data() {
     return {
       href: location.href,
@@ -149,63 +159,54 @@ export default {
       head_img: require("../../assets/images/hot/logo2.png"),
       hot_content_list: [],
 
-      index: this.$route.query.index
+      index: 3,
+
+      simpleName: "",
+      hotTitle: "",
+      stop: false
     };
   },
   mounted() {
-    wxApi.wxRegister(this.wxRegCallback);
+    window.addEventListener("scroll", () => {
+      this.stop = document.scrollingElement.scrollTop > 800;
+    });
   },
+
   computed: {
     tit() {
       return this.title;
     },
     ...mapGetters(["list", "title"])
   },
+  metaInfo() {
+    return {
+      title:
+        this.content.merchant &&
+        this.hotTitle + "-" + this.content.merchant.simpleName + "-去海外网"
+      // meta: [{
+      //         name: "keywords",
+      //         content: this.keywords
+      //     },
+      //     {
+      //         name: "description",
+      //         content: this.description
+      //     }
+      // ]
+    };
+  },
   methods: {
-    wxRegCallback() {
-      // 用于微信JS-SDK回调
-      this.wxShareTimeline();
-      this.wxShareAppMessage();
-    },
-    wxShareTimeline() {
-      let option = {
-        title: "限时团购周 挑战最低价",
-        link: window.location.href,
-        imgUrl: this.content.coverImg,
-        success: () => {
-          console.log("分享成功");
-        },
-        error: () => {
-          console.log("分享失败");
-        }
-      };
-
-      wxApi.ShareTimeline(option);
-    },
-    wxShareAppMessage() {
-      let option = {
-        title: "限时团购周 挑战最低价",
-        link: location.href,
-        imgUrl: this.content.coverImg,
-        desc: "略略略",
-        success: () => {
-          console.log("分享成功");
-          this.$toast("分享成功");
-        },
-        error: () => {
-          console.log("分享失败");
-          this.$toast("分享失败");
-        }
-      };
-
-      wxApi.ShareAppMessage(option);
-    },
-
     reload(id, name) {
-      localStorage.setItem("title", name);
-      this.set_tit(name || localStorage.getItem("title"));
-      this.$router.replace({ path: `/news/newsd`, query: { id } });
-      this.$router.go(0);
+      console.log(name);
+      let type = this.$route.query.type;
+      this.hotTitle = name;
+      // localStorage.setItem("title", name);
+      // this.set_tit(name || localStorage.getItem("title"));
+      this.$router.push({
+        path: `/${this.cityJX}/news/${type}/newsd`,
+        query: { id }
+      });
+      this.getDetails();
+      // this.$router.go(0);
     },
 
     // 加载更多评论
@@ -216,9 +217,14 @@ export default {
     // 获取评论api
     getComment() {
       this.$fetch(
-        `/dhr/client/comment/list?soft_language_id=${this.content.id}`
+        `/dhr/client/comment/list?soft_language_id=${this.content.id}`,
+        {
+          page: 1,
+          limit: 50
+        }
       ).then(res => {
         this.comment = res.Result.data;
+        console.log(this.comment);
         this.count = res.Result.count;
       });
     },
@@ -250,14 +256,28 @@ export default {
       this.$fetch(`/dhr/client/article/${id}`).then(res => {
         if (res.ErrCode == "0000") {
           this.content = res.Result;
-          console.log(this.content);
-          this.set_tit(this.content.name); //讲name保存到 vuex中
+          console.log(this.content)
+          this.hotTitle = this.content.name;
+
           this.simpleName = this.content.merchant.simpleName;
           this.getComment();
+          // androd
+          // this.titleImg(this.content.name + "-去海外网", this.content.coverImg);
+          // localStorage.setItem("desc", this.content.describe);
+
+          // ios
+          this.iosTitleImg(
+            this.content.name +
+              "-" +
+              this.content.merchant.simpleName +
+              "-去海外网",
+            this.content.describe,
+            this.content.coverImg,
+            this.content.merchant_id
+          );
         }
       });
     },
-
     getUpCom() {
       let hotD = this.$refs.hotD;
       let inp = this.$refs.inp;
@@ -278,36 +298,43 @@ export default {
     // 获取列表
     getList() {
       let { index } = this.$route.query;
+      console.log(index);
       let params = {
         page: this.page,
-        limit: this.limit
+        limit: this.limit,
+        checkState: 1
       };
-      if (this.index == 0) {
+      if (index == 0) {
         params = Object.assign(params, { by: "createdAt" });
       } else {
         params = Object.assign(params, { cate: index });
       }
-      this.$fetch(`/dhr/client/article/list`, params)
-
-        .then(res => {
-          if (res.Result.data.length > 0) {
-            this.list_data = res.Result.data;
-            this.hot_content_list = this.list_data;
-          }
-        })
-        .catch(err => {});
+      console.log(params);
+      this.$fetch(`/dhr/client/article/list`, params).then(res => {
+        console.log(res);
+        if (res.Result.data.length > 0) {
+          this.list_data = res.Result.data;
+          this.hot_content_list = this.list_data;
+          console.log(this.hot_content_list);
+        }
+      });
     },
     ...mapMutations({
       set_tit: "SET_TITLE"
     })
   },
-  beforeRouteLeave(to, from, next) {
-    document.title =
-      "去海外网，海外房产，移民，留学，游学，东南亚，美国，英国，澳洲，加拿大，日本，希腊，圣基茨，塞浦路斯";
-    next();
+  destroyed() {
+    localStorage.removeItem("desc");
+    // window.removeEventListener("scroll");
   },
+  // beforeRouteLeave(to, from, next) {
+  //   document.title =
+  //     "去海外网，海外房产，移民，留学，游学，东南亚，美国，英国，澳洲，加拿大，日本，希腊，圣基茨，塞浦路斯";
+  //   next();
+  // },
   beforeRouteEnter(to, from, next) {
     next(vm => {
+      console.log(vm.content);
       document.title = vm.tit || localStorage.getItem("title") || "";
       // document.body.scrollTop = 0;
       // document.documentElement.scrollTop = 0;
@@ -319,7 +346,8 @@ export default {
     this.getDetails();
   },
   components: {
-    con
+    con,
+    top
   }
 };
 </script>
@@ -334,9 +362,11 @@ export default {
 
 <style scoped lang="scss">
 .hot_detail {
-  overflow: auto;
+  // overflow: hidden;
+  // height: 100vh;
   // position: relative;
   padding-bottom: 190px;
+  scroll-behavior: smooth;
   &.open .mask {
     visibility: visible;
     background-color: rgba(0, 0, 0, 0.4);
@@ -404,7 +434,7 @@ export default {
     background-color: #fff;
     padding: 30px;
     h3 {
-      font-size: 30px;
+      font-size: 38px;
       line-height: 60px;
       font-weight: bold;
     }
@@ -540,7 +570,6 @@ export default {
           justify-content: center;
           align-items: center;
           .heads_box {
-
           }
           img {
             // display: block;

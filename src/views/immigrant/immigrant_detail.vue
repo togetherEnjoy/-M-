@@ -1,11 +1,14 @@
 <template>
   <div class="immg_detail">
-    <city ref="city"/>
-    <publicHead :centerImg="centerImg" backURL="/home/immig"/>
+    <city ref="city" />
+    <publicHead
+      :centerImg="centerImg"
+      :backURL="`/${cityJx}/immig/${$route.query.country}?hostCountryNum=${$route.query.active}`"
+    />
     <div class="ser_img_wrap">
       <div class="card_item">
         <div class="imgs">
-          <img v-lazy="immig_detail.imgs">
+          <img v-lazy="immig_detail.imgs" />
         </div>
 
         <div class="txt">
@@ -28,11 +31,13 @@
           <div>
             <div class="c_ch os">
               <p>办理周期</p>
-              <p class="m">{{ immig_detail.handlingCycle }}个月</p>
+              <p class="m">{{ immig_detail.handlingCycle }}</p>
             </div>
             <div class="c_ch">
               <p>投资额度</p>
-              <p class="m">{{ immig_detail.investmentQuota }}万澳币</p>
+              <p
+                class="m"
+              >{{ immig_detail.investmentQuota == '无' ?immig_detail.investmentQuota: '￥'+immig_detail.investmentQuota+'万' }}</p>
             </div>
           </div>
           <div>
@@ -55,18 +60,21 @@
         <div class="s_huan" ref="change">
           <p @click="referer">换一换</p>
           <span
-            @click="$router.push({path: '/home/immigmore', query:{id,sourceDescription,showCity}})"
+            @click="$router.push({path: `/${cityJx}/immigmore`, query:{id,sourceDescription,showCity,sourceTitle:immig_detail.name}})"
           >更多</span>
         </div>
       </div>
 
-      <div class="s_item" v-for="(item,i) in merchant_data.slice(0, 4)" :key="i">
-        <div class="heads_img">
-          <img v-lazy="item.headPortrait">
+      <div class="s_item" v-for="(item,i) in merchant_data" :key="i">
+        <div
+          class="heads_img"
+          @click="$router.push({path: `/${cityJX}/merchant`,query:{id:item.id}})"
+        >
+          <img v-lazy="item.headPortrait" />
         </div>
 
         <div class="text">
-          <h3>{{ item.companyName }}</h3>
+          <h3>{{ item.simpleName }}</h3>
           <p>咨询量：{{ item.actualNumber }}</p>
         </div>
 
@@ -76,7 +84,7 @@
           </span>
           <span class="pb" @click="clickRate(item.id)">
             <!-- <i class="phone"></i> -->
-            <a :href="`tel:${item.phone}`" class="phone"></a>
+            <a :href="`tel:${item.xuNiPhone||phone}`" class="phone"></a>
           </span>
         </div>
       </div>
@@ -105,11 +113,13 @@
       :id="merchant_data[0].id"
       :head_img="head_img"
       :hot="hot"
-      :myphone="merchant_data[0].phone"
+      :myphone="merchant_data[0].xuNiPhone ||phone"
       :typeOf="2"
       ref="con"
       :showCity="immig_detail.showCity"
       :sourceDescription="sourceDescription"
+      :sourceTitle="immig_detail.name"
+      :sourceDetailed="2"
     />
   </div>
 </template>
@@ -117,13 +127,18 @@
 <script>
 import { Tab, Tabs } from "vant";
 import con from "../../components/conf";
-import { setTimeout } from "timers";
-import { referer, clickRate } from "../../utils/mixins";
+import {
+  referer,
+  clickRate,
+  setCountryMode,
+  phone,
+  setShareTitle
+} from "../../utils/mixins";
 import publicHead from "../../components/public_detail_head";
 import city from "../../components/city_station";
 const url = `/dhr/client/migrate/`;
 export default {
-  mixins: [referer,clickRate],
+  mixins: [referer, clickRate, setCountryMode, phone, setShareTitle],
   data() {
     return {
       active: 0,
@@ -145,17 +160,46 @@ export default {
       sourceDescription: location.href,
       showCity: "",
 
-      centerImg: require("../../assets/images/immig/immig_center.png")
+      centerImg: require("../../assets/images/immig/immig_center.png"),
+
+      mer_name: this.$route.query.mer_name || ""
     };
   },
+  metaInfo() {
+    return {
+      title: this.immig_detail.name + "-去海外网",
+      meta: [
+        {
+          name: "keywords",
+          content:
+            this.immig_detail.labels +
+            ",移民申请条件，移民申请流程，移民费用详情，移民参考服务费，投资移民，技术移民,投资移民政策，移民供应商，去海外网"
+        },
+        {
+          name: "description",
+          content: `去海外网留学为您提供美国移民项目介绍，美国移民申请条件，美国移民申请流程，美国移民政策等内容，更多精彩移民信息，就上去海外网。`
+        }
+      ]
+    };
+  },
+
   methods: {
     getImmigDetail() {
-      console.log(this.id)
+      console.log(this.id);
       this.$fetch(url + this.id).then(res => {
         if (res.ErrCode == "0000") {
           this.immig_detail = res.Result;
           console.log(this.immig_detail);
           this.showCity = this.immig_detail.showCity;
+
+          // this.titleImg( this.immig_detail.name + "-去海外网",this.immig_detail.imgs);
+
+          // ios
+          this.iosTitleImg(
+            this.immig_detail.name + (this.mer_name ? ("-" + this.mer_name + "-去海外网") : "-去海外网"),
+            this.desc.immigd,
+            this.immig_detail.imgs
+          );
         }
       });
     },
@@ -166,6 +210,7 @@ export default {
     }
   },
   created() {
+    console.log(this.$route.query.country);
     this.getImmigDetail();
     this.getMerchantData();
   },
@@ -220,6 +265,7 @@ export default {
         top: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
+        width: 90%;
         h1 {
           font-size: 48px;
           font-weight: bold;
@@ -239,7 +285,7 @@ export default {
         p {
           line-height: 36px;
           font-size: 24px;
-          width: 195px;
+          width: 350px;
           margin: 10px auto 0;
         }
       }
@@ -413,6 +459,7 @@ export default {
     .content {
       padding: 20px 30px;
       font-size: 30px;
+      min-height: 100vh;
       .imgs {
         width: 480px;
         height: 320px;

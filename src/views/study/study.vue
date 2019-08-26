@@ -2,6 +2,8 @@
   <div class="study">
     <smenu
       v-if="comReferer"
+      setCountrymod="hostCountryNum"
+      setCitymod="hostCityNum"
       :item="item"
       :country="country"
       :athor="athor"
@@ -55,11 +57,11 @@
           class="study_item"
           v-for="(item, i) in allListData"
           :key="i"
-          @click="$router.push({path: `/home/study/${item.id}`})"
+          @click="getDetails(item.id)"
         >
           <div class="imgs">
             <div class="imgs_box">
-              <img v-lazy="item.schoolBadgeImg">
+              <img v-lazy="item.schoolBadgeImg" />
             </div>
           </div>
 
@@ -74,7 +76,7 @@
               </span>
               <span class="r">
                 录取率：
-                <i>{{ item.acceptanceRate }}.0%</i>
+                <i>{{ item.acceptanceRate }}%</i>
               </span>
             </p>
           </div>
@@ -87,11 +89,12 @@
 <script>
 import smenu from "../../components/slideMenu";
 import { mapGetters, mapMutations } from "vuex";
-import { screen_data } from "../../utils/mixins";
-
+import { screen_data, setShareTitle } from "../../utils/mixins";
+import { SEOConfig } from "../../utils/config";
 const url = `/dhr/client/study_abroad/list`;
 export default {
-  mixins: [screen_data],
+  name: "study",
+  mixins: [screen_data, setShareTitle],
   data() {
     return {
       item: ["国家", "类别", "国内排名", "更多"],
@@ -106,25 +109,46 @@ export default {
       merchantUrl: `/dhr/client/study_abroad/merchant/list`
     };
   },
+  activated() {
+    this.iosTitleImg(SEOConfig.study.title);
+  },
   created() {
     this.getStudyData();
     this.searchCountry();
   },
   methods: {
+    getDetails(id) {
+      console.log(this.letter);
+      // console.log(this.letter)
+      if (!this.letter) {
+        console.log(this.letter);
+        this.$router.push({
+          path: `/${this.cityJX}/study/detail`,
+          query: { id, country: this.letter }
+        });
+        return;
+      }
+      this.$router.push({
+        path: `/${this.cityJX}/study/${this.letter}/detail`,
+        query: { id, country: this.letter }
+      });
+    },
     onLoad() {
-      if (this.$route.query.id + 1) {
+      console.log("onload");
+      if (this.$route.query.id) {
         let id = this.$route.query.id;
-        this.result_data.hostCountryNum = this.filterCountry(id);
+        console.log(id);
+
+        this.result_data.hostCountryNum = this.filterCountry(parseInt(id));
+        console.log(this.result_data);
       }
 
-      // console.log(222)
       this.getAllList(this.result_data);
     },
     // 获取留学国家
     getStudyData() {
       this.$fetch("/dhr/client/study_abroad/menu").then(res => {
         if (res.ErrCode == "0000") {
-          console.log(res.Result);
           let { IELTS, TOEFL, cost, country, rank, schoolType } = res.Result;
           this.country = country;
           this.athor = schoolType;
@@ -132,7 +156,6 @@ export default {
           this.tf = TOEFL;
           this.ys = IELTS;
           this.fy = cost;
-          console.log(this.tf);
         }
       });
     },
@@ -144,12 +167,6 @@ export default {
 
     filterCountry(id) {
       switch (id) {
-        case 0:
-          return {
-            id: 0,
-            html: "美国",
-            type: "hostCountryNum"
-          };
         case 1:
           return {
             id: 1,
@@ -168,16 +185,19 @@ export default {
             html: "澳大利亚",
             type: "hostCountryNum"
           };
-      }
-    }
-  },
-  activated() {},
-  watch: {
-    $route(val) {
-      // console.log(val);
-    }
-  },
 
+        case 4:
+          return {
+            id: 4,
+            html: "美国",
+            type: "hostCountryNum"
+          };
+      }
+    },
+    ...mapMutations({
+      wxShare: "SET_SHARETITLE_IMG"
+    })
+  },
   components: {
     smenu
   }
@@ -224,6 +244,7 @@ export default {
       .content {
         padding-left: 30px;
         font-weight: 500;
+        flex: 1;
         h3 {
           font-size: 30px;
         }
@@ -253,7 +274,7 @@ export default {
           color: #9399a5;
           font-size: 24px;
           display: flex;
-          justify-content: space-between;
+          // justify-content: space-between;
           span {
             i {
               font-size: 34px;

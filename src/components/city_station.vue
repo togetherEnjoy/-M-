@@ -14,35 +14,36 @@
           <div class="l_city">{{nowCity}}</div>
           <p>重新定位</p>
         </div>
-      </div> -->
+      </div>-->
       <div class="hot_city">
         <h3>热门城市</h3>
         <ul>
           <li
             v-for="item in citys.hot"
-            @click="choseCity(item.id,item.city,$event)"
+            @click="choseCity(item.id,item.letter,item.city,$event)"
             ref="li"
           >{{ item.city }}</li>
         </ul>
       </div>
     </div>
 
-    <div class="opened_city">
+    <!-- <div class="opened_city">
       <h3>已开通城市</h3>
       <ul>
         <li
           v-for="item in citys.all"
-          @click="choseCity(item.id,item.city,$event)"
+          @click="choseCity(item.id,item.letter,item.city,$event)"
           ref="li"
         >{{ item.city }}</li>
       </ul>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import { bus } from "../utils/event";
+import { mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -51,7 +52,8 @@ export default {
     };
   },
   methods: {
-    choseCity(num, city, e) {
+    choseCity(num, jx, city, e) {
+      console.log(jx);
       let item = this.$refs.li;
       item.forEach(val => {
         if (val.classList.contains("redd")) {
@@ -59,16 +61,20 @@ export default {
         }
       });
       e.target.classList.add("redd");
-     
+
       this.nowCity = city;
       bus.$emit("sendCity", this.nowCity);
-      this.$store.commit("SET_NUMBER", num);
-       this.close_city()
+      this.set_numberAndJX({ num, jx, cityName:this.nowCity});
+      this.close_city();
+
+      this.$router.push({ path: `/${this.$store.state.cityJX}` });
+      window.location.reload()
     },
     getCityCount() {
       this.$fetch("/dhr/showCity").then(res => {
         if (res.ErrCode == "0000") {
           this.citys = res.data;
+          console.log(this.citys);
         }
       });
     },
@@ -78,7 +84,10 @@ export default {
       citys.classList.remove("show");
       document.body.style = "inherit";
       this.$emit("getCity", this.nowCity);
-    }
+    },
+    ...mapMutations({
+      set_numberAndJX: "SET_NUMBER"
+    })
   },
   created() {
     this.getCityCount();
@@ -96,9 +105,10 @@ export default {
   left: 0;
   top: 0;
   font-size: 28px;
-  transition: all 500ms cubic-bezier(0.79, 0.465, 0.67, 1);
   transform: translateY(-100%);
+
   &.show {
+    transition: all 500ms cubic-bezier(0.79, 0.465, 0.67, 1);
     transform: none;
   }
   h3 {
@@ -223,7 +233,7 @@ export default {
       border-radius: 4px;
       margin-right: 50px;
       text-align: center;
-        margin-top: 30px;
+      margin-top: 30px;
       // &:nth-child(n + 5) {
       //   margin-top: 30px;
       // }

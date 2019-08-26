@@ -12,6 +12,7 @@
 
     <div>
       <con
+     
         :simpleName="simpleName"
         :head_img="head_img"
         :hot="hot"
@@ -21,6 +22,7 @@
         :showFoot="false"
         :showCity="showCity"
         :sourceDescription="sourceDescription"
+        :sourceTitle="sourceTitle"
       />
     </div>
   </div>
@@ -51,6 +53,7 @@ export default {
       id: this.$route.query.id,
       showCity: this.$route.query.showCity,
       sourceDescription: this.$route.query.sourceDescription,
+      sourceTitle: this.$route.query.sourceTitle,
       // 供应商
       url: `/dhr/client/immigrant/support`
     };

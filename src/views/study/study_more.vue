@@ -7,12 +7,13 @@
         :simpleName="simpleName"
         :head_img="head_img"
         :hot="hot"
-        :typeOf="2"
+        :typeOf="5"
         :id="id"
         ref="con"
         :showFoot="false"
         :showCity="showCity"
         :sourceDescription="sourceDescription"
+        :sourceTitle="sourceTitle"
       />
     </div>
   </div>
@@ -33,7 +34,8 @@ export default {
       myPhone : '',
       id: this.$route.query.id,
       showCity: this.$route.query.showCity,
-      sourceDescription: this.$route.query.sourceDescription
+      sourceDescription: this.$route.query.sourceDescription,
+      sourceTitle: this.$route.query.sourceTitle
     };
   },
   methods: {

@@ -1,12 +1,9 @@
 <template>
   <div class="zi">
-    <div class="zi_box" v-if="showFoot">
-
+    <div class="zi_box" :id="merStyle?'myStyle':''" v-if="showFoot">
       <div class="z_l">
-        <div class="z_l_img" @click="$router.push({path: '/home/merchant',query:{id}})">
-          
-            <img v-lazy="head_img">
-          
+        <div class="z_l_img" @click="$router.push({path: `/${cityJX}/merchant`,query:{id,typeOf}})">
+          <img v-lazy="head_img" />
         </div>
         <div class="z_l_t">
           <h3>{{ simpleName }}</h3>
@@ -16,7 +13,7 @@
 
       <div class="btn_wrap">
         <div class="z_c" @click="eject();clickRate(id)">
-          <p>在线问</p>
+          <p>{{ask}}</p>
         </div>
         <div class="z_r" @click="clickRate(id)">
           <p>
@@ -27,15 +24,15 @@
     </div>
 
     <div class="eject_wrap" ref="eje">
-      <h3>预约咨询</h3>
-      <p>去海外商户将尽快联系您</p>
+      <h3>{{hd_title}}</h3>
+      <p v-if="canShowMer">去海外商户将尽快联系您</p>
       <div class="names">
         <label>
           <p>
             <span>*</span>
             姓名
           </p>
-          <input type="text" placeholder="请输入姓名" v-model="name" maxlength="5" minlength="1">
+          <input type="text" placeholder="请输入姓名" v-model="name" maxlength="5" minlength="1" />
         </label>
       </div>
       <div class="phone">
@@ -44,17 +41,18 @@
             <span>*</span>
             电话
           </p>
-          <input type="telephone" placeholder="请输入电话" v-model="phone" minlength="11" maxlength="11">
+          <input type="telephone" placeholder="请输入电话" v-model="phone" minlength="11" maxlength="11" />
+          <span class="error" ref="err_phone">{{errMSG}}</span>
         </label>
       </div>
 
-      <div class="immed" @click="sendMSG">立即预约</div>
+      <div class="immed" @click="sendMSG">{{ yuyue }}</div>
     </div>
 
     <!-- 预约成功 toast -->
     <div class="success" ref="success">
       <div class="img">
-        <img src="../assets/images/home/success.png">
+        <img src="../assets/images/home/success.png" />
       </div>
       <p>恭喜您，预约成功</p>
     </div>
@@ -65,8 +63,25 @@
 
 <script>
 import { setTimeout } from "timers";
+import { setCountryMode } from "../utils/mixins";
 export default {
+  mixins: [setCountryMode],
   props: {
+    merStyle: {
+      default: false
+    },
+    yuyue: {
+      default: "立即预约"
+    },
+    canShowMer: {
+      default: true
+    },
+    hd_title: {
+      default: "预约咨询"
+    },
+    ask: {
+      default: "在线问"
+    },
     id: {},
     head_img: {},
     showFoot: {
@@ -84,22 +99,30 @@ export default {
     // 产品类型
     typeOf: {},
     showCity: "",
-    sourceDescription: ""
+    sourceDescription: "",
+
+    // 文章标题
+    sourceTitle: {},
+    sourceDetailed: {},
+    source: {
+      default: 1
+    }
   },
   data() {
     return {
       name: "",
-      phone: ""
+      phone: "",
+      errMSG: ""
     };
   },
   methods: {
     // 点击率
     clickRate() {
-      this.$fetch('dhr/client/merchant_number',{
+      this.$fetch("dhr/client/merchant_number", {
         id: this.id
       }).then(res => {
-        console.log(res)
-      })
+        console.log(res);
+      });
     },
     // 供应商
     eject() {
@@ -127,27 +150,31 @@ export default {
           phone: this.phone,
           typeOf: this.typeOf,
           showCity: this.showCity,
+          sourceTitle: this.sourceTitle,
           showCityNum: 1,
           sourceDescription: this.sourceDescription,
-          merchant_id: this.id
+          merchant_id: this.id,
+          sourceDetailed: this.sourceDetailed,
+          source: this.source
         }).then(res => {
-          console.log(res);
           if (res.ErrCode == "0000") {
             this.showAndHide("remove");
             let success = this.$refs.success;
             success.classList.add("showToast");
-
+            this.$refs.err_phone.style.display = "none";
             setTimeout(() => {
               success.classList.remove("showToast");
               let mask = this.$refs.mask;
               mask.classList.remove("show");
             }, 1000);
+          } else {
+            this.errMSG = res.ErrMsg;
+            this.$refs.err_phone.style.display = "block";
           }
         });
       }
     }
-  },
-  components: {}
+  }
 };
 </script>
 
@@ -159,7 +186,7 @@ export default {
   width: 100%;
   z-index: 9999;
   .zi_box {
-    box-shadow: 0 -1px 1px  rgba(0, 0, 0, .1);
+    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.1);
     display: flex;
     height: 150px;
     background-color: #fff;
@@ -171,7 +198,6 @@ export default {
     width: 100%;
     z-index: 9999;
   }
-
   .z_l {
     display: flex;
     align-self: center;
@@ -208,7 +234,9 @@ export default {
   }
   .btn_wrap {
     display: flex;
+    flex: 1;
   }
+
   .z_c,
   .z_r {
     width: 205px;
@@ -232,6 +260,19 @@ export default {
     a {
       color: #fff;
       display: block;
+    }
+  }
+
+  #myStyle {
+    .btn_wrap {
+      justify-content: space-around;
+    }
+    .z_l {
+      display: none;
+    }
+    .z_c,
+    .z_r {
+      width: 300px;
     }
   }
 
@@ -284,6 +325,15 @@ export default {
     }
     .phone {
       margin-top: 10px;
+      position: relative;
+      .error {
+        color: #ed2530;
+        font-size: 24px;
+        position: absolute;
+        right: 20px;
+        top: 30px;
+        display: none;
+      }
     }
     .immed {
       color: #fff;

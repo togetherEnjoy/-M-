@@ -1,7 +1,7 @@
 <template>
   <div class="studytour">
     <smenu
-     v-if="comReferer"
+      v-if="comReferer"
       :item="item"
       :athor="athor"
       :two="two"
@@ -28,12 +28,12 @@
           </p>
         </div>
       </div>
-    </div> -->
+    </div>-->
 
     <!-- <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click="emptyall">
       <span></span>
       清空所有条件
-    </div> -->
+    </div>-->
 
     <div class="lx_content">
       <!-- <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3> -->
@@ -47,18 +47,19 @@
         <div
           class="lx_c_item"
           v-for="(item, i) in allListData"
-          @click="$router.push({path: `/home/studytour/${item.id}`})"
+          @click="getDetails(item.id)"
           :key="i"
         >
           <div class="imgs">
-            <img v-lazy="item.coverImg">
+            <img v-lazy="item.coverImg" />
           </div>
           <div class="lx_r">
             <p class="tit">{{ item.title }}</p>
 
             <p class="price">
-              价格  &nbsp;
-              <b>￥</b><i>{{ item.price }}</i>
+              价格 &nbsp;
+              <b>￥</b>
+              <i>{{ item.price }}</i>
               <span>{{ app._goTime(item.startTime,item.endTime) | goTime() }}天</span>
             </p>
           </div>
@@ -70,10 +71,13 @@
 
 <script>
 import smenu from "../../components/slideMenu";
-import { screen_data } from "../../utils/mixins";
+import { screen_data, setShareTitle } from "../../utils/mixins";
+import { SEOConfig } from "../../utils/config";
+import { mapMutations } from "vuex";
 export default {
-  mixins: [screen_data],
-  inject: ['app'],
+  name: "studytour",
+  mixins: [screen_data, setShareTitle],
+  inject: ["app"],
   data() {
     return {
       item: ["招生对象", "游学国家", "游学主题"],
@@ -93,14 +97,30 @@ export default {
 
       yx_menu: [],
       url: `/dhr/client/study_tour/list`,
-      merchantUrl:`/dhr/client/study_tour/list`
+      merchantUrl: `/dhr/client/study_tour/list`
     };
+  },
+  activated() {
+    this.iosTitleImg(SEOConfig.studytour.title);
   },
   created() {
     this.getStudyTourdata();
-    
   },
   methods: {
+    getDetails(id) {
+      if (!this.letter) {
+        console.log(this.letter);
+        this.$router.push({
+          path: `/${this.cityJX}/studytour/detail`,
+          query: { id, country: this.letter }
+        });
+        return;
+      }
+      this.$router.push({
+        path: `/${this.cityJX}/studytour/${this.letter}/detail`,
+        query: { id, country: this.letter }
+      });
+    },
     onLoad() {
       this.getAllList(this.result_data);
     },
@@ -114,6 +134,7 @@ export default {
           this.yx_menu = res.Result;
           this.athor = this.yx_menu.recruitStudent;
           this.two = this.yx_menu.country;
+          console.log(this.two);
           this.three = this.yx_menu.theme;
         }
       });
@@ -135,6 +156,9 @@ export default {
     //     }
     //   });
     // }
+    ...mapMutations({
+      wxShare: "SET_SHARETITLE_IMG"
+    })
   },
 
   components: {
@@ -254,7 +278,7 @@ export default {
             width: 10px;
             height: 10px;
             right: 2px;
-            top:11px;
+            top: 11px;
             background: url("../../assets/images/study/close.png") no-repeat
               center/ cover;
           }

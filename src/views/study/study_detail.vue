@@ -1,11 +1,11 @@
 <template>
   <div class="study_detail">
-    <city ref="city"/>
-    <publicHead :centerImg="centerImg" backURL="/home/study"/>
+    <city ref="city" />
+    <publicHead :centerImg="centerImg" :backURL="`/${cityJx}/study/${$route.query.country}`" />
     <div class="ser_img_wrap">
       <div class="card_item">
         <div class="imgs">
-          <img v-lazy="detail_data.bgImg">
+          <img v-lazy="detail_data.bgImg" />
         </div>
 
         <div class="cont_txt">
@@ -42,23 +42,26 @@
         <div class="s_huan" ref="change">
           <p @click="referer(getStudyDetail)">换一换</p>
           <span
-            @click="$router.push({path: '/home/studymore', query:{id,sourceDescription,showCity}})"
+            @click="$router.push({path: '/home/studymore', query:{id,sourceDescription,showCity,sourceTitle:detail_data.schoolName}})"
           >更多</span>
         </div>
       </div>
 
       <div class="s_item" v-for="(item,i) in merchant_data" :key="i">
-        <div class="heads_img">
-          <img v-lazy="item.headPortrait">
+        <div
+          class="heads_img"
+          @click="$router.push({path: `/${cityJX}/merchant`,query:{id:item.id}})"
+        >
+          <img v-lazy="item.headPortrait" />
         </div>
 
         <div class="text">
-          <h3>{{ item.companyName }}</h3>
+          <h3>{{ item.simpleName }}</h3>
           <p>咨询量：{{ item.actualNumber }}</p>
         </div>
 
         <div class="func">
-          <span @click="showToast;clickRate(item.id)">
+          <span @click="showToast();clickRate(item.id)">
             <i class="email"></i>
           </span>
           <span class="pb" @click="clickRate(item.id)">
@@ -78,7 +81,7 @@
       >
         <van-tab title="学校介绍">
           <div class="study_de">
-            <div class="content">
+            <div class="content" v-html="detail_data.schoolIntroduce">
               <van-row>
                 <van-col span="8">
                   <div class="content_item">
@@ -164,12 +167,7 @@
               </van-row>
             </div>
 
-            <p class="article" v-html="detail_data.schoolIntroduce">
-              <!-- 麻省理工学院（Massachusetts Institute of Technology），简称MIT，是美国一所研究型私立大学，位于马萨诸塞州（麻省）的剑桥市，查尔斯河（Charles River）将其与波士顿的后湾区（Back Bay）隔开。麻省理工学院无论是在美国还是全世界都有非常重要的影响力，MIT培养了众多对世界产生影响的人士，是全球高科技和高等研究的先驱领导大学。
-            麻省理工学院（英文全称：Massachusetts Institute of Technology， 简称MIT），位于美国马萨诸塞州剑桥市，占地面积168英亩（68.0公顷），吉祥物是海狸（Beaver），NCAA运动队绰号是工程师（Engineers），校训是“理论与实践并重”
-            （Mens et Manus），英文翻译是：Mind and Hand。 MIT录取率极低，每年只录取2000人，保证了全世界最优秀的学子云集于MIT，每年能从MIT顺利毕业的人无疑是世界上最精英的一群人。
-              2014年9月16日发布2014—2015年世界大学排名榜，美国麻省理工学院连续第三年位居榜首。-->
-            </p>
+            <p class="article"></p>
           </div>
         </van-tab>
         <van-tab title="申请条件">
@@ -185,25 +183,18 @@
           </div>
         </van-tab>
         <van-tab title="专业设置">
-          <div class="condition" v-html="detail_data.professionalSetup">
-            <h3>专业介绍</h3>
-            <p>修读年限：4年</p>
-          </div>
-          <!-- <div class="condition">
-            <h3>本科专业</h3>
-            <p>文学：音乐学、创意写作、文学研究、语言学、戏剧艺术、艺术与设计、比较媒体研究、写作与人文</p>
-          </div>-->
+          <div class="condition" v-if="need" v-html="need.content"></div>
 
-          <div id="swipe" ref="bs_swipe">
+          <div id="swipe" ref="bs_swipe" v-if="need">
             <ul>
-              <li v-for="i in 4">
-                <img src="../../assets/images/study/swipe.png">
+              <li v-for="(item,i) in need.imgs">
+                <img v-lazy="item" />
               </li>
             </ul>
           </div>
         </van-tab>
         <van-tab title="每年学费">
-          <div class="mnxf" v-html="detail_data.annualFee">
+          <div class="mnxf xuefei" v-html="detail_data.annualFee">
             <van-row v-for="i in 2">
               <van-col span="6">
                 <div class="content_item">
@@ -229,24 +220,11 @@
           </div>
         </van-tab>
         <van-tab title="截止日期">
-          <div class="mnxf" v-html="detail_data.expirationDate">
-            <van-row v-for="i in 3">
-              <van-col span="12">
-                <div class="content_item">
-                  <h3>学位类型</h3>
-                </div>
-              </van-col>
-              <van-col span="12">
-                <div class="content_item">
-                  <h3>截止日期</h3>
-                </div>
-              </van-col>
-            </van-row>
-          </div>
+          <div class="mnxf" v-html="detail_data.expirationDate"></div>
         </van-tab>
         <van-tab title="开学日期">
           <div class="mnxf" v-html="detail_data.schoolBeginsDate">
-            <van-row v-for="i in 3">
+            <!-- <van-row v-for="i in 3">
               <van-col span="12">
                 <div class="content_item">
                   <h3>学位类型</h3>
@@ -257,7 +235,7 @@
                   <h3>截止日期</h3>
                 </div>
               </van-col>
-            </van-row>
+            </van-row>-->
           </div>
         </van-tab>
       </van-tabs>
@@ -269,11 +247,13 @@
       :head_img="head_img"
       :id="merchant_data[0].id"
       :hot="hot"
-      :myphone="merchant_data[0].phone"
+      :myphone="merchant_data[0].xuNiPhone||phone"
       :typeOf="3"
       ref="con"
       :showCity="showCity"
       :sourceDescription="sourceDescription"
+      :sourceTitle="detail_data.schoolName"
+       :sourceDetailed='2'
     />
   </div>
 </template>
@@ -285,20 +265,44 @@ import publicHead from "../../components/public_detail_head";
 import city from "../../components/city_station";
 import BScroll from "better-scroll";
 import { BSConfigX } from "../../utils/config.js";
-import { referer, clickRate } from "../../utils/mixins";
+import {
+  referer,
+  clickRate,
+  setCountryMode,
+  phone,
+  setShareTitle
+} from "../../utils/mixins";
 const url = `/dhr/client/study_abroad/`;
 export default {
-  mixins: [referer,clickRate],
+  mixins: [referer, clickRate, setCountryMode, phone, setShareTitle],
   data() {
     return {
       active: 0,
-      id: this.$route.params.id,
+      id: this.$route.query.id,
       detail_data: [],
       //供应商url
       refererURL: `/dhr/client/study/support`,
       sourceDescription: location.href,
       showCity: "",
-      centerImg: require("../../assets/images/study/study.png")
+      centerImg: require("../../assets/images/study/study.png"),
+      need: []
+    };
+  },
+  metaInfo() {
+    return {
+      title: this.detail_data.schoolName + "-去海外网",
+      meta: [
+        {
+          name: "keywords",
+          content:
+            `${this.detail_data.schoolName}+留学,${this.detail_data.schoolName}留学申请,${this.detail_data.schoolName}留学申请条件,${this.detail_data.schoolName}留学申请流程,${this.detail_data.schoolName}留学申请时间，${this.detail_data.schoolName}留学学费，${this.detail_data.schoolName}留学专业` +
+            this.detail_data.labels
+        },
+        {
+          name: "description",
+          content: `去海外网留学为您提供${this.detail_data.schoolName}留学，${this.detail_data.schoolName}留学申请，${this.detail_data.schoolName}留学申请条件，${this.detail_data.schoolName}留学申请流程等内容，更多精彩留学信息，就上去海外网。`
+        }
+      ]
     };
   },
   created() {
@@ -310,9 +314,22 @@ export default {
       this.$fetch(url + this.id).then(res => {
         if (res.ErrCode == "0000") {
           this.detail_data = res.Result;
-          console.log(this.detail_data);
+
+          this.need = JSON.parse(this.detail_data.professionalSetup);
           this.showCity = this.detail_data.showCity;
-           console.log(this.showCity);
+          console.log(this.detail_data);
+
+          // this.titleImg(
+          //   this.detail_data.schoolName + "-去海外网",
+          //   this.detail_data.bgImg
+          // );
+
+          // ios
+          this.iosTitleImg(
+            this.detail_data.schoolName + "-去海外网",
+            this.desc.studyd,
+            this.detail_data.bgImg
+          );
         }
       });
     },
@@ -328,6 +345,7 @@ export default {
     // 咨询框
     showToast() {
       let con = this.$refs.con;
+      console.log(con);
       con.eject();
     }
   },
@@ -387,8 +405,10 @@ export default {
   // bottom: 0px;
   // height: 100%;
   background-color: #f8f8f8;
+  height: 100%;
   padding-bottom: 208px;
   padding-top: 100px;
+  -webkit-overflow-scrolling: touch;
   .ser_img_wrap {
     .card_item {
       color: #fff;
@@ -588,16 +608,19 @@ export default {
   .project {
     margin-top: 30px;
     background-color: #fff;
-    padding: 0 30px;
     color: #9399a5;
     line-height: 48px;
     font-size: 24px;
+    min-height: 100vh;
     .study_de {
       padding: 30px 0;
+
+      // min-height: 100vh;
     }
     .content {
       background-color: #fff;
-      text-align: center;
+      padding: 0 30px;
+      font-size: 24px !important;
 
       .content_item {
         font-weight: 500;
@@ -620,7 +643,7 @@ export default {
     }
 
     .condition {
-      padding-top: 20px;
+      padding: 20px 30px;
       font-size: 30px;
 
       h3 {
@@ -631,6 +654,7 @@ export default {
     #swipe {
       width: 100%;
       overflow: hidden;
+      padding: 0 30px;
       ul {
         display: inline-block;
         white-space: nowrap;
@@ -651,7 +675,7 @@ export default {
     }
   }
   .mnxf {
-    padding-top: 20px;
+    padding: 20px 30px;
     .content_item {
       height: 78px;
       line-height: 78px;
@@ -660,5 +684,58 @@ export default {
       text-align: center;
     }
   }
+}
+</style>
+<style>
+.mnxf table,
+.content table {
+  font-size: 24px;
+  width: 100%;
+  border: 1px solid #eeeeee;
+  text-align: center;
+}
+.mnxf table tr:first-child,
+.content table tr:first-child {
+  background-color: #f4f5f6;
+}
+.mnxf table tr > th,
+.content table tr > th {
+  padding: 0;
+  width: 50%;
+  height: 78px;
+  /* line-height: 78px; */
+  background: #eee;
+  text-align: center;
+  border: 1px solid #eeeeee;
+}
+.mnxf table tr > td {
+  width: 50%;
+  height: 78px;
+  /* line-height: 78px; */
+  text-align: center;
+  border: 1px solid #eeeeee;
+}
+
+.xuefei table tr > th,
+.xuefei table tr > td {
+  width: 25%;
+}
+
+.content table tr > th,
+.content table tr > td {
+  width: 33.333%;
+  height: 120px;
+  border: 1px solid #eeeeee;
+}
+
+.study_de table tr:first-child {
+  display: none;
+}
+.study_de table tr > td {
+  width: 25%;
+}
+.study_de table tr > td span {
+  font-size: 26px !important;
+  color: #0d1c31 !important;
 }
 </style>

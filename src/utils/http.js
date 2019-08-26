@@ -1,7 +1,11 @@
 const config = require('./config')
 
 import state from '../store/state'
+// console.log(sessionStorage.getItem('vuex'))
 
+
+const number = sessionStorage.getItem('vuex') && JSON.parse(sessionStorage.getItem('vuex'))['number']
+console.log(number)
 import {
     Toast
 } from 'vant'
@@ -24,8 +28,10 @@ axios.interceptors.request.use(
         // if (getToken()) {
         //     config.headers['X-Token'] = getToken()
         // }
+
+    // console.log(config)
         if (config.method == 'get') {
-            config.params['showCityNum'] = state.number || 1
+            config.params['showCityNum'] = number || 1
         }
         // console.log(config)
         return config
@@ -66,6 +72,21 @@ export function fetch(url, params = {}) {
 export function post(url, data = {}) {
     return new Promise((resolve, reject) => {
         axios.post(url, data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                resolve(response.data);
+            }, err => {
+                reject(err)
+            })
+    })
+}
+
+export function put(url, data = {}) {
+    return new Promise((resolve, reject) => {
+        axios.put(url, data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

@@ -5,11 +5,13 @@
       :showCity="false"
       :athor="athor"
       :two="two"
-      :params1="params1"
-      :params2="params2"
+      :what="2"
+      oneData="国家"
+      params1="countryNum"
+      params2="immigrationType"
       @get_result="get_result"
     ></smenu>
-    <div class="sx_result" v-if="Object.keys(result_data).length > 0">
+    <!-- <div class="sx_result" v-if="Object.keys(result_data).length > 0">
       <h3>筛选结果</h3>
       <div class="condition">
         <div v-for="(item,i) of result_data" :key="i" class="sel" v-if="item.html != ''">
@@ -21,15 +23,15 @@
           </p>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click="emptyall">
+    <!-- <div class="thinklike" v-if="Object.keys(result_data).length > 0" @click="emptyall">
       <span></span>
       清空所有条件
-    </div>
+    </div> -->
 
     <div class="supplier">
-      <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3>
+      <!-- <h3 class="like" v-if="Object.keys(result_data).length > 0">猜您喜欢</h3> -->
       <van-list
         v-model="loading"
         :finished="finished"
@@ -38,12 +40,12 @@
         :offset="10"
       >
         <div class="s_item" v-for="(item, i) in allListData" :key="i">
-          <div class="heads_img">
+          <div class="heads_img" @click="$router.push({path: `/${cityJX}/merchant`,query:{id:item.id}})">
             <img v-lazy="item.headPortrait">
           </div>
 
           <div class="text">
-            <h3>{{ item.companyName }}</h3>
+            <h3>{{ item.simpleName }}</h3>
             <p>咨询量：{{ item.actualNumber }}</p>
           </div>
 
@@ -52,7 +54,7 @@
               <i class="email"></i>
             </span>
             <span class="pb" @click="clickRate(item.id)">
-              <a :href="`tel:${item.phone}`" class="phone"></a>
+              <a :href="`tel:${item.xuNiPhone||phone}`" class="phone"></a>
             </span>
           </div>
         </div>
@@ -63,9 +65,10 @@
 
 <script>
 import smenu from "./slideMenu";
-import { screen_data,clickRate } from "../utils/mixins";
+import { screen_data,clickRate,setCountryMode,phone } from "../utils/mixins";
 export default {
-  mixins: [screen_data,clickRate],
+  name: 'more',
+  mixins: [screen_data,clickRate,setCountryMode,phone],
   props: {
     item: {
       type: Array
@@ -85,6 +88,7 @@ export default {
   },
   data() {
     return {
+      canmetaInfo: false,
       merchant_data: [],
       // url: `/dhr/business/immigrant/support`
     };

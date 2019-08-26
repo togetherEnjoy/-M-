@@ -1,11 +1,11 @@
 <template>
   <div class="studytour_detail">
-    <city ref="city"/>
-    <publicHead :centerImg="centerImg" :backURL="backURL"/>
+    <city ref="city" />
+    <publicHead :centerImg="centerImg" :backURL="`/${cityJx}/studytour/${$route.query.country}`" />
     <div class="ser_img_wrap">
       <div class="card_item">
         <div class="imgs">
-          <img v-lazy="List_data.coverImg">
+          <img v-lazy="List_data.coverImg" />
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@
         <div class="right">
           <p>
             <i class="justify">年龄</i>:
-            <span>{{ List_data.ages }}岁</span>
+            <span>{{ List_data.ages }}</span>
           </p>
           <p>
             出行日期:
@@ -89,11 +89,13 @@
       :simpleName="List_data.merchant.simpleName"
       :typeOf="4"
       :id="List_data.merchant.id"
-      :myphone="List_data.merchant.phone"
+      :myphone="List_data.merchant.xuNiPhone||phone"
       :hot="List_data.hot"
       :showCity="List_data.showCity"
       :sourceDescription="href"
       :head_img="List_data.merchant.headPortrait"
+      :sourceTitle="List_data.title"
+       :sourceDetailed='2'
     />
   </div>
 </template>
@@ -104,7 +106,9 @@ import con from "../../components/conf";
 import { UTCformat } from "../../api/UTCformat.js";
 import publicHead from "../../components/public_detail_head";
 import city from "../../components/city_station";
+import { setCountryMode, phone, setShareTitle } from "../../utils/mixins";
 export default {
+  mixins: [setCountryMode, phone, setShareTitle],
   inject: ["app"],
   data() {
     return {
@@ -113,31 +117,49 @@ export default {
       detailedDescription: {},
       href: location.href,
       centerImg: require("../../assets/images/studytour/tour.png"),
-      backURL: "/home/studytour",
-
-      UTCTime: ''
+      UTCTime: ""
     };
   },
-
+  metaInfo() {
+    return {
+      title:this.List_data.merchant&& this.List_data.title+'-'+this.List_data.merchant.simpleName+'-去海外网',
+      meta: [
+        {
+          name: "keywords",
+          content: `${this.List_data.county}+大学游学,游学申请,游学申请条件,游学申请流程,游学申请时间，游学学费，游学专业，${this.List_data.labels}，去海外网`
+        },
+        {
+          name: "description",
+          content: `去海外网游学为您提供${this.List_data.county}，${this.List_data.county}申请，${this.List_data.county}申请条件，${this.List_data.county}申请流程等内容，更多精彩游学政策和信息，就上去海外网。`
+        }
+      ]
+    };
+  },
   created() {
-    this.$nextTick(() => {
-      this.getTourDetail();
-    });
+    this.getTourDetail();
   },
   methods: {
     getTourDetail() {
-      let { id } = this.$route.params;
+      let { id } = this.$route.query;
       this.$fetch(`/dhr/client/study_tour/${id}`).then(res => {
         if (res.ErrCode == "0000") {
           this.List_data = res.Result;
           console.log(this.List_data);
           this.detailedDescription = JSON.parse(res.Result.detailedDescription);
+          // this.titleImg(res.Result.title + "-去海外网", res.Result.coverImg);
+
+          // ios
+          this.iosTitleImg(
+            res.Result.title+'-'+this.List_data.merchant.simpleName + "-去海外网",
+            this.desc.studytourd,
+            res.Result.coverImg,
+            res.Result.merchant_id
+          );
         }
       });
     },
     _UTCformat(start, end) {
-      this.UTCTime = UTCformat(start) + " " + UTCformat(end).substr(5);
-      console.log(this.UTCTime)
+      this.UTCTime = UTCformat(start) + "-" + UTCformat(end).substr(5);
       return this.UTCTime;
     }
   },
@@ -280,7 +302,7 @@ export default {
     color: #9399a5;
     line-height: 48px;
     font-size: 24px;
-
+    min-height: 100vh;
     .xcbox {
       font-weight: 500;
       padding: 20px 30px;

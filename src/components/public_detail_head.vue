@@ -99,7 +99,7 @@ export default {
     line-height: 100px;
   }
   .t_c {
-    width: 132px;
+    width: 140px;
     height: 60px;
     display: inline-block;
     vertical-align: middle;

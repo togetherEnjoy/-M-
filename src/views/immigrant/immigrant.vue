@@ -8,51 +8,55 @@
         @click="tabClick"
         sticky
       >
-        <van-tab v-for="index in immig_country" :title="index.name">
-          <div class="card" :index_id="index.id">
-            <van-list
-              v-model="loading"
-              :finished="finished"
-              finished-text="没有更多了"
-              @load="getImmigListData"
-              :offset="10"
-            >
-              <div class="card_wrap" v-for="(immig, i) in list_data" :key="i">
-                <div @click="$router.push({path:'/home/immig/detail', query: {id: immig.id}})">
-                  <div class="card_item">
-                    <div class="imgs">
-                      <img v-lazy="immig.imgs">
+        <div ref="wrap">
+          <van-tab v-for="index in immig_country" :title="index.name">
+            <div class="card" :index_id="index.id">
+              <van-list
+                v-model="loading"
+                :finished="finished"
+                finished-text="没有更多了"
+                @load="getImmigListData"
+                :offset="10"
+              >
+                <div class="card_wrap" v-for="(immig, i) in list_data" :key="i">
+                  <div @click="getDetails(immig.id)">
+                    <div class="card_item">
+                      <div class="imgs">
+                        <img v-lazy="immig.imgs" />
+                      </div>
+
+                      <div class="txt">
+                        <h1>{{ immig.name }}</h1>
+                        <p>{{ immig.subtitle }}</p>
+                      </div>
                     </div>
 
-                    <div class="txt">
-                      <h1>{{ immig.name }}</h1>
-                      <p>{{ immig.subtitle }}</p>
-                    </div>
-                  </div>
-
-                  <div class="card_ds">
-                    <div>
-                      <p class="m">{{ immig.handlingCycle }}个月</p>
-                      <p>办理周期</p>
-                    </div>
-                    <div>
-                      <p class="m">{{ immig.identityType }}</p>
-                      <p>身份类别</p>
-                    </div>
-                    <div>
-                      <p class="m">{{ immig.investmentQuota }}万澳币</p>
-                      <p>投资额度</p>
-                    </div>
-                    <div>
-                      <p class="m">{{ immig.demand }}</p>
-                      <p>居住要求</p>
+                    <div class="card_ds">
+                      <div>
+                        <p class="m text_overflow">{{ immig.handlingCycle }}</p>
+                        <p>办理周期</p>
+                      </div>
+                      <div>
+                        <p class="m text_overflow">{{ immig.identityType }}</p>
+                        <p>身份类别</p>
+                      </div>
+                      <div>
+                        <p
+                          class="m text_overflow"
+                        >{{ immig.investmentQuota == '无' ?immig.investmentQuota: '￥'+immig.investmentQuota+'万' }}</p>
+                        <p>投资额度</p>
+                      </div>
+                      <div>
+                        <p class="m text_overflow need">{{ immig.demand }}</p>
+                        <p>居住要求</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </van-list>
-          </div>
-        </van-tab>
+              </van-list>
+            </div>
+          </van-tab>
+        </div>
       </van-tabs>
     </div>
   </div>
@@ -60,10 +64,27 @@
 
 <script>
 import { Tab, Tabs } from "vant";
-import { mapGetters } from "vuex";
-import { screen_data } from "../../utils/mixins";
-
+import { mapGetters, mapMutations } from "vuex";
+import { setCountryMode, setShareTitle } from "../../utils/mixins";
+import { SEOConfig } from "../../utils/config";
 export default {
+  name: "immigrant",
+  mixins: [setCountryMode, setShareTitle],
+  metaInfo() {
+    return {
+      title: SEOConfig[this.$options.name].title,
+      meta: [
+        {
+          name: "keywords",
+          content: SEOConfig[this.$options.name].keywords
+        },
+        {
+          name: "description",
+          content: SEOConfig[this.$options.name].description
+        }
+      ]
+    };
+  },
   data() {
     return {
       page: 1,
@@ -81,17 +102,35 @@ export default {
       active: 0,
       list_data: [],
 
-      immig_country: []
+      immig_country: [],
+
+      // 国家简写路由
+      letter: ""
     };
-  },
-  watch: {
-    // active(val) {
-    //   console.log(val)
-    //   this.active = val + 1
-    // }
   },
 
   methods: {
+    getDetails(id) {
+      // this.$router.push({path:`/${this.cityJx}/immig/detail`})
+      // console.log(this.cityJX);
+      console.log(this.active);
+      if (!this.letter) {
+        console.log(this.letter);
+        this.$router.push({
+          path: `/${this.cityJX}/immig/detail`,
+          query: { id, country: this.letter, active: this.active }
+        });
+        return;
+      }
+
+      this.$router.push({
+        path: `/${this.cityJX}/immig/${this.letter}/detail`,
+        query: { id, country: this.letter, active: this.active }
+      });
+    },
+    onload() {
+      console.log("出发了");
+    },
     getImmigData() {
       this.$fetch("/dhr/client/migrate/menu").then(res => {
         if (res.ErrCode == "0000") {
@@ -105,24 +144,30 @@ export default {
       let params = {
         page: this.page,
         limit: this.limit,
-        hostCountryNum: this.hostCountryNum
+        hostCountryNum: this.hostCountryNum || "",
+        by: "index_1"
       };
+
+      this.merchant_id = this.$route.query.merchant_id
+        ? this.$route.query.merchant_id
+        : false;
 
       if (this.merchant_id) {
         params = Object.assign(params, {
           merchant_id: this.merchant_id
         });
       }
-      console.log(params);
+      // console.log(params);
       setTimeout(() => {
         this.$fetch(this.url, params).then(res => {
           if (res.ErrCode == "0000") {
             this.list_data = this.list_data.concat(res.Result.data);
             this.count = res.Result.count / 1;
-
             this.loading = false;
             if (this.list_data.length >= this.count) {
               this.finished = true;
+            } else {
+              this.finished = false;
             }
             this.page++;
           }
@@ -130,13 +175,15 @@ export default {
       }, 500);
     },
 
-    tabClick(i) {
+    tabClick(i, pageName) {
+      this.letter = this.immig_country[i].letter;
+      console.log(this.letter);
+      this.$router.push({ path: `/${this.cityJx}/immig/${this.letter}` });
+
       this.list_data = [];
       this.page = 1;
-
+      sessionStorage.setItem("active", i);
       this.hostCountryNum = this.immig_country[i].id;
-
-      console.log(this.hostCountryNum);
       this.initialization();
     },
     initialization() {
@@ -145,7 +192,10 @@ export default {
       if (this.loading) {
         this.getImmigListData();
       }
-    }
+    },
+    ...mapMutations({
+      wxShare: "SET_SHARETITLE_IMG"
+    })
   },
 
   created() {
@@ -156,15 +206,19 @@ export default {
   },
 
   activated() {
-   console.log(sessionStorage.getItem('active'))
-    this.active = parseInt(this.$route.query.hostCountryNum) + 1 
- console.log(this.active)
-    this.hostCountryNum = this.$route.query.hostCountryNum
+    this.iosTitleImg(SEOConfig.immigrant.title);
+
+    if (this.$route.query.hostCountryNum) {
+      this.active = this.$route.query.hostCountryNum;
+    } else {
+      this.active = 0;
+    }
+
+    this.hostCountryNum = this.$route.query.hostCountryNum;
     this.merchant_id = this.$route.query.merchant_id
       ? this.$route.query.merchant_id
       : false;
 
-    console.log(this.merchant_id);
     if (!this.$route.meta.isBack || this.isFirstEnter) {
       this.loading = true;
       if (!this.firstOnload) {
@@ -176,6 +230,7 @@ export default {
     } else {
       this.loading = false;
     }
+
     this.finished = false;
     this.firstOnload = false;
     this.$route.meta.isBack = false;
@@ -183,8 +238,6 @@ export default {
   },
 
   beforeRouteEnter(to, from, next) {
-    // console.log(from);
-    // console.log(to);
     if (from.name == "merchant") {
       next(vm => {
         vm.url = vm.merchantUrl;
@@ -201,9 +254,16 @@ export default {
         vm.merchant_id = false;
         vm.url = vm.url;
 
-        console.log(vm.url);
+        console.log(`home page`);
       });
     }
+
+    next();
+  },
+
+  beforeRouteLeave(to, from, next) {
+    let app = document.getElementById("app");
+    this.homeTop = window.pageYOffset;
 
     next();
   },
@@ -266,6 +326,7 @@ export default {
           }
         }
         .txt {
+          width: 90%;
           position: absolute;
           left: 50%;
           top: 50%;
@@ -290,7 +351,7 @@ export default {
           p {
             line-height: 36px;
             font-size: 24px;
-            width: 195px;
+            width: 350px;
             margin: 10px auto 0;
           }
         }
@@ -304,13 +365,20 @@ export default {
         text-align: center;
         padding-top: 10px;
         & > div {
+          width: 25%;
+          flex: 1;
           color: #9399a5;
           font-size: 24px;
+          display: flex;
+          flex-direction: column;
           .m {
             color: #ed2530;
             font-size: 30px;
             font-weight: bold;
             margin-bottom: 19px;
+          }
+          .need {
+            //  width: 50%;
           }
         }
       }

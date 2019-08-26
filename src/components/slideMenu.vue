@@ -13,26 +13,31 @@
             v-for="(item, i) in country"
             :key="i"
             :class="{active: i == 0}"
-            @click="checkCountry(i,item.id,$event)"
+            @click="checkCountry(i,item.id,item.letter,$event)"
           >{{ item.name }}</li>
         </ul>
       </div>
+
       <div class="c_right">
-        <ul
-          v-for="(item, i) in country"
-          :key="i"
-          :city="item.name"
-          :id="i == 0?'fir':''"
-          :class="{checked: i==checked}"
-        >
-          <li
-            v-for="(ci, i) in item.city"
+        <div ref="bs_city">
+          <ul
+            v-for="(item, i) in country"
             :key="i"
-            @click="checkCtry(ci.id, $event)"
-            ref="ctry"
-            :country="true"
-          >{{ ci.name }}</li>
-        </ul>
+            :city="item.name"
+            :id="i == 0?'fir':''"
+            :class="{checked: i==checked}"
+          >
+            <div>
+              <li
+                v-for="(ci, i) in item.city"
+                :key="i"
+                @click="checkCtry(ci.id, $event)"
+                ref="ctry"
+                :country="true"
+              >{{ ci.name }}</li>
+            </div>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -49,13 +54,13 @@
       </div>
     </div>
 
-    <div :class="navs===2? 'some two cs': 'some two'">
+    <div :class="navs===2? 'some two cs': 'some two'" ref="bs3">
       <div class="two">
         <ul>
           <li
             v-for="(item, i) in two"
             :key="i"
-            @click="twoClick(item.id, $event)"
+            @click="twoClick(item.id, item.letter,$event)"
             :data-id="item.id"
           >{{ item.name }}</li>
         </ul>
@@ -113,8 +118,14 @@
 import { BSConfigY } from "../utils/config.js";
 import BScroll from "better-scroll";
 import { mapGetters, mapMutations } from "vuex";
+import { setCountryMode } from "../utils/mixins";
 export default {
+  mixins: [setCountryMode],
   props: {
+    // 国家
+    setCountrymod: {},
+    // 城市
+    setCitymod: {},
     item: {
       type: Array
     },
@@ -218,17 +229,35 @@ export default {
       g_type: "",
 
       sendObj: {},
-      moreData: {}
+      moreData: {},
+
+      // 设置国家
+      c_jx: "",
+
+      firstIn: true
     };
   },
   mounted() {
     this.$nextTick(() => {
-      // this.aBScroll1 = new BScroll(this.$refs.bs1, BSConfigY);
-      // this.aBScroll2 = new BScroll(this.$refs.bs2, BSConfigY);
-      // if (this.$refs.bs4) {
-      //   this.aBScroll4 = new BScroll(this.$refs.bs4, BSConfigY);
-      // }
+      this.aBScroll1 = new BScroll(this.$refs.bs1, BSConfigY);
+      this.aBScroll2 = new BScroll(this.$refs.bs2, BSConfigY);
+      this.aBScroll3 = new BScroll(this.$refs.bs3, BSConfigY);
+
+      // this.bs_city = new BScroll(this.$refs.bs_city, BSConfigY);
+
+      if (this.$refs.bs4) {
+        this.aBScroll4 = new BScroll(this.$refs.bs4, BSConfigY);
+      }
     });
+
+    if (this.$route.query.id) {
+      let par = this.$refs.par;
+      console.log(par);
+      let c = this.filterCountry(parseInt(this.$route.query.id));
+      console.log(c);
+      par[0].children[0].innerHTML = c.html;
+      par[0].classList.add("active");
+    }
   },
   computed: {
     screen() {
@@ -289,11 +318,10 @@ export default {
       this.$delete(this.sendObj, "TOEFL");
       this.$delete(this.sendObj, "IELTS");
       this.$delete(this.sendObj, "cost");
-      this.moreData = {}
-        console.log(this.moreData);
+      this.moreData = {};
+      console.log(this.moreData);
     },
     confirm() {
-        console.log(this.moreData);
       let par = this.$refs.par;
       par.forEach(val => {
         if (val.classList.contains("active")) {
@@ -301,19 +329,17 @@ export default {
         }
       });
 
-     
-      if (Object.keys(this.moreData).length > 1 ) {
-         console.log(this.moreData);
-         par[3].classList.add('sect')
-         par[3].children[0].innerHTML = '更多'
-      } else if(Object.keys(this.moreData).length == 0) {
-        par[3].classList.remove('sect')
-      } 
-      
-      else {
-        par[3].classList.add('sect')
-        console.log(Object.values(this.moreData)[0])
-        par[3].children[0].innerHTML = Object.values(this.moreData)[0].name
+      if (Object.keys(this.moreData).length > 1) {
+        // console.log(this.moreData);
+        par[3].classList.add("sect");
+        par[3].children[0].innerHTML = "更多";
+      } else if (Object.keys(this.moreData).length == 0) {
+        par[3].classList.remove("sect");
+        par[3].children[0].innerHTML = "更多";
+      } else {
+        par[3].classList.add("sect");
+        console.log(Object.values(this.moreData)[0]);
+        par[3].children[0].innerHTML = Object.values(this.moreData)[0].name;
       }
 
       this.$refs.mask.classList.remove("show");
@@ -339,11 +365,11 @@ export default {
       e.target.classList.add("check");
     },
     chang(i, e) {
-      // console.log(e.target.innerHTML=  666)
+      console.log(e.target.innerHTML);
 
       this.$nextTick(() => {
         if (this.aBScroll1 && this.$refs.bs1) {
-          this.aBScroll1 = new BScroll(this.$refs.bs1, BSConfigY);
+          // this.aBScroll1 = new BScroll(this.$refs.bs1, BSConfigY);
         }
         if (this.$refs.bs4 && !this.aBScroll4) {
           this.aBScroll4 = new BScroll(this.$refs.bs4, BSConfigY);
@@ -354,13 +380,25 @@ export default {
         i += 1;
       }
       let par = this.$refs.par;
+
       if (e.target.parentNode.classList.contains("active")) {
+        if (this.firstIn) {
+          if (this.$route.query.id) {
+            this.navs = 0;
+            this.$refs.mask.classList.remove("show");
+            document.body.style.overflow = "initial";
+            this.firstIn = false;
+            return;
+          }
+        }
+
         e.target.parentNode.classList.remove("active");
         this.navs = "";
         this.$refs.mask.classList.remove("show");
         document.body.style.overflow = "initial";
         return;
       }
+
       par.forEach(val => {
         if (val.classList.contains("active")) {
           val.classList.remove("active");
@@ -372,20 +410,34 @@ export default {
       this.$refs.mask.classList.add("show");
       this.navs = i;
     },
-    checkCountry(i, id, e) {
+    checkCountry(i, id, letter, e) {
       let par = this.$refs.par;
       let target = e.target;
 
+      console.log(par);
+      /**
+       * @letter 国家的英文 名词
+       */
+      this.c_jx = letter;
+      console.log(this.c_jx);
+
       if (target.innerHTML == "不限") {
+        /**
+         * 设置国家路由
+         */
+        this.$router.push({
+          path: `/${this.cityJx}/${this.$parent.$options.name}`
+        });
+
         par[0].classList.remove("sect");
         par[0].children[0].innerHTML = "国家";
-        this.$delete(this.sendObj, "belongCity");
-        this.$delete(this.sendObj, "belongCountry");
+        this.$delete(this.sendObj, this.setCitymod);
+        this.$delete(this.sendObj, this.setCountrymod);
 
-        
+        console.log(this.sendObj);
         this.$parent.allListData = [];
-        this.$parent.page =1
-        
+        this.$parent.page = 1;
+
         this.$parent.getAllList(this.sendObj);
         this.close_all();
       } else {
@@ -403,18 +455,24 @@ export default {
       });
       target.classList.add("active");
       this.checked = i;
-      this.$set(this.sendObj, "belongCountry", {
+      this.$set(this.sendObj, this.setCountrymod, {
         id,
         html: html,
-        type: "belongCountry"
+        type: this.setCountrymod
       });
-      this.$emit("get_result", this.sendObj);
-      document.body.style.overflow = "initial";
+      this.$emit("get_result", this.sendObj, this.c_jx);
+      // document.body.style.overflow = "initial";
     },
 
     checkCtry(id, e) {
+      // console.log(this.c_jx)
       let par = this.$refs.par;
       let target = e.target;
+
+      this.$router.push({
+        path: `/${this.cityJx}/${this.$parent.$options.name}/${this.c_jx}`
+      });
+
       par[0].classList.add("sect");
       if (target.innerHTML != "不限") {
         par[0].children[0].innerHTML = target.innerHTML;
@@ -432,22 +490,22 @@ export default {
       });
       e.target.classList.add("active");
       if (e.target.parentNode.id == "fir") {
-        this.$set(this.sendObj, "belongCountry", {
+        this.$set(this.sendObj, this.setCountrymod, {
           id: 0,
           html: "美国",
-          type: "belongCountry"
+          type: this.setCountrymod
         });
       }
 
-      this.$set(this.sendObj, "belongCity", {
+      this.$set(this.sendObj, this.setCitymod, {
         id: id,
         html: html,
-        type: "belongCity"
+        type: this.setCitymod
       });
       this.close_all();
       this.$parent.page = 1;
       this.$parent.allListData = [];
-      this.$emit("get_result", this.sendObj);
+      this.$emit("get_result", this.sendObj, this.c_jx);
 
       this.$parent.getAllList(this.sendObj);
       this.$parent.allListData = [];
@@ -462,7 +520,6 @@ export default {
       let parent = target.parentNode.parentNode;
       let all_li = target.parentNode.children;
       let par = target.parentNode.parentNode.parentNode;
-
       let li = [...all_li];
       li.forEach(val => {
         if (val.classList.contains("active")) {
@@ -482,7 +539,8 @@ export default {
       this.$parent.allListData = [];
       //调用父组件方法
       this.$parent.getAllList(this.sendObj);
-      this.$emit("get_result", this.sendObj);
+      console.log(this.c_jx);
+      this.$emit("get_result", this.sendObj, this.c_jx);
     },
 
     oneClick(id, e) {
@@ -493,7 +551,28 @@ export default {
       let name = this.params1;
       this.teds(name, type, id, e);
     },
-    twoClick(id, e) {
+    twoClick(id, letter, e) {
+      console.log(letter);
+      let canLetter = true;
+      if (!this.canmetaInfo) {
+        canLetter = false;
+      }
+      if (canLetter) {
+        if (letter) {
+          this.c_jx = letter;
+          /**
+           * 设置国家路由
+           */
+          this.$router.push({
+            path: `/${this.cityJx}/${this.$parent.$options.name}/${this.c_jx}`
+          });
+        } else {
+          this.$router.push({
+            path: `/${this.cityJx}/${this.$parent.$options.name}`
+          });
+        }
+      }
+
       this.setHTML(2, 1, e, this.twoData);
       let type = 2;
       let name = this.params2;
@@ -523,7 +602,16 @@ export default {
 
     setHTML(one, two, e, InnerHTML) {
       let par = this.$refs.par;
-
+      console.log(par[1]);
+      if (this.what == 0) {
+        if (e.target.innerHTML != "不限") {
+          par[one].children[0].innerHTML = e.target.innerHTML;
+          par[one].classList.add("sect");
+        } else {
+          par[one].children[0].innerHTML = InnerHTML;
+          par[one].classList.remove("sect");
+        }
+      }
       if (this.what == 1) {
         if (e.target.innerHTML != "不限") {
           par[one].children[0].innerHTML = e.target.innerHTML;
@@ -535,12 +623,42 @@ export default {
       }
       if (this.what == 2) {
         if (e.target.innerHTML != "不限") {
+          console.log(par[two]);
           par[two].children[0].innerHTML = e.target.innerHTML;
           par[two].classList.add("sect");
         } else {
           par[two].children[0].innerHTML = InnerHTML;
           par[two].classList.remove("sect");
         }
+      }
+    },
+    filterCountry(id) {
+      switch (id) {
+        case 1:
+          return {
+            id: 1,
+            html: "英国",
+            type: "hostCountryNum"
+          };
+        case 2:
+          return {
+            id: 2,
+            html: "加拿大",
+            type: "hostCountryNum"
+          };
+        case 3:
+          return {
+            id: 3,
+            html: "澳大利亚",
+            type: "hostCountryNum"
+          };
+
+        case 4:
+          return {
+            id: 4,
+            html: "美国",
+            type: "hostCountryNum"
+          };
       }
     },
 
@@ -641,6 +759,7 @@ export default {
     .c_left {
       width: 270px;
       background-color: #f8f8f8;
+      overflow-y: auto;
       ul {
         display: flex;
         flex-direction: column;
@@ -660,7 +779,9 @@ export default {
         left: 0;
         top: 0;
         width: 100%;
+        height: 100%;
         visibility: hidden;
+        overflow-y: scroll;
         opacity: 0;
         transition: all 0.5s cubic-bezier(0.36, 0.66, 0.04, 1);
 

@@ -2,6 +2,8 @@
   <div class="house">
     <smenu
       v-if="comReferer"
+      setCountrymod="belongCountry"
+      setCitymod="belongCity"
       :item="item"
       :country="menu.country"
       :athor="menu.housingDemand"
@@ -49,10 +51,10 @@
           class="list_box"
           v-for="(item, i) in allListData"
           :key="i"
-          @click="$router.push({name: 'housedetail',params: {id: item.id}})"
+          @click="getDetails(item.id)"
         >
           <div class="l_left">
-            <img v-lazy="item.coverImg">
+            <img v-lazy="item.coverImg" />
             <p>{{ item.belongCountryName }}·{{ item.belongCityName }}</p>
           </div>
           <div class="l_right">
@@ -84,22 +86,37 @@
 
 <script>
 import smenu from "../../components/slideMenu";
-import { screen_data } from "../../utils/mixins";
+import { screen_data,setShareTitle } from "../../utils/mixins";
+import { SEOConfig } from "../../utils/config";
+import { mapGetters, mapMutations } from "vuex";
 export default {
-  mixins: [screen_data],
+  name: "house",
+  mixins: [screen_data,setShareTitle],
   data() {
     return {
-      // 刷新
-      comReferer: true,
       item: ["国家", "购房需求", "物业类型", "总价"],
       url: `/dhr/client/house/list`,
       merchantUrl: `/dhr/client/house/list`,
       menu: [] // 顶部筛选
-      // merchant_id: $route.query.merchant_id ? $route.query.merchant_id: false
     };
   },
-
   methods: {
+    getDetails(id) {
+      console.log(this.cityJX);
+      // console.log(this.letter)
+      if (!this.letter) {
+        console.log(this.letter);
+        this.$router.push({
+          path: `/${this.cityJX}/house/details`,
+          query: { id, country: this.letter }
+        });
+        return;
+      }
+      this.$router.push({
+        path: `/${this.cityJX}/house/${this.letter}/details`,
+        query: { id, country: this.letter }
+      });
+    },
     onLoad() {
       this.getAllList(this.result_data);
     },
@@ -107,7 +124,7 @@ export default {
     getMenuData() {
       this.$fetch("/dhr/client/house/menu").then(res => {
         this.menu = res.Result;
-        // console.log(this.menu);
+        console.log(this.menu.country);
       });
     },
     houstType(type) {
@@ -119,19 +136,33 @@ export default {
         case 3:
           return "精品住宅";
         case 4:
-          return "双拼别墅";
+          return "酒店公寓";
+        case 5:
+          return "商铺";
+        case 6:
+          return "庄园";
+        case 7:
+          return "土地";
+        case 8:
+          return "商业地产";
+        case 9:
+          return "其他";
       }
     },
-    reload() {
-      this.comReferer = false;
-      this.$nextTick(() => (this.comReferer = true));
-    }
+    ...mapMutations({
+      wxShare: "SET_SHARETITLE_IMG"
+    })
   },
-
-
 
   created() {
     this.getMenuData();
+  },
+  mounted(){
+    //  this.iosTitleImg(SEOConfig.house.title);
+  },
+  activated(){
+     console.log('house activated::执行')
+       this.iosTitleImg(SEOConfig.house.title);
   },
   components: {
     smenu

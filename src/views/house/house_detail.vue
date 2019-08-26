@@ -1,12 +1,12 @@
 <template>
   <div class="house_detail">
-    <city ref="city"/>
-    <publicHead :centerImg="centerImg" backURL="/home/house"/>
+    <city ref="city" />
+    <publicHead :centerImg="centerImg" :backURL="`/${cityJx}/house/${backPath||''}`" />
     <van-swipe @change="onChange">
       <!-- :style="`width:${viewWidth}px`" -->
       <van-swipe-item v-for="item in banner_img">
         <div class="hd_img">
-          <img v-lazy="item">
+          <img v-lazy="item" />
         </div>
       </van-swipe-item>
       <div class="custom-indicator" slot="indicator">{{ current + 1 }}/{{ banner_img.length }}</div>
@@ -16,7 +16,7 @@
       <div class="d_t">
         <h3>{{ house_detail.title }}</h3>
         <div class="addr">
-          <p>{{ house_detail.belongCountryName }} • {{ house_detail.belongCityName }} </p>
+          <p>{{ house_detail.belongCountryName }} • {{ house_detail.belongCityName }}</p>
         </div>
 
         <div class="cans">
@@ -95,129 +95,169 @@
     </div>
 
     <div class="project">
-      <van-tabs v-model="active"  sticky  :line-height="1">
+      <van-tabs v-model="active" sticky :line-height="1" title-active-color="#ED2530">
         <van-tab title="项目简介">
           <div class="content" v-html="house_detail.content"></div>
         </van-tab>
         <van-tab title="周边设施">
           <div class="zb_content">
             <div class="education">
-              <h3 v-if="peripheral.education">{{ peripheral.education.name }}</h3>
-              <p v-if="peripheral.education" v-html="peripheral.education.content"></p>
+              <h3 v-if="peripheral&&peripheral.education">{{ peripheral.education.name }}</h3>
+              <p v-if="peripheral&&peripheral.education" v-html="peripheral.education.content"></p>
             </div>
             <div class="shop">
-              <h3 v-if="peripheral.education">{{ peripheral.shopping.name }}</h3>
-              <p v-if="peripheral.education" v-html="peripheral.shopping.content"></p>
+              <h3 v-if="peripheral&&peripheral.shopping">{{ peripheral.shopping.name }}</h3>
+              <p v-if="peripheral&&peripheral.shopping" v-html="peripheral.shopping.content"></p>
             </div>
 
             <div class="leisure">
-              <h3 v-if="peripheral.education">{{ peripheral.leisuretime.name }}</h3>
-              <p v-if="peripheral.education" v-html="peripheral.leisuretime.content"></p>
+              <h3 v-if="peripheral&&peripheral.leisuretime">{{ peripheral.leisuretime.name }}</h3>
+              <p v-if="peripheral&&peripheral.leisuretime" v-html="peripheral.leisuretime.content"></p>
             </div>
 
             <div class="hospot">
-              <h3 v-if="peripheral.education">{{ peripheral.hospital.name }}</h3>
-              <p v-if="peripheral.education" v-html="peripheral.hospital.content"></p>
+              <h3 v-if="peripheral&&peripheral.hospital">{{ peripheral.hospital.name }}</h3>
+              <p v-if="peripheral&&peripheral.hospital" v-html="peripheral.hospital.content"></p>
             </div>
 
             <div class="traffic">
-              <h3 v-if="peripheral.education">{{ peripheral.traffic.name }}</h3>
-              <p v-if="peripheral.education" v-html="peripheral.traffic.content"></p>
+              <h3 v-if="peripheral&&peripheral.traffic">{{ peripheral.traffic.name }}</h3>
+              <p v-if="peripheral&&peripheral.traffic" v-html="peripheral.traffic.content"></p>
             </div>
           </div>
         </van-tab>
+
         <van-tab title="物业配套">
           <div class="wy_content">
             <div class="kt">
               <h3>空调设施</h3>
               <p>
-                <span v-if="property.airConditioning.SplitType">√</span> 分体式空调
+                <template v-if="property.airConditioning">
+                  <span v-if="property.airConditioning.SplitType">√</span> 分体式空调
+                </template>
               </p>
             </div>
             <div class="cf">
               <h3>厨房配置</h3>
               <p>
-                <span v-if="property.kitchen.Refrigerator">√</span> 冰箱
+                <template v-if="property.kitchen">
+                  <span v-if="property.kitchen.Refrigerator">√</span> 冰箱
+                </template>
               </p>
               <p>
-                <span v-if="property.kitchen.Oven.Washingmachine">√</span> 烤箱
+                <template v-if="property.kitchen">
+                  <span v-if="property.kitchen.Oven.Washingmachine">√</span> 烤箱
+                </template>
               </p>
               <p>
-                <span v-if="property.kitchen.Dishwasher">√</span> 洗碗机
+                <template v-if="property.kitchen">
+                  <span v-if="property.kitchen.Dishwasher">√</span> 洗碗机
+                </template>
               </p>
               <p>
-                <span v-if="property.kitchen.MicrowaveOven">√</span> 微波炉
+                <template v-if="property.kitchen">
+                  <span v-if="property.kitchen.MicrowaveOven">√</span> 微波炉
+                </template>
               </p>
               <p>
-                <span v-if="property.kitchen.Heater">√</span> 热水器
+                <template v-if="property.kitchen">
+                  <span v-if="property.kitchen.Heater">√</span> 热水器
+                </template>
               </p>
               <p>
-                <span v-if="property.kitchen.Cupboard">√</span> 橱柜
+                <template v-if="property.kitchen">
+                  <span v-if="property.kitchen.Cupboard">√</span> 橱柜
+                </template>
               </p>
               <p>
-                <span v-if="property.kitchen.Washingmachine">√</span> 洗衣机
+                <template v-if="property.kitchen">
+                  <span v-if="property.kitchen.Washingmachine">√</span> 洗衣机
+                </template>
               </p>
             </div>
             <div class="wy">
               <h3>卫浴配置</h3>
               <p>
-                <span v-if="property.bathroom.Bathtub">√</span> 浴缸
+                <template v-if="property.bathroom">
+                  <span v-if="property.bathroom.Bathtub">√</span> 浴缸
+                </template>
               </p>
               <p>
-                <span v-if="property.bathroom.shower">√</span> 淋浴
+                <template v-if="property.bathroom">
+                  <span v-if="property.bathroom.shower">√</span> 淋浴
+                </template>
               </p>
               <p>
-                <span v-if="property.bathroom.Basin">√</span> 台盆
+                <template v-if="property.bathroom">
+                  <span v-if="property.bathroom.Basin">√</span> 台盆
+                </template>
               </p>
               <p>
-                <span v-if="property.bathroom.Pedestalpan">√</span> 坐便器
+                <template v-if="property.bathroom">
+                  <span v-if="property.bathroom.Pedestalpan">√</span> 坐便器
+                </template>
               </p>
             </div>
 
             <div class="tcc">
               <h3>停车场</h3>
               <p>
-                <span v-show="property.yard.Doublegarage">√</span> 单车库
+                <template v-if="property.yard">
+                  <span v-show="property.yard.Doublegarage">√</span> 单车库
+                </template>
               </p>
               <p>
-                <span v-show="property.yard.Singlegarage">√</span> 双车库
+                <template v-if="property.yard">
+                  <span v-show="property.yard.Singlegarage">√</span> 双车库
+                </template>
               </p>
             </div>
 
             <div class="hy">
               <h3>花园配置</h3>
-              <!-- <p>√ 私人庭院</p> -->
               <p>
-                <span v-if="property.Garden.PrivateCourtyard">√</span> 私人庭院
+                <template v-if="property.Garden">
+                  <span v-if="property.Garden.PrivateCourtyard">√</span> 私人庭院
+                </template>
               </p>
               <p>
-                <span v-if="property.Garden.SwimmingPool">√</span> 游泳池
+                <template v-if="property.Garden">
+                  <span v-if="property.Garden.SwimmingPool">√</span> 游泳池
+                </template>
               </p>
             </div>
           </div>
         </van-tab>
       </van-tabs>
     </div>
-
     <con
+      v-if="house_detail.merchant"
       :simpleName="house_detail.merchant.simpleName"
       :id="house_detail.merchant.id"
       :typeOf="1"
-      :myphone="house_detail.merchant.phone"
+      :myphone="house_detail.merchant.xuNiPhone ||  phone"
       :hot="house_detail.hot"
       :showCity="house_detail.showCity"
       :sourceDescription="href"
       :head_img="house_detail.merchant.headPortrait"
+      :sourceTitle="house_detail.title"
+      :sourceDetailed='2'
     />
   </div>
 </template>
+  
+    
 
 <script>
 import { Tab, Tabs } from "vant";
 import publicHead from "../../components/public_detail_head";
 import city from "../../components/city_station";
 import con from "../../components/conf";
+import { setCountryMode, phone, setShareTitle } from "../../utils/mixins";
+import { mapMutations } from "vuex";
+import { wechatAuth } from "../../utils/wechatConfig";
 export default {
+  mixins: [setCountryMode, phone, setShareTitle],
   data() {
     return {
       current: 0,
@@ -233,34 +273,85 @@ export default {
       href: location.href,
 
       centerImg: require("../../assets/images/house/house_center.png"),
-      backURL: ""
+
+      backPath: ""
+    };
+  },
+  metaInfo() {
+    return {
+      title:this.house_detail.merchant&& this.house_detail.title+'-'+this.house_detail.merchant.simpleName + "-去海外网",
+      meta: [
+        {
+          name: "keywords",
+          content:
+            this.house_detail.title +
+            this.house_detail.labels +
+            ",项目国家 买房，项目国家 房产网，海外房产，去海外网"
+        },
+        {
+          name: "description",
+          content: `去海外网为您提供伦敦 ${this.house_detail.title}详细介绍、房价、户型、产权年限、周边设施、物业配套等信息，买海外房产，上去海外网`
+        }
+      ]
     };
   },
   created() {
+    this.backPath = this.$route.query.country;
+    console.log();
     this.getHouseDetail();
     // this.getSwipeData();
   },
-  methods: {
 
+  methods: {
     getHouseDetail() {
-      let { id } = this.$route.params;
+      let { id } = this.$route.query;
       this.$fetch(`/dhr/client/house/${id}`).then(res => {
         if (res.ErrCode == "0000") {
           this.house_detail = res.Result;
-          console.log(this.house_detail)
+          console.log(this.house_detail);
           let json = JSON.parse;
-          let img = Object.values(json(this.house_detail.templateImgs));
+          console.log(this.house_detail.templateImgs);
+          if (this.house_detail) {
+            let img = Object.values(json(this.house_detail.templateImgs));
+            let img1 = Object.values(json(this.house_detail.appearanceImg));
+            let img2 = Object.values(json(this.house_detail.apartmentImgs));
+            let img3 = Object.values(json(this.house_detail.peripheralImgs));
+            let img4 = Object.values(json(this.house_detail.localtionImgs));
+            this.banner_img = this.banner_img.concat(
+              img,
+              img1,
+              img2,
+              img3,
+              img4
+            );
+          }
 
-          let img1 = Object.values(json(this.house_detail.appearanceImg));
-          let img2 = Object.values(json(json(this.house_detail.apartmentImgs)));
-          let img3 = Object.values(json(this.house_detail.peripheralImgs));
-          let img4 = Object.values(json(this.house_detail.localtionImgs));
-          this.banner_img = this.banner_img.concat(img, img1, img2, img3, img4)
-          this.banner_img.push(this.house_detail.coverImg)
+          if (res.Result.property) {
+            this.property = JSON.parse(res.Result.property);
+          }
+          if (res.Result.peripheral) {
+            this.peripheral = JSON.parse(res.Result.peripheral);
+          }
 
+          // 微信title
+          // this.wxShare({
+          //   shareTitle: this.house_detail.title + "-去海外网",
+          //   shareImg: "9999999"
+          // });
 
-          this.property = JSON.parse(res.Result.property);
-          this.peripheral = JSON.parse(res.Result.peripheral);
+          // andord
+          // this.titleImg(
+          //   this.house_detail.title + "-去海外网",
+          //   this.house_detail.coverImg
+          // );
+          // ios
+          console.log( this.house_detail.coverImg)
+          this.iosTitleImg(
+            this.house_detail.title+'-'+this.house_detail.merchant.simpleName + "-去海外网",
+            this.desc.housed,
+            this.house_detail.coverImg,
+            this.house_detail.merchant_id
+          );
         }
       });
     },
@@ -277,7 +368,17 @@ export default {
         case 3:
           return "精品住宅";
         case 4:
-          return "双拼别墅";
+          return "酒店公寓";
+        case 5:
+          return "商铺";
+        case 6:
+          return "庄园";
+        case 7:
+          return "土地";
+        case 8:
+          return "商业地产";
+        case 9:
+          return "其他";
       }
     },
     // 可选户型
@@ -301,8 +402,12 @@ export default {
         case 0:
           return "其他";
       }
-    }
+    },
+    ...mapMutations({
+      wxShare: "SET_SHARETITLE_IMG"
+    })
   },
+
   components: {
     [Tab.name]: Tab,
     [Tabs.name]: Tabs,
@@ -484,6 +589,8 @@ export default {
     .content {
       padding: 30px 0;
       font-size: 30px;
+      min-height: 100vh;
+      color: #9399a5;
       .imgs {
         width: 480px;
         height: 320px;
@@ -497,6 +604,7 @@ export default {
     }
     .zb_content,
     .wy_content {
+      color: #9399a5;
       font-size: 30px;
       & > div {
         padding: 35px 0 30px 0;

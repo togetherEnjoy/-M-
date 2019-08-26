@@ -1,25 +1,32 @@
 <template>
   <div class="home">
-    <city ref="city" @getCity="getCity"/>
+    <city ref="city" @getCity="getCity" />
     <div class="home_top">
       <div class="top_le">
-        <p @click="showCity">{{ city||'深圳' }}</p>
+        <p @click="showCity">{{ cityName|| '北京' }}</p>
       </div>
       <div class="top_cen_wrap">
         <div class="top_cen">
-          <img src="../../assets/images/home/logo.png">
+          <img src="../../assets/images/home/logo.png" />
         </div>
       </div>
-      <!-- <div class="top_ri">
-        <img src="../../assets/images/home/per.png">
-      </div>-->
+      <div class="top_ri">
+        <router-link :to="{path:`/${cityJX}/in`}">
+          <img
+            :src="login ? (userInfo.icon || defaultImg ) : defaulHometImg"
+            :style="{borderRadius: (login ? '50%':'')}"
+          />
+        </router-link>
+      </div>
     </div>
 
     <!-- 精品推荐 -->
     <div class="jinp">
       <div class="tuij">精品推荐</div>
-      <div class="jinp_some" v-for="(item, i) in recommen" :key="i">
-        <a :href="item.host">{{ item.img }}</a>
+      <div class="box">
+        <div class="jinp_some" v-for="(item, i) in recommen" :key="i">
+          <a :href="item.host">{{ item.title }}</a>
+        </div>
       </div>
     </div>
 
@@ -28,7 +35,7 @@
         <van-swipe-item v-for="(image, index) in swipeImg" :key="index">
           <div class="banner_box">
             <a :href="image.host">
-              <img v-lazy="image.img">
+              <img v-lazy="image.imgPath" />
               <!-- <img src="../../assets/images/home/" alt=""> -->
             </a>
           </div>
@@ -37,48 +44,68 @@
     </div>
 
     <div class="categroy">
-      <div class="cate_item" @click="$router.push({path: '/home/house'})">
+      <!-- ${city_number} -->
+      <div class="cate_item" @click="$router.push({path: `/${cityJx}/house`})">
         <div class="shadow">
-          <img src="../../assets/images/home/house.png">
+          <img src="../../assets/images/home/house.png" />
         </div>
         <p>房产</p>
       </div>
-      <div class="cate_item" @click="$router.push({path: '/home/immig',query: {hostCountryNum:''}})">
+      <div
+        class="cate_item"
+        @click="$router.push({path: `/${cityJx}/immig`,query: {hostCountryNum:''}})"
+      >
         <div class="shadow">
-          <img src="../../assets/images/home/yimin.png">
+          <img src="../../assets/images/home/yimin.png" />
         </div>
         <p>移民</p>
       </div>
-      <div class="cate_item" @click="$router.push({path: '/home/study'})">
+      <div class="cate_item" @click="$router.push({path: `/${cityJx}/study`})">
         <div class="shadow">
-          <img src="../../assets/images/home/liuxue.png">
+          <img src="../../assets/images/home/liuxue.png" />
         </div>
         <p>留学</p>
       </div>
-      <div class="cate_item" @click="$router.push({path: '/home/studytour'})">
+      <div class="cate_item" @click="$router.push({path: `/${cityJx}/studytour`})">
         <div class="shadow">
-          <img src="../../assets/images/home/youxue.png">
+          <img src="../../assets/images/home/youxue.png" />
         </div>
         <p>游学</p>
       </div>
-      <div class="cate_item" @click="$router.push({path: `/news`})">
+      <div class="cate_item" @click="$router.push({path: `/${cityJx}/news`})">
         <div class="shadow">
-          <img src="../../assets/images/home/hot.png">
+          <img src="../../assets/images/home/hot.png" />
         </div>
-        <p>热门</p>
+        <p>头条</p>
       </div>
     </div>
 
     <div class="content">
+      <!-- 活动  -->
+      <div class="hd_hw">
+        <ul>
+          <li v-for="i in HD" :key="i.id">
+            <router-link :to="{path:`/${cityJX}/hwhd`,query:{id:i.id}}">
+              <div class="img_content">
+                <img v-lazy="i.coverImg" />
+                <span>{{_UTCTimeForMat(i.startTime,'mm-dd')}}</span>
+                <p class="txt_double">{{i.title}}</p>
+              </div>
+            </router-link>
+          </li>
+        </ul>
+      </div>
+
       <!-- 海外好房 -->
       <div class="house">
         <div class="top_bar">
           <h1>海外好房</h1>
-          <p style="cursor:pointer" v-on:click="$router.push({path: '/home/house'})">探索更多海外房产</p>
+          <p style="cursor:pointer" v-on:click="$router.push({path: `/${cityJx}/house`})">探索更多海外房产</p>
         </div>
         <van-tabs :line-height="0" @click="hsTabClick" color="#000">
-          <van-tab v-for="(item, i) in house_menu.country" :key="i" :title="item.name">
+          <van-tab v-for="(item, i) in house_country" :key="i" :title="item.name">
             <div class="h_cate">
+              <!--  @scroll="load_more" -->
               <div class="house_content" ref="house_content">
                 <div class="show_box">
                   <van-loading color="#ed2530" v-if="house_data.length == 0"></van-loading>
@@ -88,10 +115,10 @@
                     v-for="(item, i) in house_data"
                     :key="i"
                     v-if="house_data.length>0"
-                    @click="$router.push({name: 'housedetail',params: {id: item.id}})"
+                    @click="$router.push({path: `/${cityJx}/house/details`,query: {id: item.id}})"
                   >
                     <div class="show_bg">
-                      <img v-lazy="item.coverImg">
+                      <img v-lazy="item.coverImg" />
                     </div>
 
                     <p class="tit text_overflow">{{ item.title }}</p>
@@ -100,6 +127,17 @@
                       ￥
                       <span>{{ item.price }}</span>万起
                     </p>
+                  </div>
+
+                  <div
+                    v-show="house_data.length>0"
+                    class="show_item loadMore"
+                    ref="loadmore"
+                    @click="loadmore"
+                  >
+                    <div>
+                      <span>加载更多</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -112,32 +150,32 @@
       <div class="yim">
         <div class="top_bar">
           <h1>热门移民</h1>
-          <p @click="$router.push({path: '/home/immig',query: {hostCountryNum: ''}})">探索更多移民国家</p>
+          <p @click="$router.push({path: `/${cityJx}/immig`,query: {hostCountryNum: ''}})">探索更多移民国家</p>
         </div>
         <div class="yim_box" ref="yim">
           <ul>
             <li
-              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[1].id}})"
+              @click="$router.push({path: `/${cityJx}/immig/${immig_menu[1].letter}`, query: {hostCountryNum: immig_menu[1].id}})"
             >
-              <img src="../../assets/images/home/meiguo.png">
+              <img src="../../assets/images/home/immig_yg.jpg" />
               <p v-if="immig_menu.length>0">{{ immig_menu[1].name }}</p>
             </li>
             <li
-              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[2].id}})"
+              @click="$router.push({path: `/${cityJx}/immig/${immig_menu[2].letter}`, query: {hostCountryNum: immig_menu[2].id}})"
             >
-              <img src="../../assets/images/home/aodaliya.png">
+              <img src="../../assets/images/home/immig_jnd.jpg" />
               <p v-if="immig_menu.length>0">{{ immig_menu[2].name }}</p>
             </li>
             <li
-              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[3].id}})"
+              @click="$router.push({path: `/${cityJx}/immig/${immig_menu[3].letter}`, query: {hostCountryNum: immig_menu[3].id}})"
             >
-              <img src="../../assets/images/home/jianada.png">
+              <img src="../../assets/images/home/aodaliya.png" />
               <p v-if="immig_menu.length>0">{{ immig_menu[3].name }}</p>
             </li>
             <li
-              @click="$router.push({path: '/home/immig', query: {hostCountryNum: immig_menu[4].id}})"
+              @click="$router.push({path: `/${cityJx}/immig/${immig_menu[4].letter}`, query: {hostCountryNum: immig_menu[4].id}})"
             >
-              <img src="../../assets/images/home/yidali.png">
+              <img src="../../assets/images/home/meiguo.png" />
               <p v-if="immig_menu.length>0">{{ immig_menu[4].name }}</p>
             </li>
           </ul>
@@ -148,43 +186,43 @@
       <div class="liuxue">
         <div class="top_bar lx_top_bar">
           <h1>热门留学</h1>
-          <p @click="$router.push({path: '/home/study'})">探索更多海外留学</p>
+          <p @click="$router.push({path: `/${cityJx}/study`})">探索更多海外留学</p>
         </div>
 
         <div class="lx_box">
           <div
             class="lx_item"
-            @click="$router.push({path: '/home/study',query: {id: study_menu[1].id}})"
+            @click="$router.push({path: `/${cityJx}/study`,query: {id: study_menu[1].id}})"
           >
             <div>
-              <img src="../../assets/images/home/m_l.png">
+              <img src="../../assets/images/home/yin_l.png" />
               <p v-if="study_menu.length>0">{{ study_menu[1].name }}学院</p>
             </div>
           </div>
           <div
             class="lx_item"
-            @click="$router.push({path: '/home/study',query: {id: study_menu[2].id}})"
+            @click="$router.push({path: `/${cityJx}/study`,query: {id: study_menu[2].id}})"
           >
             <div>
-              <img src="../../assets/images/home/ao_l.png">
+              <img src="../../assets/images/home/jia_l.png" />
               <p v-if="study_menu.length>0">{{ study_menu[2].name }}学院</p>
             </div>
           </div>
           <div
             class="lx_item"
-            @click="$router.push({path: '/home/study',query: {id: study_menu[3].id}})"
+            @click="$router.push({path: `/${cityJx}/study`,query: {id: study_menu[3].id}})"
           >
             <div>
-              <img src="../../assets/images/home/yin_l.png">
+              <img src="../../assets/images/home/ao_l.png" />
               <p v-if="study_menu.length>0">{{ study_menu[3].name }}学院</p>
             </div>
           </div>
           <div
             class="lx_item"
-            @click="$router.push({path: '/home/study',query: {id: study_menu[4].id}})"
+            @click="$router.push({path: `/${cityJx}/study`,query: {id: study_menu[4].id}})"
           >
             <div>
-              <img src="../../assets/images/home/jia_l.png">
+              <img src="../../assets/images/home/m_l.png" />
               <p v-if="study_menu.length>0">{{ study_menu[4].name }}学院</p>
             </div>
           </div>
@@ -199,14 +237,14 @@
                   class="stydy_item"
                   v-for="(data, index) in lx_data"
                   :key="index"
-                  @click="$router.push({path: `/home/study/${item.id}`})"
+                  @click="$router.push({path: `/${cityJx}/study/detail`,query:{id:data.id}})"
                 >
                   <div class="imgs">
                     <div class="img_box">
-                      <img v-lazy="data.schoolBadgeImg">
+                      <img v-lazy="data.schoolBadgeImg" />
                     </div>
                   </div>
-                  <p>{{ data.schoolName }}</p>
+                  <p class="text_overflow">{{ data.schoolName }}</p>
                 </div>
               </div>
             </div>
@@ -218,7 +256,7 @@
       <div class="jin_liuxue">
         <div class="top_bar">
           <h1>海外游学</h1>
-          <p @click="$router.push({path: '/home/studytour'})">探索更多海外游学</p>
+          <p @click="$router.push({path: `/${cityJx}/studytour`})">探索更多海外游学</p>
         </div>
         <van-tabs :line-height="0" @click="yxBtnClick">
           <van-tab v-for="(item, i) in yx_menu" :key="i" :title="item.name">
@@ -229,10 +267,10 @@
                   class="lx_c_item"
                   v-for="(item, i) in yx_data"
                   :key="i"
-                  @click="$router.push({path:`/home/studytour/${item.id}`})"
+                  @click="$router.push({path:`/${cityJx}/studytour/detail`,query:{id:item.id}})"
                 >
                   <div class="imgs">
-                    <img v-lazy="item.coverImg">
+                    <img v-lazy="item.coverImg" />
                   </div>
                   <div class="lx_r">
                     <p class="tit">{{ item.name }}</p>
@@ -254,8 +292,8 @@
       <!-- 海外热门 -->
       <div class="hai_hot">
         <div class="top_bar">
-          <h1>海外热门</h1>
-          <p @click="$router.push({path: '/news'})">探索更多海外热门</p>
+          <h1>海外头条</h1>
+          <p @click="$router.push({path: `/${cityJx}/news`})">探索更多海外热门</p>
         </div>
 
         <van-tabs :line-height="0" @click="tabBtnClick">
@@ -278,18 +316,18 @@
                       <div class="item_left">
                         <p class="txt txt_double" v-text="list.name"></p>
                         <p class="hover">
-                          {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
-                          <span>评论数：{{list.commentCount}}</span>
+                          {{ list.merchant.simpleName }} · {{_getDateDiff(list.createdAt)}}
+                          <!-- <span>评论数：{{list.comment.length}}</span> -->
                         </p>
                       </div>
                       <div class="item_right">
-                        <img v-lazy="list.coverImg">
+                        <img v-lazy="list.coverImg" />
                       </div>
                     </div>
 
                     <div
                       class="hot_all"
-                      @click="$router.push({path:  `/news/newsd`,query: {id: list.id, index}})"
+                      @click="$router.push({path:  `/${cityJx}/news/newsd`,query: {id: list.id, index}})"
                       v-if="list.coverImg && list.coverImg1 && list.coverImg2"
                       :key="i"
                     >
@@ -298,19 +336,19 @@
                       </div>
                       <div class="all_c">
                         <div>
-                          <img v-lazy="list.coverImg">
+                          <img v-lazy="list.coverImg" />
                         </div>
                         <div>
-                          <img v-lazy="list.coverImg1">
+                          <img v-lazy="list.coverImg1" />
                         </div>
                         <div>
-                          <img v-lazy="list.coverImg2">
+                          <img v-lazy="list.coverImg2" />
                         </div>
                       </div>
                       <div class="all_b">
                         <p class="hover">
-                          {{ list.simpleName }} · {{_getDateDiff(list.createdAt)}}
-                          <span>评论数：{{list.commentCount}}</span>
+                          {{ list.merchant.simpleName }} · {{_getDateDiff(list.createdAt)}}
+                          <!-- <span>评论数：{{list.comment.length}}</span> -->
                         </p>
                       </div>
                     </div>
@@ -371,10 +409,16 @@ import city from "../../components/city_station";
 import { mapMutations, mapGetters } from "vuex";
 
 import { getDateDiff } from "../../api/api.js";
+import { SEOConfig, logo } from "../../utils/config";
+import { UTCTimeForMat } from "../../common/timeFormat";
+import { setShareTitle } from "../../utils/mixins";
 export default {
   inject: ["app"],
+  mixins: [setShareTitle],
   data() {
     return {
+      defaulHometImg: require("../../assets/images/home/per.png"),
+      defaultImg: require("../../assets/images/edit.png"),
       msg: process.env.VUE_APP_MSG,
       url: process.env.VUE_APP_FLAG,
       house: ["精选", "泰国", "马来西亚", "美国", "英国", "柬埔寨", "希腊"],
@@ -388,7 +432,10 @@ export default {
         "在职人士",
         "亲子"
       ],
-      hot: ["24h快讯", "房产", "移民", "游学", "留学", "医疗"],
+      hot: ["24h快讯", "房产", "游学 ", "移民", "留学", "医疗"],
+
+      // 活动
+      HD: [],
 
       // 城市站
       city: "",
@@ -410,6 +457,7 @@ export default {
       yx_cache: {}, // 缓存
       // 房产menu
       house_menu: [],
+      house_country: [],
       house_data: [],
       houst_cache: {},
       house_referer: 0,
@@ -428,22 +476,85 @@ export default {
       recommen: []
     };
   },
-  mounted() {
-    this.$nextTick(() => {
-      let house = this.$refs;
-      let yim = this.$refs.yim;
-      if (!this.yim) {
-        // this.yim = new BScroll(yim, BSConfigX);
-      }
-    });
-  },
   computed: {
+    cityName() {
+      return this.cityName;
+    },
+    cityJx() {
+      return this.cityJX;
+    },
     list() {
       return this.list;
     },
-    ...mapGetters(["list"])
+    city_number() {
+      return this.city_number;
+    },
+    login() {
+      return this.login;
+    },
+    userInfo() {
+      return this.userInfo;
+    },
+    ...mapGetters([
+      "list",
+      "city_number",
+      "cityJX",
+      "cityName",
+      "login",
+      "userInfo"
+    ])
   },
+
+  activated(){
+    console.log('home activated::执行力')
+     this.iosTitleImg(SEOConfig.home.title);
+  },
+  // beforeRouteEnter(to, from, next) { 
+  //   next(vm => {
+  //      console.log(vm) 
+  //      vm.iosTitleImg(SEOConfig.home.title) 
+  //   })
+  // },
+  
   methods: {
+    // 左拉加载更多
+    // load_more(e) {
+    //   console.log(e.target.scrollLeft)
+    //   let sl=e.target.scrollLeft
+    //   let loadmore=   this.$refs.loadmore[0]
+    //   // console.log(loadmore)
+    //   if  (sl>5640&&sl<6000) {
+    //     loadmore.style.width  = 300 + sl-5640 +'px'
+    //     var wid =  300 + sl-5640
+
+    //   }
+    //   if (sl-5640>=wid ) {
+    //       this.$router.push({path:`/${cityJX}/house`})
+    //     }
+    // },
+
+    // 活动
+    getHD() {
+      this.$fetch("/dhr/merchant/activity/management", {
+        shelf: 1,
+        checkState: 1,
+        by: "index_1",
+        limit: 4
+      }).then(res => {
+        if (res.ErrCode == "0000") {
+          console.log(res);
+          this.HD = res.Result.data;
+        }
+      });
+    },
+    _UTCTimeForMat(utc, time = true) {
+      return UTCTimeForMat(utc, time);
+    },
+
+    loadmore() {
+      this.$router.push({ path: `/${this.cityJX}/house` });
+    },
+
     // 获取城市
     getCity(val) {
       this.city = val;
@@ -456,16 +567,22 @@ export default {
       document.body.style = "overflow:hidden";
     },
     getSwipeImg() {
-      this.$fetch("/dhr/advertise/img").then(res => {
+      this.$fetch("/dhr/activity/news", {
+        typeOf: 6
+        // businessNum: 100
+      }).then(res => {
         if (res.ErrCode == "0000") {
-          
           this.swipeImg = res.Result.data;
-          console.log( res.Result.data)
+          console.log(this.swipeImg);
         }
       });
-      this.$fetch("/dhr/advertise/text").then(res => {
+      this.$fetch("/dhr/activity/news", {
+        typeOf: 7,
+        businessNum: 0
+      }).then(res => {
         if (res.ErrCode == "0000") {
           this.recommen = res.Result.data;
+          console.log(this.recommen);
         }
       });
     },
@@ -474,7 +591,7 @@ export default {
       this.$fetch("/dhr/client/study_tour/menu").then(res => {
         if (res.ErrCode == "0000") {
           this.yx_menu = res.Result.recruitStudent;
-          console.log( this.yx_menu)
+          // console.log( this.yx_menu)
         }
       });
     },
@@ -483,8 +600,8 @@ export default {
       this.$fetch("/dhr/client/study_abroad/menu").then(res => {
         if (res.ErrCode == "0000") {
           this.study_menu = res.Result.country;
-
-          this.schoolType = res.Result.schoolType.slice(1);
+          // console.log(this.study_menu);
+          this.schoolType = res.Result.schoolType;
         }
       });
     },
@@ -501,25 +618,27 @@ export default {
     getMenuData() {
       this.$fetch("/dhr/client/house/menu").then(res => {
         this.house_menu = res.Result;
-
+        this.house_country = this.house_menu.country.slice(0, 6);
         this.houseMenu(this.house_menu);
       });
     },
 
     // 房产
-    hsTabClick(i = '', pageName = "不限") {
+    hsTabClick(i = "", pageName = "不限") {
+      console.log(i);
       if (!this.getcache("houseList", "house_data", pageName)) return;
-      console.log(i)
-      if (i) {
-        i -= 1
-      }
+
+      // if (i) {
+      //   i -= 1
+      // }
       this.houseListData(i, pageName);
     },
-    houseListData(i = '', pageName = "不限") {
+    houseListData(i = "", pageName = "不限") {
       this.$fetch("/dhr/client/house/list", {
         belongCountry: i,
         page: 1,
-        limit: 4
+        limit: 8,
+        by: "index_1"
       }).then(res => {
         if (res.ErrCode == "0000") {
           this.house_data = res.Result.data;
@@ -533,18 +652,19 @@ export default {
       });
     },
     // 游学
-    yxBtnClick(index = '', pageName = "不限") {
+    yxBtnClick(index = "", pageName = "不限") {
       if (!this.getcache("yxList", "yx_data", pageName)) return;
       // if (index) {
       //   index = index
       // }
       this.yxListData(index, pageName);
     },
-    yxListData(index = '', pageName = "不限") {
+    yxListData(index = "", pageName = "不限") {
       this.$fetch("/dhr/client/study_tour/list", {
         page: this.yx_page,
         limit: this.yx_limit,
-        recruitStudent: index
+        recruitStudent: index,
+        by: "index_1"
       }).then(res => {
         if (res.ErrCode == "0000") {
           this.yx_data = res.Result.data;
@@ -557,15 +677,15 @@ export default {
       });
     },
     // 留学
-    lxTabClick(i = 0, pageName = "不限") {
+    lxTabClick(i = "", pageName = "不限") {
       if (!this.getcache("lx_List", "lx_data", pageName)) return;
       this.lxListData(i, pageName);
     },
-    lxListData(index = 0, pageName = "不限") {
+    lxListData(index = "", pageName = "不限") {
       this.$fetch("/dhr/client/study_abroad/list", {
         page: this.lx_page,
         limit: this.lx_limit,
-        schoolType: index + 1,
+        schoolType: index,
         by: "index_1"
       }).then(res => {
         if (res.ErrCode == "0000") {
@@ -589,7 +709,6 @@ export default {
         return true;
       }
     },
-
     // 上拉加载
     onRefresh() {
       let self = this;
@@ -601,7 +720,9 @@ export default {
     onLoad(pageName = "24h快讯") {
       let params = {
         page: this.page,
-        limit: this.limit
+        limit: this.limit,
+        checkState: 1,
+        by: "index_1"
       };
       if (this.index == 0) {
         params = Object.assign(params, { by: "createdAt" });
@@ -666,7 +787,7 @@ export default {
     },
     getDetails(id, name) {
       this.$router.push({
-        path: `/news/newsd`,
+        path: `/${this.cityJx}/news/hour/newsd`,
         query: { id, index: this.index }
       });
       localStorage.setItem("title", name);
@@ -677,23 +798,41 @@ export default {
       return getDateDiff(t);
     },
     init() {
-       this.getSwipeImg();
+      this.getSwipeImg();
       this.getMenuData();
       this.houseListData();
       this.getImmigData();
       this.getStudyData();
       this.getStudyTourdata();
       this.yxListData();
-      this.lxListData();    
+      this.lxListData();
     },
     ...mapMutations({
       set_list: "SET_LIST",
       set_title: "SET_TITLE",
       houseMenu: "HOUSE_MENU",
       immigMenu: "IMMIG_MENU"
+      // wxShare: "SET_SHARETITLE_IMG"
     })
   },
+
+  metaInfo() {
+    return {
+      title: SEOConfig.home.title,
+      meta: [
+        {
+          name: "keywords",
+          content: SEOConfig.home.keywords
+        },
+        {
+          name: "description",
+          content: SEOConfig.home.description
+        }
+      ]
+    };
+  },
   created() {
+    this.getHD();
     this.init();
   },
   components: {
@@ -798,7 +937,7 @@ export default {
       line-height: 100px;
     }
     .top_cen {
-      width: 132px;
+      width: 140px;
       height: 60px;
       display: inline-block;
       vertical-align: middle;
@@ -825,8 +964,14 @@ export default {
     }
 
     .top_ri {
-      width: 36px;
+      position: absolute;
+      right: 35px;
+      top: 30px;
+      width: 40px;
       height: 40px;
+      img {
+        object-fit: initial;
+      }
     }
   }
 
@@ -840,11 +985,17 @@ export default {
     .tuij {
       margin-right: 15px;
     }
+    .box {
+      white-space: nowrap;
+      overflow-x: auto;
+      flex: 1;
+    }
 
     .jinp_some {
       margin-right: 12px;
+      display: inline-block;
       a {
-        display: block;
+        display: inline-block;
         height: 48px;
         line-height: 48px;
         text-align: center;
@@ -946,6 +1097,50 @@ export default {
         }
       }
     }
+
+    // 活动版块
+    .hd_hw {
+      padding-bottom: 20px;
+      overflow-x: auto;
+      ul {
+        display: inline-block;
+        white-space: nowrap;
+        li {
+          width: 340px;
+          height: 190px;
+          margin-right: 10px;
+          display: inline-block;
+          border-radius: 4px;
+          overflow: hidden;
+          .img_content {
+            position: relative;
+            height: 100%;
+            color: #fff;
+            img {
+            }
+            span {
+              position: absolute;
+              left: 0;
+              top: 0;
+              background-color: #ed4750;
+              font-size: 24px;
+              padding: 7px;
+            }
+            p {
+              font-size: 28px;
+              position: absolute;
+              width: 90%;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              text-align: center;
+              white-space: normal;
+            }
+          }
+        }
+      }
+    }
+
     // 海外好房
     .house {
       .h_cate {
@@ -955,27 +1150,23 @@ export default {
           overflow-x: scroll;
           text-align: center;
           -webkit-overflow-scrolling: touch;
-          &::-webkit-scrollbar {
-            /*隐藏滚轮*/
-            display: none;
-          }
-          &::-webkit-scrollbar {
-            width: 0;
-            height: 0;
-            background-color: transparent;
-          }
         }
         .show_box {
           // margin-top: 40px;
+          position: relative;
+          // padding-right: 80px;
+          overflow-x: scroll;
           &::-webkit-scrollbar {
             /*隐藏滚轮*/
             display: none;
           }
+
           &::-webkit-scrollbar {
             width: 0;
             height: 0;
             background-color: rgba(240, 240, 240, 0);
           }
+
           display: inline-block;
           white-space: nowrap;
           .show_item {
@@ -1015,6 +1206,33 @@ export default {
               }
             }
           }
+
+          .loadMore {
+            // position: absolute;
+            // width:auto;
+            // display: flex;
+            display: inline-block;
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.3);
+            height: 320px;
+            width: 100px;
+            border-radius: 20px 0 0 20px;
+            vertical-align: top;
+            div {
+              width: 50px;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+            span {
+              // display: block;
+              // height: 100%;
+              text-align: center;
+              width: 35px;
+              white-space: pre-wrap;
+            }
+          }
         }
       }
     }
@@ -1040,6 +1258,11 @@ export default {
             border-radius: 4px;
             overflow: hidden;
             margin-right: 30px;
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
             p {
               position: absolute;
               width: 100%;
@@ -1074,7 +1297,7 @@ export default {
       .lx_box {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: space-around;
         margin-top: 38px;
         .lx_item {
           width: 340px;
@@ -1087,21 +1310,22 @@ export default {
           color: #fff;
           font-size: 24px;
           flex-wrap: wrap;
+          flex-basis: 49%;
           &:nth-child(1) {
-            background: url("../../assets/images/home/m.png") no-repeat center /
+            background: url("../../assets/images/home/yg.jpg") no-repeat center /
               cover;
           }
           &:nth-child(2) {
-            background: url("../../assets/images/home/ao.png") no-repeat center /
+            background: url("../../assets/images/home/jnd.jpg") no-repeat center /
               cover;
           }
           &:nth-child(3) {
-            background: url("../../assets/images/home/yin.png") no-repeat center /
-              cover;
+            background: url("../../assets/images/home/adly.jpg") no-repeat
+              center / cover;
             margin-top: 10px;
           }
           &:nth-child(4) {
-            background: url("../../assets/images/home/jia.png") no-repeat center /
+            background: url("../../assets/images/home/mg.jpg") no-repeat center /
               cover;
             margin-top: 10px;
           }

@@ -1,13 +1,13 @@
 <template>
   <div id="app">
-    <!-- <transition name="fade" mode="out-in"> -->
+    <!-- <transition :name="transitionName" mode="out-in"> -->
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive"></router-view>
       </keep-alive>
     <!-- </transition> -->
 
     <!-- <transition name="fade" mode="out-in"> -->
-      <router-view v-if="!$route.meta.keepAlive"></router-view>
+    <router-view v-if="!$route.meta.keepAlive"></router-view>
     <!-- </transition> -->
   </div>
 </template>
@@ -20,11 +20,18 @@ export default {
       app: this
     };
   },
+  data() {
+    return {
+      transitionName: ""
+    };
+  },
   methods: {
     _goTime(start, end) {
+      // console.log(goTime(start, end))
       return goTime(start, end);
     }
-  }
+  },
+
 };
 </script>
 
@@ -33,7 +40,7 @@ export default {
 #app {
   background-color: #fff;
   // height: 100vh;
-  
+
   // position: absolute;
   // right: 0;
   // left: 0;

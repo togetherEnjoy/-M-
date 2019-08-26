@@ -17,8 +17,6 @@ const wxApi = {
                 timestamp = new Date().getTime(),
                 jsapi_ticket = res.Result.ticket,
                 url = location.href.split('#')[0]
-            console.log(res)
-            console.log(url)
             let string1 = `jsapi_ticket=${jsapi_ticket}&noncestr=${noncestr}&timestamp=${timestamp}&url=${url}`
 
             let signature = sha1(string1)
