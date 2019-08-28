@@ -35,6 +35,24 @@ export default new Router({
       path: '/test',
       component: resolve => require(['./views/test.vue'], resolve)
     },
+
+
+    // 测一测首页
+    {
+      path: '/:city/test',
+      component: resolve => require(['./views/testone/test.vue'],resolve),
+    },
+    // 测一测房产
+    {
+      path: '/:city/htest',
+      component:  resolve => require(['./views/testone/house_test.vue'],resolve)
+    },
+    // 测一测移民
+    {
+      path: '/:city/itest',
+      component: resolve  => require(['./views/testone/immig_test.vue'],resolve)
+    },
+
     // 登录
     {
       path: '/:city/in',

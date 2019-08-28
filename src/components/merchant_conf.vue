@@ -13,7 +13,10 @@
 
       <div class="btn_wrap">
         <div class="ce">
-          <router-link to="/">测一测</router-link>
+          <div class="w">
+              <router-link :to='{path:`/${cityJX}/test`,query:{simpleName,head_img,id:$route.query.id,typeOf}}'>测一测</router-link>
+              <!-- <a href="javascript:;">测一测</a> -->
+          </div>
         </div>
 
         <div class="z_c" @click="eject();clickRate(id)">
@@ -240,21 +243,32 @@ export default {
     display: flex;
     flex: 1;
     & > div {
-        flex: 1;
-        color:#0D1C31;
+      flex: 1;
+      color: #0d1c31;
     }
     .ce {
+        padding: 20px 0;
+        .w  {
+            line-height: 64px;
+            position: relative;
+            &::after {
+                position: absolute;
+                content: '';
+                width: 1px;
+                height: 100%;
+                background-color: #DFDFDF;
+                right: 0;
+                top: 0;
+            }
+        }
     }
   }
-
+  .ce,
   .z_c,
   .z_r {
-    // width: 205px;
-    // height: 90px;
-    // border-radius: 10px;
-    font-size: 28px;
+    font-size: 34px;
     text-align: center;
-    font-weight: bold;
+    // font-weight: bold;
     line-height: 104px;
   }
   .z_c {
@@ -264,7 +278,7 @@ export default {
     // display: none;
   }
   .z_r {
-    background-color: #ED2530;
+    background-color: #ed2530;
     a {
       color: #fff;
       display: block;

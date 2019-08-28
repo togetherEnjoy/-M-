@@ -2,7 +2,7 @@
   <div>
     <div class="top_bar">
       <div class="t_l">
-        <i @click="$router.push({path: backURL})"></i>
+        <i @click="$router.back(-1)"></i>
         <!-- <span @click="showCity">{{ city || '深圳' }}</span> -->
       </div>
       <div class="t_c_box">

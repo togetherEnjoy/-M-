@@ -368,7 +368,7 @@ export const setShareTitle = {
                 immigd: `互联网海外服务平台，提供技术移民、投资移民、家属移民、留学移民等专业靠谱移民机构首选。`,
                 studyd: `涵盖美国留学、英国留学、加拿大留学、澳新留学、欧亚留学等国家"一站式"留学服务。`,
                 studytourd: `链接全球优质教育资源，与全球名校、名企直接对话!平台精心挑选,找到适合您的国际游学项目!
-                `
+              `
             }
         }
     },
@@ -377,41 +377,11 @@ export const setShareTitle = {
         iosTitleImg(title, desc, img, id = 8) {
             console.log(process.env.NODE_ENV)
             let dumain = process.env.NODE_ENV == 'production' ? 'http://testm.qhiwi.com' : 'http://testm.qhiwi.com'
-            let authUrl = dumain + '/dhr/wechat/authorize?url=' + window.location.href +'&merchant_id=' + id;
+            let authUrl = dumain + '/dhr/wechat/authorize?url=' + window.location.href + '&merchant_id=' + id;
             let allowShare = true;
-            // let sendUrl
+            let sendUrl
 
-
-            // this.$fetch('/dhr/wechat/authorize', {
-            //     url: authUrl,
-            //     merchant_id: id
-            // }).then(res => {
-            //     console.log('res:::::::', res)
-            //     if (res.ErrCode == '0000') {
-            //         sendUrl = res.Result
-            //     } else {
-            //         return
-            //     }
-
-            //     if (!!window.__wxjs_is_wkwebview) {
-            //         // IOS
-            //         if (window.entryUrl == "" || window.entryUrl == undefined) {
-            //             window.entryUrl = sendUrl; // 将后面的参数去除
-            //         }
-            //         console.log('ios::===', sendUrl)
-            //         wechatAuth(sendUrl, "ios", allowShare, null, title, desc, img);
-            //     } else {
-            //         // 安卓
-            //         console.log('android::===', sendUrl)
-            //         setTimeout(function () {
-            //             wechatAuth(sendUrl, "android", allowShare, null, title, desc, img);
-            //         }, 500);
-            //     }
-            // })
-
-
-
-            // m.prettycode.cn
+            // 通用
             if (!!window.__wxjs_is_wkwebview) {
                 // IOS
                 if (window.entryUrl == "" || window.entryUrl == undefined) {
